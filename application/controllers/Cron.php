@@ -30,52 +30,61 @@ class Cron extends MY_Controller
 
         $facebook =  $this->getFacebookResponse();
 
-        //facebook
-        $fbData = $this->cron_model->checkFeedByType("1");
+        if(myIsMultiArray($facebook))
+        {
+            //facebook
+            $fbData = $this->cron_model->checkFeedByType("1");
 
-        $fbPost = array(
-            'feedText' => json_encode($facebook),
-            'feedType' => '1'
-        );
-        if($fbData['status'] === true)
-        {
-            $this->cron_model->updateFeedByType($fbPost,"1");
-        }
-        else
-        {
-            $this->cron_model->insertFeedByType($fbPost);
-        }
-
-        //twitter
-        $fbData = $this->cron_model->checkFeedByType("2");
-
-        $fbPost = array(
-            'feedText' => json_encode($twitter),
-            'feedType' => '2'
-        );
-        if($fbData['status'] === true)
-        {
-            $this->cron_model->updateFeedByType($fbPost, "2");
-        }
-        else
-        {
-            $this->cron_model->insertFeedByType($fbPost);
+            $fbPost = array(
+                'feedText' => json_encode($facebook),
+                'feedType' => '1'
+            );
+            if($fbData['status'] === true)
+            {
+                $this->cron_model->updateFeedByType($fbPost,"1");
+            }
+            else
+            {
+                $this->cron_model->insertFeedByType($fbPost);
+            }
         }
 
-        //Instagram
-        $fbData = $this->cron_model->checkFeedByType("3");
+        if(myIsMultiArray($twitter))
+        {
+            //twitter
+            $fbData = $this->cron_model->checkFeedByType("2");
 
-        $fbPost = array(
-            'feedText' => json_encode($instagram),
-            'feedType' => '3'
-        );
-        if($fbData['status'] === true)
-        {
-            $this->cron_model->updateFeedByType($fbPost, "3");
+            $fbPost = array(
+                'feedText' => json_encode($twitter),
+                'feedType' => '2'
+            );
+            if($fbData['status'] === true)
+            {
+                $this->cron_model->updateFeedByType($fbPost, "2");
+            }
+            else
+            {
+                $this->cron_model->insertFeedByType($fbPost);
+            }
         }
-        else
+
+        if(myIsMultiArray($instagram))
         {
-            $this->cron_model->insertFeedByType($fbPost);
+            //Instagram
+            $fbData = $this->cron_model->checkFeedByType("3");
+
+            $fbPost = array(
+                'feedText' => json_encode($instagram),
+                'feedType' => '3'
+            );
+            if($fbData['status'] === true)
+            {
+                $this->cron_model->updateFeedByType($fbPost, "3");
+            }
+            else
+            {
+                $this->cron_model->insertFeedByType($fbPost);
+            }
         }
 
         $this->storeAllFeeds();
@@ -174,7 +183,14 @@ class Cron extends MY_Controller
         $fbFeeds[] = $this->curl_library->getFacebookPosts('1741740822733140',$params);
         $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolally',$params);
 
-        return array_merge($fbFeeds[0]['data'],$fbFeeds[1]['data'],$fbFeeds[2]['data']);
+        if(isset($fbFeeds) && myIsMultiArray($fbFeeds) && isset($fbFeeds[0]['data']))
+        {
+            return array_merge($fbFeeds[0]['data'],$fbFeeds[1]['data'],$fbFeeds[2]['data']);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public function shiftEvents()
