@@ -43,7 +43,9 @@ class Login extends MY_Controller {
         }
         else
         {
-            $loginPin = '';
+            $data['status'] = false;
+            $data['errorMsg'] = 'Invalid Login Method!';
+            /*$loginPin = '';
 
             if(!isset($post['loginPin1']))
             {
@@ -63,7 +65,7 @@ class Login extends MY_Controller {
             }
             $loginPin .= $post['loginPin1'] . $post['loginPin2'] . $post['loginPin3'] . $post['loginPin4'];
             $isPinUsed = 1;
-            $userResult = $this->login_model->checkUserByPin(md5($loginPin));
+            $userResult = $this->login_model->checkUserByPin(md5($loginPin));*/
         }
         if($userResult['status'] === true && $userResult['userId'] != 0)
         {
@@ -74,11 +76,19 @@ class Login extends MY_Controller {
             }
             else
             {
-                $this->login_model->setLastLogin($userResult['userId']);
-                $this->generalfunction_library->setUserSession($userResult['userId']);
-                $data['status'] = true;
-                $data['isUserSession'] = $this->isUserSession;
-                $data['userName'] = $this->userName;
+                if($userResult['userType'] == '4' && $userResult['userId'] != '8')
+                {
+                    $data['status'] = false;
+                    $data['errorMsg'] = 'User Not allowed!';
+                }
+                else
+                {
+                    $this->login_model->setLastLogin($userResult['userId']);
+                    $this->generalfunction_library->setUserSession($userResult['userId']);
+                    $data['status'] = true;
+                    $data['isUserSession'] = $this->isUserSession;
+                    $data['userName'] = $this->userName;
+                }
             }
         }
         else
@@ -97,26 +107,26 @@ class Login extends MY_Controller {
 
         if($responseType == RESPONSE_JSON)
         {
-            if($userResult['status'] === true && $isPinUsed == 1 && $userResult['isPinChanged'] == '0')
+            /*if($userResult['status'] === true && $isPinUsed == 1 && $userResult['isPinChanged'] == '0')
             {
                 $data['pageUrl'] = base_url().'login/pinChange/'.$userResult['userId'];
             }
             else
-            {
+            {*/
                 $data['pageUrl'] = $this->pageUrl;
-            }
+            /*}*/
             echo json_encode($data);
         }
         else
         {
-            if($userResult['status'] === true && $isPinUsed == 1 && $userResult['isPinChanged'] == '0')
+            /*if($userResult['status'] === true && $isPinUsed == 1 && $userResult['isPinChanged'] == '0')
             {
                 redirect(base_url().'login/pinChange/'.$userResult['userId']);
             }
             else
             {
-                redirect($this->pageUrl);
-            }
+               */ redirect($this->pageUrl);
+            /*}*/
         }
 
     }
@@ -151,7 +161,8 @@ class Login extends MY_Controller {
 
     public function pinChange($userId)
     {
-        $data = array();
+        redirect(PAGE_404);
+        /*$data = array();
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
         $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
@@ -159,7 +170,7 @@ class Login extends MY_Controller {
 
         $data['userId'] = $userId;
 
-        $this->load->view('ChangePinView', $data);
+        $this->load->view('ChangePinView', $data);*/
     }
 
     public function changePin($responseType = RESPONSE_JSON)
@@ -188,14 +199,14 @@ class Login extends MY_Controller {
             $data['pageUrl'] = base_url();
         }
 
-        if($responseType == RESPONSE_JSON)
+        /*if($responseType == RESPONSE_JSON)
         {
             echo json_encode($data);
         }
         else
         {
             return $data;
-        }
+        }*/
     }
 
     public function changePassword()

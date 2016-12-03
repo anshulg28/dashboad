@@ -261,7 +261,7 @@ class Sendemail_library
         {
             $fromName = ucfirst($this->CI->userFirstName);
         }
-        $subject = 'Mug Club '.$userData['mugId'].' has been Renewed';
+        $subject = 'Mug #'.$userData['mugId'].' has been Renewed';
         $toEmail = $userData['emailId'];
 
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);

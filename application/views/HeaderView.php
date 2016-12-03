@@ -67,12 +67,12 @@
                                 <!--<li class="divider"></li>-->
                                 <li><a href="<?php echo base_url();?>login/settings"><i class="fa fa-cog"></i> Settings</a></li>
                                 <?php
-                                    if($this->userType != SERVER_USER)
+                                    /*if($this->userType != SERVER_USER)
                                     {
-                                        ?>
-                                        <li><a href="<?php echo base_url();?>login/pinChange/<?php echo $this->userId;?>"><i class="fa fa-cog"></i> Change Pin</a></li>
-                                        <?php
-                                    }
+                                        */?><!--
+                                        <li><a href="<?php /*echo base_url();*/?>login/pinChange/<?php /*echo $this->userId;*/?>"><i class="fa fa-cog"></i> Change Pin</a></li>
+                                        --><?php
+/*                                    }*/
                                 ?>
                                 <li><a href="<?php echo base_url(); ?>login/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
                             </ul>

@@ -16,7 +16,7 @@ class Login_Model extends CI_Model
 
     public function checkUser($userName, $userPassword)
     {
-        $query = "SELECT userId,ifActive "
+        $query = "SELECT userId,ifActive,userType "
             ."FROM doolally_usersmaster "
             ."where userName = '".$userName."' "
             ."AND password = '".$userPassword."' ";

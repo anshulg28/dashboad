@@ -140,3 +140,4 @@ defined('BEVERAGE_PATH_NORMAL') OR define('BEVERAGE_PATH_NORMAL','uploads/bevera
 defined('EVENT_PATH_THUMB') OR define('EVENT_PATH_THUMB','uploads/events/thumb/');
 defined('ITEM_FOOD') OR define('ITEM_FOOD','1');
 defined('ITEM_BEVERAGE') OR define('ITEM_BEVERAGE','2');
+defined('MOBILE_URL') OR define('MOBILE_URL','https://doolally.in/');
