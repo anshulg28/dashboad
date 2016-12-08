@@ -16,10 +16,31 @@ class Login_Model extends CI_Model
 
     public function checkUser($userName, $userPassword)
     {
-        $query = "SELECT userId,ifActive,userType "
+        $query = "SELECT userId,ifActive,userType, attemptTimes "
             ."FROM doolally_usersmaster "
             ."where userName = '".$userName."' "
             ."AND password = '".$userPassword."' ";
+
+        $result = $this->db->query($query)->row_array();
+
+        $data = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+
+    public function checkUsername($userName)
+    {
+        $query = "SELECT userId,ifActive,attemptTimes "
+            ."FROM doolally_usersmaster "
+            ."where userName = '".$userName."' ";
 
         $result = $this->db->query($query)->row_array();
 
@@ -85,6 +106,13 @@ class Login_Model extends CI_Model
           'lastLogin'=> date('Y-m-d H:i:s')
         );
 
+        $this->db->where('userId', $userId);
+        $this->db->update('doolally_usersmaster', $data);
+        return true;
+    }
+
+    public function updateUserRecord($userId,$data)
+    {
         $this->db->where('userId', $userId);
         $this->db->update('doolally_usersmaster', $data);
         return true;

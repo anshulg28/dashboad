@@ -36,9 +36,11 @@ class Login extends MY_Controller {
         $post = $this->input->post();
         $userResult='';
         $isPinUsed = 0;
+        $userNameCheck = '';
 
         if(isset($post['userName']) && $post['userName'] != '' && isset($post['password']) && $post['password'] != '')
         {
+            $userNameCheck = $this->login_model->checkUsername($post['userName']);
             $userResult = $this->login_model->checkUser($post['userName'],md5($post['password']));
         }
         else
@@ -67,42 +69,76 @@ class Login extends MY_Controller {
             $isPinUsed = 1;
             $userResult = $this->login_model->checkUserByPin(md5($loginPin));*/
         }
-        if($userResult['status'] === true && $userResult['userId'] != 0)
+        if($userNameCheck['status'] === true)
         {
-            if($userResult['ifActive'] == NOT_ACTIVE)
+            if($userResult['status'] === true && $userResult['userId'] != 0)
             {
-                $data['errorMsg'] = 'User Account is Disabled!';
-                $data['status'] = false;
-            }
-            else
-            {
-                if($userResult['userType'] == '4' && $userResult['userId'] != '8')
+                if($userResult['ifActive'] == NOT_ACTIVE)
                 {
+                    $data['errorMsg'] = 'User Account is Disabled!';
                     $data['status'] = false;
-                    $data['errorMsg'] = 'User Not allowed!';
                 }
                 else
                 {
-                    $this->login_model->setLastLogin($userResult['userId']);
-                    $this->generalfunction_library->setUserSession($userResult['userId']);
-                    $data['status'] = true;
-                    $data['isUserSession'] = $this->isUserSession;
-                    $data['userName'] = $this->userName;
+                    if($userResult['userType'] == '4' && $userResult['userId'] != '8')
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'User Not allowed!';
+                    }
+                    else
+                    {
+                        $postData = array(
+                            'attemptTimes'=>'0'
+                        );
+                        $this->login_model->updateUserRecord($userResult['userId'],$postData);
+
+                        $this->login_model->setLastLogin($userResult['userId']);
+                        $this->generalfunction_library->setUserSession($userResult['userId']);
+                        $data['status'] = true;
+                        $data['isUserSession'] = $this->isUserSession;
+                        $data['userName'] = $this->userName;
+                    }
                 }
+            }
+            else
+            {
+                /*if($isPinUsed == 1)
+                {
+                    $data['status'] = false;
+                    $data['errorMsg'] = 'Login Pin Not Found!';
+                }
+                else
+                {*/
+                if($userNameCheck['ifActive'] == NOT_ACTIVE)
+                {
+                    $data['errorMsg'] = 'User Account is Disabled!';
+                    $data['status'] = false;
+                }
+                else
+                {
+                    //code for attempt validation
+                    $newAttempt = $userNameCheck['attemptTimes'] + 1;
+                    $details = array(
+                        'attemptTimes'=> $newAttempt
+                    );
+                    $this->login_model->updateUserRecord($userNameCheck['userId'],$details);
+                    if($newAttempt == 3)
+                    {
+                        $postData = array(
+                            'ifActive'=>'0'
+                        );
+                        $this->login_model->updateUserRecord($userNameCheck['userId'],$postData);
+                    }
+                    $data['status'] = false;
+                    $data['errorMsg'] = 'Password is wrong! '.$newAttempt.' Of 3 Attempts used!';
+                }
+                /*}*/
             }
         }
         else
         {
-            if($isPinUsed == 1)
-            {
-                $data['status'] = false;
-                $data['errorMsg'] = 'Login Pin Not Found!';
-            }
-            else
-            {
-                $data['status'] = false;
-                $data['errorMsg'] = 'Username and password does not match.';
-            }
+            $data['status'] = false;
+            $data['errorMsg'] = 'Username Not Found!';
         }
 
         if($responseType == RESPONSE_JSON)
