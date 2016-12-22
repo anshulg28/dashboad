@@ -314,14 +314,15 @@
             }
             else
             {
-                if(myMugDataInfo == 'error')
+                ajaxCheckIn({mugNum:$('#mugNum').val()});
+                /*if(myMugDataInfo == 'error')
                 {
                     ajaxCheckIn({mugNum:$('#mugNum').val()});
                 }
                 else
                 {
                     localCheckIn({mugNum:$('#mugNum').val()});
-                }
+                }*/
             }
         }
         /*else if(selectedInputVal == '2')
@@ -418,6 +419,9 @@
                             $('.visual-status-icons').find('i:last-child').removeClass('hide my-danger-text').addClass('my-success-text');
                         }
                     }
+
+                    fillMissingParams(mugList[0]);
+                    checkMissingInfo();
                         
                 }
                 else
@@ -545,7 +549,7 @@
     }
 
     $(document).ready(function(){
-       myMugDataInfo = <?php if(isset($mugData) && myIsArray($mugData)) {if($mugData['status'] === false){ echo 'error';} else{echo json_encode($mugData);}}else {echo 'error';}?>;
+       myMugDataInfo = 'error';
         $('[data-toggle="tooltip"]').tooltip();
         $('[data-toggle="popover"]').popover();
     });
@@ -666,30 +670,6 @@
 
     //setInterval(fetchAllMugList,(60*60*1000));
 
-    function fetchAllMugList()
-    {
-        $.ajax({
-            type:"GET",
-            dataType:"json",
-            url:base_url+'mugclub/getAllMugListMembers',
-            success: function(data)
-            {
-                if(data.mugData.status === true)
-                {
-                    myMugDataInfo = data.mugData;
-                }
-                else
-                {
-                    myMugDataInfo = 'error';
-                }
-
-            },
-            error: function()
-            {
-                myMugDataInfo = 'error';
-            }
-        });
-    }
     $(window).load(function(){
         $('#main-mugclub-table').DataTable({ordering:  false});
     });
