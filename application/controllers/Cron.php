@@ -30,7 +30,7 @@ class Cron extends MY_Controller
 
         $facebook =  $this->getFacebookResponse();
 
-        if(myIsMultiArray($facebook))
+        if(myIsArray($facebook))
         {
             //facebook
             $fbData = $this->cron_model->checkFeedByType("1");
@@ -49,7 +49,7 @@ class Cron extends MY_Controller
             }
         }
 
-        if(myIsMultiArray($twitter))
+        if(myIsArray($twitter))
         {
             //twitter
             $fbData = $this->cron_model->checkFeedByType("2");
@@ -68,7 +68,7 @@ class Cron extends MY_Controller
             }
         }
 
-        if(myIsMultiArray($instagram))
+        if(myIsArray($instagram))
         {
             //Instagram
             $fbData = $this->cron_model->checkFeedByType("3");
@@ -331,21 +331,24 @@ class Cron extends MY_Controller
             $allFeeds = $this->sortNjoin($twitter,$instagram, $facebook);
         }
 
-        //die();
-        $fbData = $this->cron_model->checkFeedByType("0");
+        /*$firstHalf = array_slice($allFeeds,0,20,true);
+        $secondHalf = array_slice($allFeeds,20,count($allFeeds),true);*/
 
-        $fbPost = array(
+        /*//Posting First Half
+        $firstPost = array(
+            'feedText' => json_encode($firstHalf),
+            'feedType' => '4'
+        );
+
+        $this->cron_model->updateFeedByType($firstPost, "4");*/
+
+        //Second Half
+
+        $secondPost = array(
             'feedText' => json_encode($allFeeds),
             'feedType' => '0'
         );
-        if($fbData['status'] === true)
-        {
-            $this->cron_model->updateFeedByType($fbPost, "0");
-        }
-        else
-        {
-            $this->cron_model->insertFeedByType($fbPost);
-        }
+        $this->cron_model->updateFeedByType($secondPost, "0");
     }
 
     function sortNjoin($arr1 = array(), $arr2 = array(), $arr3 = array())

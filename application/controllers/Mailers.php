@@ -72,6 +72,7 @@ class Mailers extends MY_Controller {
 
     public function saveMail()
     {
+
         $post = $this->input->post();
 
         $this->mailers_model->saveMailTemplate($post);
@@ -146,6 +147,10 @@ class Mailers extends MY_Controller {
 
     public function sendAllMails($responseType = RESPONSE_RETURN)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
 
         $mugNums = $post['mugNums'];
@@ -204,6 +209,7 @@ class Mailers extends MY_Controller {
 
     function replaceMugTags($tagStr,$mugInfo)
     {
+
         $tagStr = str_replace('[sendername]',trim(ucfirst($this->userName)),$tagStr);
         preg_match_all('/\[[brcode]\w+\]/', $tagStr, $output_array);
         if(myIsMultiArray($output_array))
@@ -271,6 +277,10 @@ class Mailers extends MY_Controller {
     }
     public function pressSend()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
 
         $mailResult = $this->mailers_model->getAllPressEmails();
@@ -288,6 +298,10 @@ class Mailers extends MY_Controller {
 
     public function uploadFiles()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $attchmentArr = '';
         $this->load->library('upload');
         if(isset($_FILES))
@@ -311,6 +325,10 @@ class Mailers extends MY_Controller {
     }
     public function sendPressMails($responseType = RESPONSE_RETURN)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
         $attchmentArr = array();
 

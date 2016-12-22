@@ -205,28 +205,31 @@
             checkBirthdayMugs();*/
             if(localStorageUtil.getLocal('mailCheckDone') == null)
             {
+                localStorageUtil.setLocal('foundM2','0',(23 * 60 * 60 * 1000));
                 localStorageUtil.setLocal('mailCheckDone','1',(23 * 60 * 60 * 1000));
                 checkExpiredMugs();
-                checkExpiringMugs();
+                //checkExpiringMugs();
                 checkBirthdayMugs();
                 //write for recurring expired mugs
             }
             else if(localStorageUtil.getLocal('mailCheckDone') == '0') {
+                localStorageUtil.setLocal('foundM2','0',(23 * 60 * 60 * 1000));
                 localStorageUtil.setLocal('mailCheckDone','1',(23 * 60 * 60 * 1000));
                 checkExpiredMugs();
-                checkExpiringMugs();
+                //checkExpiringMugs();
                 checkBirthdayMugs();
             }
             else if(localStorageUtil.getLocal('foundM1') == '1' ||
-                    localStorageUtil.getLocal('foundM2') == '1' ||
                     localStorageUtil.getLocal('foundM3') == '1')
             {
+                localStorageUtil.setLocal('foundM2','0',(23 * 60 * 60 * 1000));
                 $('.notification-indicator').addClass('notification-animate-cls');
                 $('.notification-indicator-mobile').addClass('notification-animate-cls');
                 $('.notification-indicator-big').addClass('notification-animate-cls');
             }
             else
             {
+                localStorageUtil.setLocal('foundM2','0',(23 * 60 * 60 * 1000));
                 $('.notification-indicator').removeClass('notification-animate-cls');
                 $('.notification-indicator-mobile').removeClass('notification-animate-cls');
                 $('.notification-indicator-big').removeClass('notification-animate-cls');

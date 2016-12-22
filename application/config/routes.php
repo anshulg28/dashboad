@@ -89,7 +89,7 @@ $route['main'] = 'home/main';
 //$route['share-event/(:any)/(:any)'] = 'home/eventFetch/$1/$2';
 
 /* Mobile Routes */
-$route['mobile'] = 'mobile/main';
+$route['mobile'] = 'page404';
 $route['mobile/about'] = 'mobile/main/about';
 $route['events/(:any)/(:any)'] = 'mobile/main/eventFetch/$1/$2';
 $route['eventEdit/(:any)/(:any)'] = 'mobile/main/editEvent/$1/$2';

@@ -176,6 +176,10 @@ class Checkin extends MY_Controller {
 
     public function deleteMugCheckIn($Id)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $mugExists = $this->checkin_model->getCheckInDataById($Id);
 
         if($mugExists['status'] === false)
@@ -192,6 +196,10 @@ class Checkin extends MY_Controller {
     public function verifyCheckIn()
     {
         $post = $this->input->post();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
 
         if(isset($post['mugNum']))
         {

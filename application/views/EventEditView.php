@@ -175,7 +175,7 @@
                                                     {
                                                         ?>
                                                         <div class="pics-preview-panel col-sm-2 col-xs-5">
-                                                            <img src="<?php echo base_url().EVENT_PATH_THUMB.$imgrow['filename'];?>"
+                                                            <img src="<?php echo MOBILE_URL.EVENT_PATH_THUMB.$imgrow['filename'];?>"
                                                                  class="img-thumbnail"/>
                                                             <i class="fa fa-times img-remove-icon" data-picId="<?php echo $imgrow['id'];?>"></i>
                                                         </div>

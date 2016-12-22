@@ -53,6 +53,10 @@ class Offers extends MY_Controller {
 
     public function generate()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $data['todayCount'] = $this->offers_model->getTodayCodes();
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
@@ -65,6 +69,10 @@ class Offers extends MY_Controller {
 
     public function createCodes($responseType = RESPONSE_JSON)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
         $usedCodes = array();
         $unUsedCodes = array();
@@ -237,6 +245,10 @@ class Offers extends MY_Controller {
 
     public function stats()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $data['offerCodes'] = $this->offers_model->getOfferCodes();
         $data['oldOffersCodes'] = $this->offers_model->getOldOfferCodes();
@@ -254,6 +266,10 @@ class Offers extends MY_Controller {
     }
     public function delete($offerId, $offerAge)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         if(isset($offerId))
         {
             if($offerAge == 'old')
@@ -270,6 +286,10 @@ class Offers extends MY_Controller {
 
     public function offerCheck($offerCode)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $offerStatus = $this->offers_model->checkOfferCode($offerCode);
 
@@ -306,6 +326,10 @@ class Offers extends MY_Controller {
 
     public function oldOfferCheck($offerCode)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $offerStatus = $this->offers_model->checkOldOfferCode($offerCode);
 
@@ -342,12 +366,20 @@ class Offers extends MY_Controller {
     
     public function offerUnused($id)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->offers_model->setOfferUnused($id);
 
         redirect($this->pageUrl);
     }
     public function oldOfferUnused($id)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->offers_model->setoldOfferUnused($id);
 
         redirect($this->pageUrl);

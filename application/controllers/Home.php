@@ -27,6 +27,7 @@ class Home extends MY_Controller {
             }
         }*/
 
+
 		$data = array();
 		$data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
 		$data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
@@ -45,6 +46,10 @@ class Home extends MY_Controller {
     public function main()
     {
         $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
         $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
@@ -53,6 +58,10 @@ class Home extends MY_Controller {
     }
     public function getLocation()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         if(isset($this->session->page_url))
         {
@@ -71,6 +80,10 @@ class Home extends MY_Controller {
     public function setLocation()
     {
         $post = $this->input->post();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
 
         $this->generalfunction_library->setSessionVariable("currentLocation",$post['currentLoc']);
         if(isset($post['pageUrl']))
@@ -85,6 +98,10 @@ class Home extends MY_Controller {
     }
     public function eventFetch($eventId, $evenHash)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         if(hash_compare(encrypt_data($eventId),$evenHash))
         {
             $data = array();

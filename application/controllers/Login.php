@@ -179,6 +179,10 @@ class Login extends MY_Controller {
 
     public function changeSetting()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
@@ -211,6 +215,10 @@ class Login extends MY_Controller {
 
     public function changePin($responseType = RESPONSE_JSON)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
 
         if(isset($post['userId']))
@@ -247,6 +255,10 @@ class Login extends MY_Controller {
 
     public function changePassword()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
 
         if(isset($post['userId']))
@@ -262,6 +274,10 @@ class Login extends MY_Controller {
 
     public function mailPrank()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);

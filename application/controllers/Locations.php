@@ -70,6 +70,10 @@ class Locations extends MY_Controller {
 
     public function saveOrUpdateLocation()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
 
         if(!isset($post['locUniqueLink']))
@@ -91,6 +95,10 @@ class Locations extends MY_Controller {
 
     public function checkLocationByUniqueLink($locName)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $locUniqueLink = getUniqueLink($locName);
         $locExists = $this->locations_model->getLocDetailsByUniqueLink($locUniqueLink);
@@ -109,6 +117,10 @@ class Locations extends MY_Controller {
 
     public function deleteLocationData($locId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $locExists = $this->locations_model->getLocationDetailsById($locId);
 
         if($locExists['status'] === false)

@@ -139,6 +139,11 @@ class Dashboard extends MY_Controller {
     {
         $post = $this->input->post();
 
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+
         $locArray = $this->locations_model->getAllLocations();
 
         $startDate = $post['startDate'];
@@ -157,6 +162,10 @@ class Dashboard extends MY_Controller {
     public function saveRecord()
     {
         $post = $this->input->post();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
 
         $gotData = $this->dashboard_model->getDashboardRecord();
         if($gotData['status'] === false)
@@ -170,6 +179,10 @@ class Dashboard extends MY_Controller {
     public function instaMojoRecord()
     {
         $post = $this->input->post();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         // Get the MAC from the POST data
         if(isset($post['mac']))
         {
@@ -243,6 +256,10 @@ class Dashboard extends MY_Controller {
 
     public function setInstamojoDone($responseType = RESPONSE_JSON,$id)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $details = array("isApproved"=>1);
         $this->dashboard_model->updateInstaMojoRecord($id,$details);
 
@@ -310,6 +327,10 @@ class Dashboard extends MY_Controller {
     public function savefnb()
     {
         $post = $this->input->post();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $details = array(
             'itemType'=> $post['itemType'],
             'itemName' => $post['itemName'],
@@ -340,6 +361,10 @@ class Dashboard extends MY_Controller {
 
     public function beerLocation($fnbId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $locRecord = $this->dashboard_model->getTagLocsFnb($fnbId);
         if(isset($locRecord) && myIsMultiArray($locRecord))
         {
@@ -355,6 +380,10 @@ class Dashboard extends MY_Controller {
     public function fnbTagSet($fnbId)
     {
         $post = $this->input->post();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
 
         $this->dashboard_model->updateBeerLocTag($post,$fnbId);
 
@@ -364,6 +393,10 @@ class Dashboard extends MY_Controller {
     }
     public function uploadFiles()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $attchmentArr = '';
         $this->load->library('upload');
         if(isset($_FILES))
@@ -537,6 +570,10 @@ class Dashboard extends MY_Controller {
 
     public function uploadEventFiles()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $attchmentArr = '';
         $this->load->library('upload');
         if(isset($_FILES))
@@ -566,6 +603,10 @@ class Dashboard extends MY_Controller {
 
     function saveEvent()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
 
         if(isset($post['attachment']))
@@ -605,6 +646,10 @@ class Dashboard extends MY_Controller {
     
     function editEvent($eventId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $events = $this->dashboard_model->getEventById($eventId);
         if(isset($events) && myIsMultiArray($events))
@@ -628,6 +673,10 @@ class Dashboard extends MY_Controller {
 
     function updateEvent()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
 
         if(isset($post['attachment']))
@@ -661,6 +710,10 @@ class Dashboard extends MY_Controller {
 
     public function cancelEvent($eventId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $events = $this->dashboard_model->getEventById($eventId);
         $details = array(
@@ -828,16 +881,28 @@ class Dashboard extends MY_Controller {
     }
     function setEventDeActive($eventId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->dashboard_model->deActivateEventRecord($eventId);
         redirect(base_url().'dashboard');
     }
     function setEventActive($eventId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->dashboard_model->activateEventRecord($eventId);
         redirect(base_url().'dashboard');
     }
     function deleteEvent($eventId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->dashboard_model->eventDelete($eventId);
         $this->dashboard_model->eventRegisDelete($eventId);
         $this->dashboard_model->eventAttDeleteById($eventId);
@@ -845,11 +910,19 @@ class Dashboard extends MY_Controller {
     }
     function deleteCompEvent($eventId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->dashboard_model->eventCompDelete($eventId);
         redirect(base_url().'dashboard');
     }
     function deleteEventAtt()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
         $picId = $post['picId'];
         $this->dashboard_model->eventAttDelete($picId);
@@ -860,21 +933,37 @@ class Dashboard extends MY_Controller {
     //For Fnb Section
     function setFnbActive($fnbId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->dashboard_model->activateFnbRecord($fnbId);
         redirect(base_url().'dashboard');
     }
     function setFnbDeActive($fnbId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->dashboard_model->DeActivateFnbRecord($fnbId);
         redirect(base_url().'dashboard');
     }
     function deleteFnb($fnbId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->dashboard_model->fnbDelete($fnbId);
         redirect(base_url().'dashboard');
     }
     function editFnb($fnbId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $fnb = $this->dashboard_model->getFnBById($fnbId);
         if(isset($fnb) && myIsMultiArray($fnb))
@@ -895,6 +984,10 @@ class Dashboard extends MY_Controller {
     }
     function deleteFnbAtt()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
         $picId = $post['picId'];
         $this->dashboard_model->fnbAttDelete($picId);
@@ -903,6 +996,10 @@ class Dashboard extends MY_Controller {
     }
     public function updatefnb()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
         $details = array(
             'itemType'=> $post['itemType'],

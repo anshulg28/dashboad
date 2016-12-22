@@ -664,7 +664,7 @@
         }
     });
 
-    setInterval(fetchAllMugList,(60*60*1000));
+    //setInterval(fetchAllMugList,(60*60*1000));
 
     function fetchAllMugList()
     {

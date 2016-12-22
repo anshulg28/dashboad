@@ -136,62 +136,69 @@ class Mugclub extends MY_Controller {
     {
         $post = $this->input->post();
 
-        if(!isset($post['invoiceNo']))
+        if(isSessionVariableSet($this->isUserSession))
         {
-            $post['invoiceNo'] = '0000';
-        }
-        if(isset($post['mugEmail']))
-        {
-            $userEmail = $post['mugEmail'];
-            unset($post['mugEmail']);
-        }
-        $mugDetails = $this->mugclub_model->getMugIdForRenew($post['mugId']);
-        $userFirstName = $mugDetails['firstName'];
-        unset($mugDetails['firstName']);
-        $mugDetails['mugId'] = $post['mugId'];
+            if(!isset($post['invoiceNo']))
+            {
+                $post['invoiceNo'] = '0000';
+            }
+            if(isset($post['mugEmail']))
+            {
+                $userEmail = $post['mugEmail'];
+                unset($post['mugEmail']);
+            }
+            $mugDetails = $this->mugclub_model->getMugIdForRenew($post['mugId']);
+            $userFirstName = $mugDetails['firstName'];
+            unset($mugDetails['firstName']);
+            $mugDetails['mugId'] = $post['mugId'];
 
-        if(isset($mugDetails['emailId']))
-        {
-            $userEmail = $mugDetails['emailId'];
-            unset($mugDetails['emailId']);
-        }
-        
-        $this->mugclub_model->saveRenewRecord($mugDetails);
+            if(isset($mugDetails['emailId']))
+            {
+                $userEmail = $mugDetails['emailId'];
+                unset($mugDetails['emailId']);
+            }
 
-        $post['membershipStart'] = date('Y-m-d');
+            $this->mugclub_model->saveRenewRecord($mugDetails);
 
-        if(date('Y-m-d') <= $mugDetails['membershipEnd'])
-        {
-            $post['membershipEnd'] = date('Y-m-d', strtotime($mugDetails['membershipEnd'].' +12 month'));
+            $post['membershipStart'] = date('Y-m-d');
+
+            if(date('Y-m-d') <= $mugDetails['membershipEnd'])
+            {
+                $post['membershipEnd'] = date('Y-m-d', strtotime($mugDetails['membershipEnd'].' +12 month'));
+            }
+            else
+            {
+                $post['membershipEnd'] = date('Y-m-d', strtotime($post['membershipStart'].' +12 month'));
+            }
+            $post['invoiceDate'] = date('Y-m-d');
+            $post['mailStatus'] = 0;
+
+            $this->mugclub_model->setMugRenew($post);
+
+            if(isset($userEmail) && $userEmail != '')
+            {
+                $mailData = array(
+                    "mugId" => $post['mugId'],
+                    "firstName" => $userFirstName,
+                    "newEndDate" => $post['membershipEnd'],
+                    "emailId" => $userEmail
+                );
+                $this->sendemail_library->membershipRenewSendMail($mailData);
+            }
+
+            if($responseType == RESPONSE_RETURN)
+            {
+                redirect(base_url().'mugclub');
+            }
+            else
+            {
+                $data['status'] = true;
+                echo json_encode($data);
+            }
         }
         else
         {
-            $post['membershipEnd'] = date('Y-m-d', strtotime($post['membershipStart'].' +12 month'));
-        }
-        $post['invoiceDate'] = date('Y-m-d');
-        $post['mailStatus'] = 0;
-
-        $this->mugclub_model->setMugRenew($post);
-
-        if(isset($userEmail) && $userEmail != '')
-        {
-            $mailData = array(
-                "mugId" => $post['mugId'],
-                "firstName" => $userFirstName,
-                "newEndDate" => $post['membershipEnd'],
-                "emailId" => $userEmail
-            );
-            $this->sendemail_library->membershipRenewSendMail($mailData);
-        }
-
-        if($responseType == RESPONSE_RETURN)
-        {
-            redirect(base_url().'mugclub');
-        }
-        else
-        {
-            $data['status'] = true;
-            echo json_encode($data);
+            redirect(PAGE_404);
         }
 
     }
@@ -199,47 +206,54 @@ class Mugclub extends MY_Controller {
     {
         $post = $this->input->post();
 
-        if(isset($post['oldMugNum']))
+        if(isSessionVariableSet($this->isUserSession))
         {
-            $mugId = $post['oldMugNum'];
-            unset($post['oldMugNum']);
-        }
-
-        if(isset($mugId))
-        {
-            $mugExists = $this->mugclub_model->getMugDataById($mugId);
-        }
-        else
-        {
-            $mugExists = $this->mugclub_model->getMugDataById($post['mugNum']);
-        }
-
-        $params = $this->mugclub_model->filterMugParameters($post);
-        
-        if($mugExists['status'] === false)
-        {
-            $this->mugclub_model->saveMugRecord($params);
-            if(isset($post['ifMail']) && $post['ifMail'] == '1')
+            if(isset($post['oldMugNum']))
             {
-                $this->sendemail_library->signUpWelcomeSendMail($params);
+                $mugId = $post['oldMugNum'];
+                unset($post['oldMugNum']);
             }
-        }
-        else
-        {
-            if(isset($post['ifMail']) && $post['ifMail'] == '1')
-            {
-                $this->sendemail_library->signUpWelcomeSendMail($params);
-            }
+
             if(isset($mugId))
             {
-                $this->mugclub_model->updateMugRecord($params,$mugId);
+                $mugExists = $this->mugclub_model->getMugDataById($mugId);
             }
             else
             {
-                $this->mugclub_model->updateMugRecord($params);
+                $mugExists = $this->mugclub_model->getMugDataById($post['mugNum']);
             }
+
+            $params = $this->mugclub_model->filterMugParameters($post);
+
+            if($mugExists['status'] === false)
+            {
+                $this->mugclub_model->saveMugRecord($params);
+                if(isset($post['ifMail']) && $post['ifMail'] == '1')
+                {
+                    $this->sendemail_library->signUpWelcomeSendMail($params);
+                }
+            }
+            else
+            {
+                if(isset($post['ifMail']) && $post['ifMail'] == '1')
+                {
+                    $this->sendemail_library->signUpWelcomeSendMail($params);
+                }
+                if(isset($mugId))
+                {
+                    $this->mugclub_model->updateMugRecord($params,$mugId);
+                }
+                else
+                {
+                    $this->mugclub_model->updateMugRecord($params);
+                }
+            }
+            redirect(base_url().'mugclub');
         }
-        redirect(base_url().'mugclub');
+        else
+        {
+            redirect(PAGE_404);
+        }
     }
 
     public function ajaxMugUpdate()
@@ -247,19 +261,28 @@ class Mugclub extends MY_Controller {
         $post = $this->input->post();
         $data = array();
 
-        $mugExists = $this->mugclub_model->getMugDataById($post['mugNum']);
-
-        if($mugExists['status'] === false)
+        if(isSessionVariableSet($this->isUserSession))
         {
-            $data['status'] = false;
-            $data['errorMsg'] = 'Mug Number Not Found!';
+            $mugExists = $this->mugclub_model->getMugDataById($post['mugNum']);
+
+            if($mugExists['status'] === false)
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'Mug Number Not Found!';
+            }
+            else
+            {
+                $params = $this->mugclub_model->filterMugParameters($post);
+                $this->mugclub_model->updateMugRecord($params);
+                $data['status'] = true;
+            }
         }
         else
         {
-            $params = $this->mugclub_model->filterMugParameters($post);
-            $this->mugclub_model->updateMugRecord($params);
-            $data['status'] = true;
+            $data['status'] = false;
+            $data['errorMsg'] = 'Unauthorized Access!';
         }
+
         echo json_encode($data);
     }
 
@@ -295,50 +318,18 @@ class Mugclub extends MY_Controller {
     public function MugAvailability($responseType = RESPONSE_JSON, $mugid)
     {
         $data = array();
-        $op = 'plus';
-        $searchCap = 50;
-        $opFlag = 1;
-        if(isset($mugid))
+        if(isSessionVariableSet($this->isUserSession))
         {
-            $result = $this->mugclub_model->getMugDataById($mugid);
-            if($result['status'] === true)
+            $op = 'plus';
+            $searchCap = 50;
+            $opFlag = 1;
+            if(isset($mugid))
             {
-                $holdMugs = $this->mugclub_model->getAllMugHolds();
-                $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, $holdMugs);
-                if(count($mugResult) < 1)
+                $result = $this->mugclub_model->getMugDataById($mugid);
+                if($result['status'] === true)
                 {
-                    while(count($mugResult) < 1 && $searchCap != 500)
-                    {
-                        if($opFlag == 1)
-                        {
-                            $opFlag = 2;
-                            $op = 'minus';
-                        }
-                        else
-                        {
-                            $opFlag = 1;
-                            $op = 'plus';
-                            $searchCap += 50;
-                        }
-
-                        $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap,$holdMugs);
-                    }
-                    $data['availMugs'] = $mugResult;
-                }
-                else
-                {
-                    $data['availMugs'] = $mugResult;
-                }
-
-                $data['status'] = false;
-                $data['errorMsg'] = 'Mug Number Already Exists';
-            }
-            else
-            {
-                $holdMug = $this->mugclub_model->getMugHoldById($mugid);
-                if($holdMug['status'] === true)
-                {
-                    $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                    $holdMugs = $this->mugclub_model->getAllMugHolds();
+                    $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, $holdMugs);
                     if(count($mugResult) < 1)
                     {
                         while(count($mugResult) < 1 && $searchCap != 500)
@@ -355,7 +346,7 @@ class Mugclub extends MY_Controller {
                                 $searchCap += 50;
                             }
 
-                            $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                            $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap,$holdMugs);
                         }
                         $data['availMugs'] = $mugResult;
                     }
@@ -369,9 +360,49 @@ class Mugclub extends MY_Controller {
                 }
                 else
                 {
-                    $data['status'] = true;
+                    $holdMug = $this->mugclub_model->getMugHoldById($mugid);
+                    if($holdMug['status'] === true)
+                    {
+                        $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                        if(count($mugResult) < 1)
+                        {
+                            while(count($mugResult) < 1 && $searchCap != 500)
+                            {
+                                if($opFlag == 1)
+                                {
+                                    $opFlag = 2;
+                                    $op = 'minus';
+                                }
+                                else
+                                {
+                                    $opFlag = 1;
+                                    $op = 'plus';
+                                    $searchCap += 50;
+                                }
+
+                                $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                            }
+                            $data['availMugs'] = $mugResult;
+                        }
+                        else
+                        {
+                            $data['availMugs'] = $mugResult;
+                        }
+
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Mug Number Already Exists';
+                    }
+                    else
+                    {
+                        $data['status'] = true;
+                    }
                 }
             }
+        }
+        else
+        {
+            $data['status'] = 'error';
+            $data['errorMsg'] = 'Unauthorized Access!';
         }
 
         //returning the response
@@ -456,18 +487,26 @@ class Mugclub extends MY_Controller {
     public function CheckMobileNumber($responseType = RESPONSE_JSON, $mobNo)
     {
         $data = array();
-        if(isset($mobNo))
+        if(isSessionVariableSet($this->isUserSession))
         {
-            $result = $this->mugclub_model->verifyMobileNo($mobNo);
-            if($result['status'] === true)
+            if(isset($mobNo))
             {
-                $data['status'] = false;
-                $data['errorMsg'] = 'Mobile Number Already Exists';
+                $result = $this->mugclub_model->verifyMobileNo($mobNo);
+                if($result['status'] === true)
+                {
+                    $data['status'] = false;
+                    $data['errorMsg'] = 'Mobile Number Already Exists';
+                }
+                else
+                {
+                    $data['status'] = true;
+                }
             }
-            else
-            {
-                $data['status'] = true;
-            }
+        }
+        else
+        {
+            $data['mugData']['status'] = false;
+            $data['error'] = 'Unauthorized Access!';
         }
 
         //returning the response
@@ -483,8 +522,17 @@ class Mugclub extends MY_Controller {
 
     public function getAllMugListMembers()
     {
-        //Getting All Mug List
-        $mugData = $this->mugclub_model->getAllMugClubList();
+        if(isSessionVariableSet($this->isUserSession))
+        {
+            //Getting All Mug List
+            $mugData = $this->mugclub_model->getAllMugClubList();
+            $data['mugData'] = $mugData;
+        }
+        else
+        {
+            $data['mugData']['status'] = false;
+            $data['error'] = 'Unauthorized Access!';
+        }
 
         /*if(isset($mugData['mugList']) && myIsArray($mugData['mugList']))
         {
@@ -497,32 +545,39 @@ class Mugclub extends MY_Controller {
             }
         }*/
 
-        $data['mugData'] = $mugData;
         echo json_encode($data);
     }
 
     public function getAllExpiringMugs($responseType = RESPONSE_RETURN, $intervalNum, $intervalSpan)
     {
         $data = array();
-        if($this->userType == EXECUTIVE_USER)
+        if(isSessionVariableSet($this->isUserSession))
         {
-            $userInfo = $this->users_model->getUserDetailsById($this->userId);
-            $mugData = $this->mugclub_model->getExpiringMugsList($intervalNum, $intervalSpan,true,$userInfo['userData'][0]['assignedLoc']);
+            if($this->userType == EXECUTIVE_USER)
+            {
+                $userInfo = $this->users_model->getUserDetailsById($this->userId);
+                $mugData = $this->mugclub_model->getExpiringMugsList($intervalNum, $intervalSpan,true,$userInfo['userData'][0]['assignedLoc']);
+            }
+            else
+            {
+                $mugData = $this->mugclub_model->getExpiringMugsList($intervalNum, $intervalSpan);
+            }
+
+            if($mugData['status'] === false)
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = "No Result Found!";
+            }
+            else
+            {
+                $data['status'] = true;
+                $data['mugData'] = $mugData;
+            }
         }
         else
-        {
-            $mugData = $this->mugclub_model->getExpiringMugsList($intervalNum, $intervalSpan);
-        }
-
-        if($mugData['status'] === false)
         {
             $data['status'] = false;
-            $data['errorMsg'] = "No Result Found!";
-        }
-        else
-        {
-            $data['status'] = true;
-            $data['mugData'] = $mugData;
+            $data['errorMsg'] = "Unauthorized Access!";
         }
 
         if($responseType == RESPONSE_JSON)
@@ -538,25 +593,33 @@ class Mugclub extends MY_Controller {
     public function getAllExpiredMugs($responseType = RESPONSE_RETURN)
     {
         $data = array();
-        if($this->userType == EXECUTIVE_USER)
+        if(isSessionVariableSet($this->isUserSession))
         {
-            $userInfo = $this->users_model->getUserDetailsById($this->userId);
-            $mugData = $this->mugclub_model->getExpiredMugsList(true,$userInfo['userData'][0]['assignedLoc']);
+            if($this->userType == EXECUTIVE_USER)
+            {
+                $userInfo = $this->users_model->getUserDetailsById($this->userId);
+                $mugData = $this->mugclub_model->getExpiredMugsList(true,$userInfo['userData'][0]['assignedLoc']);
+            }
+            else
+            {
+                $mugData = $this->mugclub_model->getExpiredMugsList();
+            }
+
+            if($mugData['status'] === false)
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = "No Mugs Expired!";
+            }
+            else
+            {
+                $data['status'] = true;
+                $data['mugData'] = $mugData;
+            }
         }
         else
-        {
-            $mugData = $this->mugclub_model->getExpiredMugsList();
-        }
-
-        if($mugData['status'] === false)
         {
             $data['status'] = false;
-            $data['errorMsg'] = "No Mugs Expired!";
-        }
-        else
-        {
-            $data['status'] = true;
-            $data['mugData'] = $mugData;
+            $data['errorMsg'] = "Unauthorized Access!";
         }
 
         if($responseType == RESPONSE_JSON)
@@ -572,25 +635,33 @@ class Mugclub extends MY_Controller {
     public function getAllBirthdayMugs($responseType = RESPONSE_RETURN)
     {
         $data = array();
-        if($this->userType == EXECUTIVE_USER)
+        if(isSessionVariableSet($this->isUserSession))
         {
-            $userInfo = $this->users_model->getUserDetailsById($this->userId);
-            $mugData = $this->mugclub_model->getBirthdayMugsList(true,$userInfo['userData'][0]['assignedLoc']);
+            if($this->userType == EXECUTIVE_USER)
+            {
+                $userInfo = $this->users_model->getUserDetailsById($this->userId);
+                $mugData = $this->mugclub_model->getBirthdayMugsList(true,$userInfo['userData'][0]['assignedLoc']);
+            }
+            else
+            {
+                $mugData = $this->mugclub_model->getBirthdayMugsList();
+            }
+
+            if($mugData['status'] === false)
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = "No Mugs Found!";
+            }
+            else
+            {
+                $data['status'] = true;
+                $data['mugData'] = $mugData;
+            }
         }
         else
-        {
-            $mugData = $this->mugclub_model->getBirthdayMugsList();
-        }
-
-        if($mugData['status'] === false)
         {
             $data['status'] = false;
-            $data['errorMsg'] = "No Mugs Found!";
-        }
-        else
-        {
-            $data['status'] = true;
-            $data['mugData'] = $mugData;
+            $data['errorMsg'] = "Unauthorized Access!";
         }
 
         if($responseType == RESPONSE_JSON)
@@ -605,12 +676,20 @@ class Mugclub extends MY_Controller {
 
     public function transfer()
     {
-        $post = $this->input->post();
-        $data = array();
+        if(isSessionVariableSet($this->isUserSession))
+        {
+            $post = $this->input->post();
+            $data = array();
 
-        $params = $this->mugclub_model->filterMugParameters($post);
-        $this->mugclub_model->updateMugRecord($params);
-        $data['status'] = true;
+            $params = $this->mugclub_model->filterMugParameters($post);
+            $this->mugclub_model->updateMugRecord($params);
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Unauthorized Access!';
+        }
         
         echo json_encode($data);
     }

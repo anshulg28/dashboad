@@ -69,6 +69,10 @@ class Users extends MY_Controller {
 
     public function saveOrUpdateUser()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $post = $this->input->post();
 
         $userExists = $this->users_model->getUserDetailsByUsername($post['userName']);
@@ -88,6 +92,10 @@ class Users extends MY_Controller {
 
     public function checkUserByUsername($userName)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $data = array();
         $userExists = $this->users_model->getUserDetailsByUsername($userName);
 
@@ -105,6 +113,10 @@ class Users extends MY_Controller {
 
     public function deleteUserData($userId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $mugExists = $this->users_model->getUserDetailsById($userId);
 
         if($mugExists['status'] === false)
@@ -120,6 +132,10 @@ class Users extends MY_Controller {
 
     public function setUserActive($userId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $userExists = $this->users_model->getUserDetailsById($userId);
 
         if($userExists['status'] === false)
@@ -135,6 +151,10 @@ class Users extends MY_Controller {
 
     public function setUserDeActive($userId)
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $userExists = $this->users_model->getUserDetailsById($userId);
 
         if($userExists['status'] === false)
