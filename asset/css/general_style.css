@@ -218,6 +218,10 @@ input::-webkit-inner-spin-button {
     color:red;
     font-weight:bold;
 }
+.homePage .my-timer
+{
+    font-size:20px;
+}
 .homePage .my-mainMenuList li, .mailPage .my-mainMenuList li
 {
     position:relative;

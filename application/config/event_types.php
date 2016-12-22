@@ -7,6 +7,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Time: 4:16 PM
  */
 
+$config['login_ip_mob_map'] = array(
+    '27.106.15.10' => '9975027683'
+);
+
 $config['insta_locationMap'] = array(
     '1020175853' => 'Andheri Taproom',
     '402256524' => 'Bandra Taproom',

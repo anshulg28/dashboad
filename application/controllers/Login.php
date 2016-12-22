@@ -166,6 +166,52 @@ class Login extends MY_Controller {
         }
 
     }
+
+    public function checkOtp($responseType = RESPONSE_RETURN)
+    {
+        $data = array();
+        $post = $this->input->post();
+
+        if(isset($post['mobNum']) && isset($post['userOtp']))
+        {
+            $check = $this->login_model->checkUserOtp($post['mobNum'], $post['userOtp']);
+            if($check['status'] == true)
+            {
+                if($check['ifActive'] == NOT_ACTIVE)
+                {
+                    $data['errorMsg'] = 'User Account is Disabled!';
+                    $data['status'] = false;
+                }
+                else
+                {
+                    $postData = array(
+                        'attemptTimes'=>'0',
+                        'userOtp'=> null
+                    );
+                    $this->login_model->updateUserRecord($check['userId'],$postData);
+
+                    $this->login_model->setLastLogin($check['userId']);
+                    $this->generalfunction_library->setUserSession($check['userId']);
+                    $data['status'] = true;
+                    $data['isUserSession'] = $this->isUserSession;
+                    $data['userName'] = $this->userName;
+                }
+            }
+            else
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'Invalid OTP!';
+            }
+        }
+        if($responseType == RESPONSE_JSON)
+        {
+            echo json_encode($data);
+        }
+        else
+        {
+            redirect($this->pageUrl);
+        }
+    }
     function logout()
     {
         $this->session->unset_userdata('user_id');

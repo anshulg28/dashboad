@@ -44,17 +44,17 @@
                 $('#mainLoginForm button[type="submit"]').removeAttr("disabled");
                 if(data.status == true)
                 {
-                    window.location.href = data.pageUrl;
+                    window.location.reload();
                 }
                 else
                 {
-                    $('#mainLoginForm .login-error-block').html(data.errorMsg);
+                    $('.login-error-block').css('color','red').html(data.errorMsg);
                 }
             },
             error:function()
             {
                 $('#mainLoginForm button[type="submit"]').removeAttr("disabled");
-                $('#mainLoginForm .login-error-block').html('Some Error Occurred, Try Again!');
+                $('.login-error-block').css('color','red').html('Some Error Occurred, Try Again!');
             }
         });
         e.preventDefault();
@@ -251,5 +251,48 @@
     }
 ?>
 
-
+$(document).on('click','.request-otp', function(){
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url:base_url+'generateOtp',
+        success: function(data){
+            if(data.status == true)
+            {
+                $('.my-timer').removeClass('hide');
+                $('#mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
+                $('.request-otp').addClass('hide');
+                $('#mainLoginForm').removeClass('hide');
+                var min = 0;
+                var sec = 0;
+                var timer = setInterval(function(){
+                    sec +=1;
+                    if(sec == 60)
+                    {
+                        min += 1;
+                        sec = 0;
+                    }
+                    $('.my-timer').html('Wait: '+min+' : '+sec);
+                    if(min >= 2)
+                    {
+                        clearInterval(timer);
+                    }
+                },1000);
+                setTimeout(function(){
+                    $('.request-otp').removeClass('hide');
+                    $('.my-timer').addClass('hide');
+                    $('#mainLoginForm').addClass('hide');
+                    clearInterval(timer);
+                },(2*60*1000));
+            }
+            else
+            {
+                $('.login-error-block').css('color','red').html(data.errorMsg);
+            }
+        },
+        error: function(){
+            bootbox.alert('Some Error Occurred!');
+        }
+    });
+});
 </script>

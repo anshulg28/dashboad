@@ -114,6 +114,34 @@
                 <div class="container-fluid">
                     <h2 class="text-center">Login</h2>
                     <hr>
+                    <!--<div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-8 text-center">
+                                <div class="my-timer"></div>
+                                <br>
+                                <div class="login-error-block text-center"></div>
+                                <br>
+                                <button type="button" class="btn btn-primary request-otp">Request OTP</button>
+                                <form action="<?php /*echo base_url();*/?>login/checkOtp/json" id="mainLoginForm" method="post" class="form-horizontal hide" role="form">
+                                    <input type="hidden" name="mobNum" />
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2" for="otp">Enter OTP:</label>
+                                        <div class="col-sm-10">
+                                            <input type="number" name="userOtp" class="form-control" id="otp" placeholder="Enter OTP">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-sm-2"></div>
+                        </div>
+
+                    </div>-->
                     <form action="<?php echo base_url();?>login/checkUser/json" id="mainLoginForm" method="post" class="form-horizontal" role="form">
                         <div class="login-error-block text-center"></div>
                         <br>
@@ -129,26 +157,6 @@
                                 <input type="password" name="password" class="form-control" id="pwd" placeholder="Enter password">
                             </div>
                         </div>
-                        <!--<h2 class="text-center">OR</h2>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="pwd">Login Pin:</label>
-                            <div class="col-sm-10">
-                                <ul class="list-inline loginpin-list">
-                                    <li>
-                                        <input class="form-control" oninput="maxLengthCheck(this)" type="number" maxlength="1" name="loginPin1" placeholder="0" />
-                                    </li>
-                                    <li>
-                                        <input class="form-control" oninput="maxLengthCheck(this)" type="number" maxlength="1" name="loginPin2" placeholder="0" />
-                                    </li>
-                                    <li>
-                                        <input class="form-control" oninput="maxLengthCheck(this)" type="number" maxlength="1" name="loginPin3" placeholder="0" />
-                                    </li>
-                                    <li>
-                                        <input class="form-control" oninput="maxLengthCheck(this)" type="number" maxlength="1" name="loginPin4" placeholder="0" />
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>-->
                         <div class="form-group">
                             <div class="col-sm-offset-2 col-sm-10">
                                 <button type="submit" class="btn btn-primary">Submit</button>

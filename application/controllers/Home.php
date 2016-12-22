@@ -6,6 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property generalfunction_library $generalfunction_library
  * @property locations_model $locations_model
  * @property dashboard_model $dashboard_model
+ * @property login_model $login_model
  */
 
 class Home extends MY_Controller {
@@ -15,6 +16,7 @@ class Home extends MY_Controller {
         parent::__construct();
         $this->load->model('locations_model');
         $this->load->model('dashboard_model');
+        $this->load->model('login_model');
     }
 
     public function index()
@@ -133,5 +135,104 @@ class Home extends MY_Controller {
         }
 
         //echo json_encode($aboutView);
+    }
+
+    function sendOtp()
+    {
+        $data = array();
+        $ipGot = $_SERVER['REMOTE_ADDR'];
+        $Mobnum = '';
+        if(isset($this->config->item('login_ip_mob_map')[$ipGot]))
+        {
+            $Mobnum = $this->config->item('login_ip_mob_map')[$ipGot];
+
+            $userCheck = $this->login_model->checkUserByMob($Mobnum);
+
+            if($userCheck['status'] == true)
+            {
+                if($userCheck['ifActive'] == NOT_ACTIVE)
+                {
+                    $data['status'] = false;
+                    $data['errorMsg'] = 'User is Disabled!';
+                }
+                else
+                {
+                    //code for attempt validation
+                    if($userCheck == 3)
+                    {
+                        $postData = array(
+                            'ifActive'=>'0'
+                        );
+                        $this->login_model->updateUserRecord($userCheck['userId'],$postData);
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'User is Disabled!';
+                    }
+                    else
+                    {
+                        $newAttempt = $userCheck['attemptTimes'] + 1;
+                        $details = array(
+                            'attemptTimes'=> $newAttempt
+                        );
+                        $this->login_model->updateUserRecord($userCheck['userId'],$details);
+
+                        $newOtp = mt_rand(10000,999999);
+
+                        $details = array(
+                            'userOtp'=> $newOtp
+                        );
+                        $this->login_model->updateUserRecord($userCheck['userId'],$details);
+
+                        $numbers = array('91'.$Mobnum);
+
+                        $postDetails = array(
+                            'apiKey' => TEXTLOCAL_API,
+                            'numbers' => implode(',', $numbers),
+                            'sender'=> urlencode('DOLALY'),
+                            'message' => rawurlencode($newOtp.' is Your OTP for login')
+                        );
+                        $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                        if($smsStatus['status'] == 'failure')
+                        {
+                            $data['status'] = false;
+                            $details = array(
+                                'attemptTimes'=> $userCheck['attemptTimes']
+                            );
+                            $this->login_model->updateUserRecord($userCheck['userId'],$details);
+                            if(isset($smsStatus['warnings']))
+                            {
+                                $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                            }
+                            else
+                            {
+                                $data['errorMsg'] = $smsStatus['errors'][0]['message'];
+                            }
+                        }
+                        else
+                        {
+                            $data['mobNum'] = $Mobnum;
+                            $data['status'] = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'User Not Found!';
+            }
+
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Invalid Server Request!';
+        }
+
+        echo json_encode($data);
+    }
+
+    function getNewOtp()
+    {
+
     }
 }

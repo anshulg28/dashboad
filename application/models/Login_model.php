@@ -57,6 +57,50 @@ class Login_Model extends CI_Model
         return $data;
     }
 
+
+    public function checkUserByMob($mobNum)
+    {
+
+        $query = "SELECT userId,ifActive,attemptTimes "
+            ."FROM doolally_usersmaster "
+            ."where (userType IN(1,2,3) OR userId = 8) AND mobNum = '".$mobNum."'";
+
+        $result = $this->db->query($query)->row_array();
+
+        $data = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+
+    public function checkUserOtp($mobNum, $otp)
+    {
+        $query = "SELECT userId,ifActive "
+            ."FROM doolally_usersmaster "
+            ."where (userType IN(1,2,3) OR userId = 8) AND mobNum = '".$mobNum."' AND userOtp = ".$otp;
+
+        $result = $this->db->query($query)->row_array();
+
+        $data = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+
     public function checkAppUser($userEmail, $userPassword)
     {
         $query = "SELECT userId,ifActive "

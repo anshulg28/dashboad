@@ -137,4 +137,10 @@ class curl_library
         );
         return $this->getDataByGet($url,0, $header);
     }
+    public function sendCouponSMS($details)
+    {
+        $url = 'http://api.textlocal.in/send/';
+
+        return $this->getDataByPost($url,$details,0);
+    }
 }
