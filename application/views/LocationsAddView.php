@@ -120,12 +120,20 @@
         }
 
     });
+    var map = new google.maps.Map(document.getElementById('my_map'), {
+        center: {lat: -33.8688, lng: 151.2195},
+        zoom: 13
+    });
     $("#mapModal #mapInput").geocomplete(
         {
             details: "#mapForm",
-            map: "#my_map",
+            map: map,
             types: ["geocode", "establishment"]
         });
+
+    $('#mapModal').on('shown.bs.modal', function() {
+        google.maps.event.trigger(map, 'resize');
+    });
     function addPlaces()
     {
         var lat = $('#mapForm input[name="lat"]').val();
