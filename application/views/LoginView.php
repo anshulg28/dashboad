@@ -7,10 +7,44 @@
 </head>
 <body>
     <?php echo $headerView; ?>
-    <main class="homePage">
+    <main class="loginPage">
         <div class="container-fluid">
             <h1 class="text-center">Login</h1>
             <hr>
+            <!--<div class="form-group">
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8 text-center">
+                        <div class="my-timer"></div>
+                        <br>
+                        <div class="login-error-block text-center"></div>
+                        <br>
+                        <div class="form-group the-email-panel">
+                            <label class="control-label col-sm-2" for="mobEmail">Mobile No/Email:</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="mobEmail" class="form-control" id="mobEmail" placeholder="Mobile No/Email">
+                            </div>
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-primary request-otp">Request OTP</button>
+                        <form action="<?php /*echo base_url();*/?>login/checkOtp/json" id="mainLoginForm" method="post" class="form-horizontal hide" role="form">
+                            <input type="hidden" name="mobNum" />
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="otp">Enter OTP:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" name="userOtp" class="form-control" id="otp" placeholder="Enter OTP">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+            </div>-->
             <form action="<?php echo base_url();?>login/checkUser/json" id="mainLoginForm" method="post" class="form-horizontal" role="form">
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="userName">Username:</label>

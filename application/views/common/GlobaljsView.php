@@ -251,7 +251,7 @@
     }
 ?>
 
-$(document).on('click','.request-otp', function(){
+$(document).on('click','.homePage .request-otp', function(){
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -259,10 +259,10 @@ $(document).on('click','.request-otp', function(){
         success: function(data){
             if(data.status == true)
             {
-                $('.my-timer').removeClass('hide');
-                $('#mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
-                $('.request-otp').addClass('hide');
-                $('#mainLoginForm').removeClass('hide');
+                $('.homePage .my-timer').removeClass('hide');
+                $('.homePage #mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
+                $('.homePage .request-otp').addClass('hide');
+                $('.homePage #mainLoginForm').removeClass('hide');
                 var min = 0;
                 var sec = 0;
                 var timer = setInterval(function(){
@@ -272,22 +272,22 @@ $(document).on('click','.request-otp', function(){
                         min += 1;
                         sec = 0;
                     }
-                    $('.my-timer').html('Wait: '+min+' : '+sec);
+                    $('.homePage .my-timer').html('Wait: '+min+' : '+sec);
                     if(min >= 2)
                     {
                         clearInterval(timer);
                     }
                 },1000);
                 setTimeout(function(){
-                    $('.request-otp').removeClass('hide');
-                    $('.my-timer').addClass('hide');
-                    $('#mainLoginForm').addClass('hide');
+                    $('.homePage .request-otp').removeClass('hide');
+                    $('.homePage .my-timer').addClass('hide');
+                    //$('#mainLoginForm').addClass('hide');
                     clearInterval(timer);
                 },(2*60*1000));
             }
             else
             {
-                $('.login-error-block').css('color','red').html(data.errorMsg);
+                $('.homePage .login-error-block').css('color','red').html(data.errorMsg);
             }
         },
         error: function(){
@@ -295,4 +295,56 @@ $(document).on('click','.request-otp', function(){
         }
     });
 });
+
+    $(document).on('click','.loginPage .request-otp', function(){
+        if($('.loginPage input[name="mobEmail"]').val() == '')
+        {
+            bootbox.alert('Field Required!');
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url:base_url+'getOtp',
+            data: {mobEmail: $('.loginPage input[name="mobEmail"]').val()},
+            success: function(data){
+                if(data.status == true)
+                {
+                    $('.loginPage .my-timer').removeClass('hide');
+                    $('.loginPage #mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
+                    $('.loginPage .request-otp').addClass('hide');
+                    $('.loginPage .the-email-panel').addClass('hide');
+                    $('.loginPage #mainLoginForm').removeClass('hide');
+                    var min = 0;
+                    var sec = 0;
+                    var timer = setInterval(function(){
+                        sec +=1;
+                        if(sec == 60)
+                        {
+                            min += 1;
+                            sec = 0;
+                        }
+                        $('.loginPage .my-timer').html('Wait: '+min+' : '+sec);
+                        if(min >= 2)
+                        {
+                            clearInterval(timer);
+                        }
+                    },1000);
+                    setTimeout(function(){
+                        $('.loginPage .request-otp').removeClass('hide');
+                        $('.loginPage .my-timer').addClass('hide');
+                        //$('#mainLoginForm').addClass('hide');
+                        clearInterval(timer);
+                    },(2*60*1000));
+                }
+                else
+                {
+                    $('.loginPage .login-error-block').css('color','red').html(data.errorMsg);
+                }
+            },
+            error: function(){
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
+    });
 </script>

@@ -167,6 +167,123 @@ class Login extends MY_Controller {
 
     }
 
+    function sendNormalOtp()
+    {
+        $data = array();
+        $post = $this->input->post();
+        $isMobile = false;
+
+        $mobEmail = $post['mobEmail'];
+
+        if(is_numeric($mobEmail))
+        {
+            $isMobile = true;
+            $userCheck = $this->login_model->checkUserByMob($mobEmail);
+        }
+        else
+        {
+            $userCheck = $this->login_model->checkUserByEmail($mobEmail);
+        }
+
+        if($userCheck['status'] == true)
+        {
+            if($userCheck['ifActive'] == NOT_ACTIVE)
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'User is Disabled!';
+            }
+            else
+            {
+                //code for attempt validation
+                if($userCheck == 3)
+                {
+                    $postData = array(
+                        'ifActive'=>'0'
+                    );
+                    $this->login_model->updateUserRecord($userCheck['userId'],$postData);
+                    $data['status'] = false;
+                    $data['errorMsg'] = 'User is Disabled!';
+                }
+                else
+                {
+                    $newAttempt = $userCheck['attemptTimes'] + 1;
+                    $details = array(
+                        'attemptTimes'=> $newAttempt
+                    );
+                    $this->login_model->updateUserRecord($userCheck['userId'],$details);
+
+                    $newOtp = mt_rand(10000,999999);
+
+                    $details = array(
+                        'userOtp'=> $newOtp
+                    );
+                    $this->login_model->updateUserRecord($userCheck['userId'],$details);
+
+                    $Mobnum = '';
+                    $email = '';
+                    if($isMobile)
+                    {
+                        $Mobnum = $mobEmail;
+                        $email = $userCheck['emailId'];
+                    }
+                    else
+                    {
+                        $Mobnum = $userCheck['mobNum'];
+                        $email = $mobEmail;
+                    }
+
+                    if(isset($Mobnum) && $Mobnum != '')
+                    {
+                        $numbers = array('91'.$Mobnum);
+
+                        $postDetails = array(
+                            'apiKey' => TEXTLOCAL_API,
+                            'numbers' => implode(',', $numbers),
+                            'sender'=> urlencode('DOLALY'),
+                            'message' => rawurlencode($newOtp.' is Your OTP for login')
+                        );
+                        $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                        if($smsStatus['status'] == 'failure')
+                        {
+                            $data['status'] = false;
+                            $details = array(
+                                'attemptTimes'=> $userCheck['attemptTimes']
+                            );
+                            $this->login_model->updateUserRecord($userCheck['userId'],$details);
+                            if(isset($smsStatus['warnings']))
+                            {
+                                $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                            }
+                            else
+                            {
+                                $data['errorMsg'] = $smsStatus['errors'][0]['message'];
+                            }
+                        }
+                    }
+
+                    if(isset($email) && $email != '')
+                    {
+                        $mailData = array(
+                            'emailId' => $email,
+                            'otp' =>$newOtp
+                        );
+                        $this->sendemail_library->otpSendMail($mailData);
+                    }
+
+                    $data['mobNum'] = $Mobnum;
+                    $data['status'] = true;
+                }
+            }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'User Not Found!';
+        }
+
+        echo json_encode($data);
+    }
+
     public function checkOtp($responseType = RESPONSE_RETURN)
     {
         $data = array();

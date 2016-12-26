@@ -548,10 +548,10 @@
                                                                 $imgs[] = MOBILE_URL.FOOD_PATH_THUMB.$attrow['filename'];
                                                                 break;
                                                             case "2":
-                                                                $imgs[] = MOBILE_URL.BEVERAGE_PATH_THUMB.$attrow['filename'];
+                                                                $imgs[] = MOBILE_URL.BEVERAGE_PATH_NORMAL.$attrow['filename'];
                                                                 break;
                                                             default:
-                                                                $imgs[] = MOBILE_URL.BEVERAGE_PATH_THUMB.$attrow['filename'];
+                                                                $imgs[] = MOBILE_URL.BEVERAGE_PATH_NORMAL.$attrow['filename'];
                                                                 break;
 
                                                         }

@@ -87,6 +87,7 @@ $route['dashboard/approve/(:any)'] = 'dashboard/eventApproved/$1';
 $route['dashboard/decline/(:any)'] = 'dashboard/eventDeclined/$1';
 $route['main'] = 'home/main';
 $route['generateOtp'] = 'home/sendOtp';
+$route['getOtp'] = 'login/sendNormalOtp';
 //$route['share-event/(:any)/(:any)'] = 'home/eventFetch/$1/$2';
 
 /* Mobile Routes */

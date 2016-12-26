@@ -179,10 +179,6 @@ class Dashboard extends MY_Controller {
     public function instaMojoRecord()
     {
         $post = $this->input->post();
-        if(isSessionVariableSet($this->isUserSession) === false)
-        {
-            redirect(base_url());
-        }
         // Get the MAC from the POST data
         if(isset($post['mac']))
         {

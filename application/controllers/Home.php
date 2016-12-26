@@ -230,9 +230,5 @@ class Home extends MY_Controller {
 
         echo json_encode($data);
     }
-
-    function getNewOtp()
-    {
-
-    }
+    
 }

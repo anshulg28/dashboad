@@ -112,7 +112,7 @@
             {
                 ?>
                 <div class="container-fluid">
-                    <h2 class="text-center">Login</h2>
+                    <h2 class="text-center"> Login</h2>
                     <hr>
                     <!--<div class="form-group">
                         <div class="row">
@@ -140,7 +140,6 @@
                             </div>
                             <div class="col-sm-2"></div>
                         </div>
-
                     </div>-->
                     <form action="<?php echo base_url();?>login/checkUser/json" id="mainLoginForm" method="post" class="form-horizontal" role="form">
                         <div class="login-error-block text-center"></div>

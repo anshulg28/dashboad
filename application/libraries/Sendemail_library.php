@@ -313,6 +313,22 @@ class Sendemail_library
         return 'DO-'.$newCode;
     }
 
+    public function otpSendMail($userData)
+    {
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/otpMailView', $data, true);
+
+        $fromEmail = 'admin@doolally.in';
+        $cc = '';
+        $fromName  = 'Doolally';
+
+        $subject = 'Your Requested Otp '.$userData['otp'];
+        $toEmail = $userData['emailId'];
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
+    }
+
     public function sendEmail($to, $cc = '', $from, $fromName, $subject, $content, $attachment = array())
     {
         $CI =& get_instance();
