@@ -92,7 +92,7 @@
                         $.ajax({
                             type:"POST",
                             url:"<?php echo base_url();?>locations/save",
-                            data:{locName:$('#locName').val(),mapLinkL:$('#mapLink').val()},
+                            data:{locName:$('#locName').val(),mapLink:$('#mapLink').val()},
                             success: function(data){
                                 window.location.href=base_url+'locations';
                             },

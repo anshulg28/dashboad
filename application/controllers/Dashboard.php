@@ -100,6 +100,14 @@ class Dashboard extends MY_Controller {
         $data['feedbacks']['bandra'] = (int)(($promo['bandra']/$total['bandra'])*100 - ($de['bandra']/$total['bandra'])*100);
         $data['feedbacks']['andheri'] = (int)(($promo['andheri']/$total['andheri'])*100 - ($de['andheri']/$total['andheri'])*100);
         $data['feedbacks']['kemps-corner'] = (int)(($promo['kemps-corner']/$total['kemps-corner'])*100 - ($de['kemps-corner']/$total['kemps-corner'])*100);
+        if($total['colaba'] == '0')
+        {
+            $data['feedbacks']['colaba'] = 0;
+        }
+        else
+        {
+            $data['feedbacks']['colaba'] = (int)(($promo['colaba']/$total['colaba'])*100 - ($de['colaba']/$total['colaba'])*100);
+        }
 
         $events = $this->dashboard_model->getAllEvents();
 

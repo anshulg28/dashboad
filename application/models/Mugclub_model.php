@@ -62,9 +62,11 @@ class Mugclub_Model extends CI_Model
                   (SELECT count(*) FROM mugmaster WHERE homeBase = 2 AND membershipStart <= (CURRENT_DATE() - INTERVAL 1 MONTH)) as oldAndheri,
                   (SELECT count(*) FROM mugmaster WHERE homeBase = 1 AND membershipStart <= (CURRENT_DATE() - INTERVAL 1 MONTH)) as oldBandra,
                   (SELECT count(*) FROM mugmaster WHERE homeBase = 3 AND membershipStart <= (CURRENT_DATE() - INTERVAL 1 MONTH)) as oldKemps,
+                  (SELECT count(*) FROM mugmaster WHERE homeBase = 4 AND membershipStart <= (CURRENT_DATE() - INTERVAL 1 MONTH)) as oldColaba,
                   (SELECT count(*) FROM mugmaster WHERE membershipStart <= CURRENT_DATE()) as newOverall,
                   (SELECT count(*) FROM mugmaster WHERE homeBase = 2 AND membershipStart <= CURRENT_DATE()) as newAndheri,
                   (SELECT count(*) FROM mugmaster WHERE homeBase = 3 AND membershipStart <= CURRENT_DATE()) as newKemps,
+                  (SELECT count(*) FROM mugmaster WHERE homeBase = 4 AND membershipStart <= CURRENT_DATE()) as newColaba,
                   (SELECT count(*) FROM mugmaster WHERE homeBase = 1 AND membershipStart <= CURRENT_DATE()) as newBandra
                   FROM mugmaster";
         $result = $this->db->query($query)->row_array();
@@ -73,6 +75,7 @@ class Mugclub_Model extends CI_Model
         $avgMugs['bandra'] = ((int)$result['newBandra']+(int)$result['oldBandra'])/2;
         $avgMugs['andheri'] = ((int)$result['newAndheri']+(int)$result['oldAndheri'])/2;
         $avgMugs['kemps'] = ((int)$result['newKemps']+(int)$result['oldKemps'])/2;
+        $avgMugs['colaba'] = ((int)$result['newColaba']+(int)$result['oldColaba'])/2;
 
         $data = $avgMugs;
         return $data;

@@ -1259,6 +1259,7 @@
             graph_avg[1] = [];
             graph_avg[2] = [];
             graph_avg[3] = [];
+            graph_avg[4] = [];
             <?php
             for($i = 0;$i<count($graph['avgChecks']); $i++)
             {
@@ -1281,6 +1282,7 @@
             graph_regulars[1] = [];
             graph_regulars[2] = [];
             graph_regulars[3] = [];
+            graph_regulars[4] = [];
             <?php
             for($i = 0;$i<count($graph['regulars']); $i++)
             {
@@ -1303,6 +1305,7 @@
             graph_irregulars[1] = [];
             graph_irregulars[2] = [];
             graph_irregulars[3] = [];
+            graph_irregulars[4] = [];
             <?php
             for($i = 0;$i<count($graph['irregulars']); $i++)
             {
@@ -1325,6 +1328,7 @@
             graph_lapsers[1] = [];
             graph_lapsers[2] = [];
             graph_lapsers[3] = [];
+            graph_lapsers[4] = [];
             <?php
             for($i = 0;$i<count($graph['lapsers']); $i++)
             {
@@ -1356,6 +1360,7 @@
             feed_locs[1] = [];
             feed_locs[2] = [];
             feed_locs[3] = [];
+            feed_locs[4] = [];
             <?php
             foreach($weeklyFeed as $key => $row)
             {

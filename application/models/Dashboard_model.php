@@ -275,6 +275,8 @@ class Dashboard_Model extends CI_Model
                  (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
                  WHERE feedbackLoc = 3) as 'total_kemps-corner',
                  (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                 WHERE feedbackLoc = 4) as 'total_colaba',
+                 (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
                  WHERE feedbackLoc != 0 AND overallRating >= 9) as 'promo_overall',
                  (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
                  WHERE feedbackLoc != 0 AND overallRating < 7) as 'de_overall'";
