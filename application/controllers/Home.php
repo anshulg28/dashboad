@@ -161,7 +161,7 @@ class Home extends MY_Controller {
                     $userCheck = $this->login_model->checkUserByMob($locCheck['locData'][0]['phoneNumber']);
 
                     //code for attempt validation
-                    if($userCheck['attemptTimes'] == 3)
+                    /*if($userCheck['attemptTimes'] == 3)
                     {
                         $postData = array(
                             'ifActive'=>'0'
@@ -169,53 +169,53 @@ class Home extends MY_Controller {
                         $this->login_model->updateUserRecord($userCheck['userId'],$postData);
                         $data['status'] = false;
                         $data['errorMsg'] = 'User is Disabled!';
-                    }
-                    else
+                    }*/
+                    /*else
+                    {*/
+                    /*$newAttempt = $userCheck['attemptTimes'] + 1;
+                    $details = array(
+                        'attemptTimes'=> $newAttempt
+                    );
+                    $this->login_model->updateUserRecord($userCheck['userId'],$details);*/
+
+                    $newOtp = mt_rand(10000,999999);
+
+                    $details = array(
+                        'userOtp'=> $newOtp
+                    );
+                    $this->login_model->updateUserRecord($userCheck['userId'],$details);
+
+                    $numbers = array('91'.$locCheck['locData'][0]['phoneNumber']);
+
+                    $postDetails = array(
+                        'apiKey' => TEXTLOCAL_API,
+                        'numbers' => implode(',', $numbers),
+                        'sender'=> urlencode('DOLALY'),
+                        'message' => rawurlencode($newOtp.' is Your OTP for login')
+                    );
+                    $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                    if($smsStatus['status'] == 'failure')
                     {
-                        $newAttempt = $userCheck['attemptTimes'] + 1;
+                        $data['status'] = false;
                         $details = array(
-                            'attemptTimes'=> $newAttempt
+                            'attemptTimes'=> $userCheck['attemptTimes']
                         );
                         $this->login_model->updateUserRecord($userCheck['userId'],$details);
-
-                        $newOtp = mt_rand(10000,999999);
-
-                        $details = array(
-                            'userOtp'=> $newOtp
-                        );
-                        $this->login_model->updateUserRecord($userCheck['userId'],$details);
-
-                        $numbers = array('91'.$locCheck['locData'][0]['phoneNumber']);
-
-                        $postDetails = array(
-                            'apiKey' => TEXTLOCAL_API,
-                            'numbers' => implode(',', $numbers),
-                            'sender'=> urlencode('DOLALY'),
-                            'message' => rawurlencode($newOtp.' is Your OTP for login')
-                        );
-                        $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
-                        if($smsStatus['status'] == 'failure')
+                        if(isset($smsStatus['warnings']))
                         {
-                            $data['status'] = false;
-                            $details = array(
-                                'attemptTimes'=> $userCheck['attemptTimes']
-                            );
-                            $this->login_model->updateUserRecord($userCheck['userId'],$details);
-                            if(isset($smsStatus['warnings']))
-                            {
-                                $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
-                            }
-                            else
-                            {
-                                $data['errorMsg'] = $smsStatus['errors'][0]['message'];
-                            }
+                            $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
                         }
                         else
                         {
-                            $data['mobNum'] = $locCheck['locData'][0]['phoneNumber'];
-                            $data['status'] = true;
+                            $data['errorMsg'] = $smsStatus['errors'][0]['message'];
                         }
                     }
+                    else
+                    {
+                        $data['mobNum'] = $locCheck['locData'][0]['phoneNumber'];
+                        $data['status'] = true;
+                    }
+                    /*}*/
                 }
             }
             else
