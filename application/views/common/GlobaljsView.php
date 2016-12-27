@@ -252,13 +252,23 @@
 ?>
 
 $(document).on('click','.homePage .request-otp', function(){
+
+    var loc = $('#locSelect option:selected').val();
+    if(loc == '')
+    {
+        bootbox.alert('Please Select A Location!');
+        return false;
+    }
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         dataType: 'json',
         url:base_url+'generateOtp',
+        data: {loc:loc},
         success: function(data){
             if(data.status == true)
             {
+                $('#locSelect').addClass('hide');
+                $('.loclabel').html('Selected Location: '+$('#locSelect option:selected').text());
                 $('.homePage .my-timer').removeClass('hide');
                 $('.homePage #mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
                 $('.homePage .request-otp').addClass('hide');
@@ -279,8 +289,10 @@ $(document).on('click','.homePage .request-otp', function(){
                     }
                 },1000);
                 setTimeout(function(){
+                    $('#locSelect').removeClass('hide');
                     $('.homePage .request-otp').removeClass('hide');
                     $('.homePage .my-timer').addClass('hide');
+                    $('.loclabel').html('Select Location: ');
                     //$('#mainLoginForm').addClass('hide');
                     clearInterval(timer);
                 },(2*60*1000));
@@ -302,6 +314,11 @@ $(document).on('click','.homePage .request-otp', function(){
             bootbox.alert('Field Required!');
             return false;
         }
+        if(!$.isNumeric($('.loginPage input[name="mobEmail"]').val()) && !isEmailValid($('.loginPage input[name="mobEmail"]').val()))
+        {
+            bootbox.alert('Email Invalid!');
+            return false;
+        }
         $.ajax({
             type: 'POST',
             dataType: 'json',
@@ -310,6 +327,7 @@ $(document).on('click','.homePage .request-otp', function(){
             success: function(data){
                 if(data.status == true)
                 {
+                    $('.loginPage .login-error-block').html('').addClass('hide');
                     $('.loginPage .my-timer').removeClass('hide');
                     $('.loginPage #mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
                     $('.loginPage .request-otp').addClass('hide');
@@ -347,4 +365,9 @@ $(document).on('click','.homePage .request-otp', function(){
             }
         });
     });
+
+    function isEmailValid(email) {
+        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return regex.test(email);
+    }
 </script>

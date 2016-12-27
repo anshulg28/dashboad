@@ -9,9 +9,9 @@
     <?php echo $headerView; ?>
     <main class="loginPage">
         <div class="container-fluid">
-            <h1 class="text-center">Login</h1>
+            <h1 class="text-center">Admin/Comm Login</h1>
             <hr>
-            <!--<div class="form-group">
+            <div class="form-group">
                 <div class="row">
                     <div class="col-sm-2"></div>
                     <div class="col-sm-8 text-center">
@@ -27,7 +27,7 @@
                         </div>
                         <br>
                         <button type="button" class="btn btn-primary request-otp">Request OTP</button>
-                        <form action="<?php /*echo base_url();*/?>login/checkOtp/json" id="mainLoginForm" method="post" class="form-horizontal hide" role="form">
+                        <form action="<?php echo base_url();?>login/checkOtp/json" id="mainLoginForm" method="post" class="form-horizontal hide" role="form">
                             <input type="hidden" name="mobNum" />
                             <div class="form-group">
                                 <label class="control-label col-sm-2" for="otp">Enter OTP:</label>
@@ -44,8 +44,8 @@
                     </div>
                     <div class="col-sm-2"></div>
                 </div>
-            </div>-->
-            <form action="<?php echo base_url();?>login/checkUser/json" id="mainLoginForm" method="post" class="form-horizontal" role="form">
+            </div>
+            <!--<form action="<?php /*echo base_url();*/?>login/checkUser/json" id="mainLoginForm" method="post" class="form-horizontal" role="form">
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="userName">Username:</label>
                     <div class="col-sm-10">
@@ -57,7 +57,7 @@
                     <div class="col-sm-10">
                         <input type="password" name="password" class="form-control" id="pwd" placeholder="Enter password">
                     </div>
-                </div>
+                </div>-->
                 <!--<h2 class="text-center">OR</h2>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="pwd">Login Pin:</label>
@@ -78,12 +78,12 @@
                         </ul>
                     </div>
                 </div>-->
-                <div class="form-group">
+                <!--<div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                         <button type="submit" class="btn btn-default">Submit</button>
                     </div>
                 </div>
-            </form>
+            </form>-->
         </div>
     </main>
 </body>

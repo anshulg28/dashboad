@@ -34,6 +34,7 @@ class Home extends MY_Controller {
 		$data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
 		$data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
 		$data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['locArray'] = $this->locations_model->getAllLocations();
         if(isSessionVariableSet($this->isUserSession) === true)
         {
             $data['title'] = 'Home :: Doolally';
@@ -140,25 +141,27 @@ class Home extends MY_Controller {
     function sendOtp()
     {
         $data = array();
-        $ipGot = $_SERVER['REMOTE_ADDR'];
-        $Mobnum = '';
-        if(isset($this->config->item('login_ip_mob_map')[$ipGot]))
+        $post = $this->input->post();
+
+        if(isset($post['loc']))
         {
-            $Mobnum = $this->config->item('login_ip_mob_map')[$ipGot];
 
-            $userCheck = $this->login_model->checkUserByMob($Mobnum);
+            $locCheck = $this->locations_model->getLocationDetailsById($post['loc']);
 
-            if($userCheck['status'] == true)
+            if($locCheck['status'] == true)
             {
-                if($userCheck['ifActive'] == NOT_ACTIVE)
+                if($locCheck['locData'][0]['ifActive'] == NOT_ACTIVE)
                 {
                     $data['status'] = false;
-                    $data['errorMsg'] = 'User is Disabled!';
+                    $data['errorMsg'] = 'Location is Disabled!';
                 }
                 else
                 {
+                    $this->generalfunction_library->setSessionVariable("currentLocation",$post['loc']);
+                    $userCheck = $this->login_model->checkUserByMob($locCheck['locData'][0]['phoneNumber']);
+
                     //code for attempt validation
-                    if($userCheck == 3)
+                    if($userCheck['attemptTimes'] == 3)
                     {
                         $postData = array(
                             'ifActive'=>'0'
@@ -182,7 +185,7 @@ class Home extends MY_Controller {
                         );
                         $this->login_model->updateUserRecord($userCheck['userId'],$details);
 
-                        $numbers = array('91'.$Mobnum);
+                        $numbers = array('91'.$locCheck['locData'][0]['phoneNumber']);
 
                         $postDetails = array(
                             'apiKey' => TEXTLOCAL_API,
@@ -209,7 +212,7 @@ class Home extends MY_Controller {
                         }
                         else
                         {
-                            $data['mobNum'] = $Mobnum;
+                            $data['mobNum'] = $locCheck['locData'][0]['phoneNumber'];
                             $data['status'] = true;
                         }
                     }
@@ -225,7 +228,7 @@ class Home extends MY_Controller {
         else
         {
             $data['status'] = false;
-            $data['errorMsg'] = 'Invalid Server Request!';
+            $data['errorMsg'] = 'Invalid Location Provided!';
         }
 
         echo json_encode($data);

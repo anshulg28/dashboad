@@ -112,9 +112,9 @@
             {
                 ?>
                 <div class="container-fluid">
-                    <h2 class="text-center"> Login</h2>
+                    <h2 class="text-center">Outlet Login</h2>
                     <hr>
-                    <!--<div class="form-group">
+                    <div class="form-group">
                         <div class="row">
                             <div class="col-sm-2"></div>
                             <div class="col-sm-8 text-center">
@@ -122,8 +122,40 @@
                                 <br>
                                 <div class="login-error-block text-center"></div>
                                 <br>
-                                <button type="button" class="btn btn-primary request-otp">Request OTP</button>
-                                <form action="<?php /*echo base_url();*/?>login/checkOtp/json" id="mainLoginForm" method="post" class="form-horizontal hide" role="form">
+                                <?php
+                                    if(isset($locArray) && $locArray['status'] == false)
+                                    {
+                                        ?>
+                                        <button type="button" class="btn btn-primary request-otp" disabled>Request OTP</button>
+                                        <?php
+                                    }
+                                    else
+                                    {
+                                        ?>
+                                        <label for="locSelect" class="loclabel">Select Location: </label>
+                                        <select class="form-control" id="locSelect" name="locId">
+                                            <option value="">Select</option>
+                                        <?php
+                                        foreach($locArray as $key => $row)
+                                        {
+                                            if(isset($row['id']))
+                                            {
+                                                if(isset($row['phoneNumber']) && $row['phoneNumber'] != '')
+                                                {
+                                                    ?>
+                                                    <option value="<?php echo $row['id'];?>"><?php echo $row['locName'];?></option>
+                                                    <?php
+                                                }
+                                            }
+                                        }
+                                        ?>
+                                        </select>
+                                        <br>
+                                        <button type="button" class="btn btn-primary request-otp">Request OTP</button><br>
+                                        <?php
+                                    }
+                                ?>
+                                <form action="<?php echo base_url();?>login/checkOtp/json" id="mainLoginForm" method="post" class="form-horizontal hide" role="form">
                                     <input type="hidden" name="mobNum" />
                                     <div class="form-group">
                                         <label class="control-label col-sm-2" for="otp">Enter OTP:</label>
@@ -140,8 +172,8 @@
                             </div>
                             <div class="col-sm-2"></div>
                         </div>
-                    </div>-->
-                    <form action="<?php echo base_url();?>login/checkUser/json" id="mainLoginForm" method="post" class="form-horizontal" role="form">
+                    </div>
+                    <!--<form action="<?php /*echo base_url();*/?>login/checkUser/json" id="mainLoginForm" method="post" class="form-horizontal" role="form">
                         <div class="login-error-block text-center"></div>
                         <br>
                         <div class="form-group">
@@ -161,7 +193,7 @@
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </div>
-                    </form>
+                    </form>-->
                 </div>
                 <?php
             }

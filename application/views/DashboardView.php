@@ -1101,14 +1101,14 @@
                 </div>
                 <div class="modal-body text-center">
                     <input type="hidden" id="fnbId" value=""/>
-                    <label>Tagged Locations</label>
+                    <label>Beer Available at these Locations</label>
                     <div class="tagged-locations">
 
                     </div>
                     <hr>
 
                     <div class="beer-loc-select">
-                        <label>Available Locations</label>
+                        <label>Locations</label>
                         <ul class="list-inline">
                             <?php
                             if(isset($locations))
@@ -2115,7 +2115,7 @@
         $.ajax({
             type:'GET',
             dataType:"json",
-            url:base_url+'/dashboard/beerLocation/'+fnbId,
+            url:base_url+'dashboard/beerLocation/'+fnbId,
             success: function(data){
                 hideCustomLoader();
                 if(data.status === true)
@@ -2123,16 +2123,19 @@
                     var newHtml = '<ul class="list-inline">';
                     for(var i=0;i<data.locData.length;i++)
                     {
-                        beerLocs.push(data.locData[i].id);
-                        newHtml += '<li class="loc-info" data-value="'+data.locData[i].id+'"><span>'+data.locData[i].locName+'</span>'+
+                        if(data.locData[i].taggedLoc != '')
+                        {
+                            beerLocs.push(data.locData[i].id);
+                            newHtml += '<li class="loc-info" data-value="'+data.locData[i].id+'"><span>'+data.locData[i].locName+'</span>'+
                                 '<i class="fa fa-times"></i></li>';
-                        $('#beerLoc-modal .beer-loc-select ul li').each(function(h,val){
-                            if($(val).attr('data-value') == data.locData[i].id)
-                            {
-                                $(val).addClass('hide');
-                            }
+                            $('#beerLoc-modal .beer-loc-select ul li').each(function(h,val){
+                                if($(val).attr('data-value') == data.locData[i].id)
+                                {
+                                    $(val).addClass('hide');
+                                }
 
-                        });
+                            });
+                        }
                     }
                     newHtml += '</ul>';
                     $('#beerLoc-modal .modal-body .tagged-locations').html(newHtml);
@@ -2179,38 +2182,39 @@
         });
     });
     $(document).on('click',".save-fnb-tags", function () {
-        if(typeof beerLocs[0] != 'undefined')
+        var postData = '';
+        if(typeof beerLocs[0] == 'undefined')
         {
-            showCustomLoader();
-            var postData = {'taggedLoc':beerLocs.join(',')};
-
-            $.ajax({
-                type:'POST',
-                dataType:'json',
-                url:base_url+'dashboard/fnbTagSet/'+$('#beerLoc-modal #fnbId').val(),
-                data:postData,
-                success: function(data){
-                    hideCustomLoader();
-                    if(data.status === true)
-                    {
-                        $('#beerLoc-modal').modal('hide');
-                    }
-                    else
-                    {
-                        bootbox.alert('Some Error Occurred!');
-                    }
-
-                },
-                error: function(){
-                    hideCustomLoader();
-                    bootbox.alert('Some Error Occurred!');
-                }
-            });
+            postData = {'taggedLoc':null};
         }
         else
         {
-            $('#beerLoc-modal').modal('hide');
+            postData = {'taggedLoc':beerLocs.join(',')};
         }
+        showCustomLoader();
+
+        $.ajax({
+            type:'POST',
+            dataType:'json',
+            url:base_url+'dashboard/fnbTagSet/'+$('#beerLoc-modal #fnbId').val(),
+            data:postData,
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    $('#beerLoc-modal').modal('hide');
+                }
+                else
+                {
+                    bootbox.alert('Some Error Occurred!');
+                }
+
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
     });
 </script>
 
