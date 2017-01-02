@@ -23,6 +23,15 @@
                         if($this->userType != SERVER_USER)
                         {
                             ?>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="fa fa-money"></i> Wallet
+                                    <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="<?php echo base_url().'wallet';?>">Wallet Check</a></li>
+                                    <li><a href="<?php echo base_url().'empDetails';?>">Wallet Users</a></li>
+                                </ul>
+                            </li>
                             <li><a href="<?php echo base_url();?>users"><i class="fa fa-user"></i> Users List</a></li>
                             <li><a href="<?php echo base_url();?>locations"><i class="fa fa-globe"></i> Locations</a></li>
                             <li><a href="<?php echo base_url();?>mailers"><i class="fa fa-envelope"></i> Mailers</a>
@@ -36,6 +45,7 @@
                         if($this->userType == SERVER_USER)
                         {
                             ?>
+                            <li><a href="<?php echo base_url().'wallet';?>"><i class="fa fa-money"></i> Wallet Check</a></li>
                             <li><a href="<?php echo base_url();?>offers/check"><i class="fa fa-trophy"></i> Offers Check</a>
                             <?php
                         }

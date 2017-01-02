@@ -64,6 +64,9 @@
                                             <?php
                                                 switch($row['userType'])
                                                 {
+                                                    case ROOT_USER:
+                                                        echo 'Root';
+                                                        break;
                                                     case ADMIN_USER:
                                                         echo 'Admin';
                                                         break;

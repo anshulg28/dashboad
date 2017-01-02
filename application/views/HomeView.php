@@ -42,7 +42,30 @@
                                                 </div>
                                             </a>
                                         </li>
-                                        <?php
+                                    <?php
+                                        if($this->userType == ROOT_USER)
+                                        {
+                                            ?>
+                                            <li>
+                                                <a href="<?php echo base_url().'wallet';?>">
+                                                    <div class="menuWrap">
+                                                        <i class="fa fa-money fa-2x"></i>
+                                                        <br>
+                                                        <span>Wallet Page</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="<?php echo base_url() . 'empDetails'; ?>">
+                                                    <div class="menuWrap">
+                                                        <i class="fa fa-users fa-2x"></i>
+                                                        <br>
+                                                        <span>Wallet Users</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <?php
+                                        }
                                     }
                                     else
                                     {
@@ -75,8 +98,55 @@
                                             </a>
                                         </li>
                                         <?php
+                                        if($this->userType == SERVER_USER)
+                                        {
+                                            ?>
+                                            <li>
+                                                <a href="<?php echo base_url().'wallet';?>">
+                                                    <div class="menuWrap">
+                                                        <i class="fa fa-money fa-2x"></i>
+                                                        <br>
+                                                        <span>Wallet Check</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <?php
+                                        }
                                     }
                                     ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                }
+                elseif($this->userType == WALLET_USER)
+                {
+                    ?>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <h2 class="text-center">Welcome <?php echo ucfirst($this->userName); ?></h2>
+                            <br>
+                            <div class="col-sm-12 text-center">
+                                <ul class="list-inline my-mainMenuList">
+                                    <li>
+                                        <a href="<?php echo base_url() . 'wallet'; ?>">
+                                            <div class="menuWrap">
+                                                <i class="fa fa-money fa-2x"></i>
+                                                <br>
+                                                <span>Wallet Check</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<?php echo base_url() . 'empDetails'; ?>">
+                                            <div class="menuWrap">
+                                                <i class="fa fa-users fa-2x"></i>
+                                                <br>
+                                                <span>Wallet Users</span>
+                                            </div>
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

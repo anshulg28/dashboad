@@ -1,10 +1,10 @@
 <!--not tho change js-->
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>asset/js/material.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/moment.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/bootstrap-datetimepicker.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/bootbox.min.js"></script>
-<script type="text/javascript" src="<?php echo base_url(); ?>asset/js/material.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/getmdl-select.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/Chart.min.js"></script>
 <script src="http://cdn.ckeditor.com/4.5.10/basic/ckeditor.js"></script>
@@ -342,7 +342,7 @@ $(document).on('click','.homePage .request-otp', function(){
                             min += 1;
                             sec = 0;
                         }
-                        $('.loginPage .my-timer').html('Wait: '+min+' : '+sec);
+                        $('.loginPage .my-timer').html('Wait(2 mins): '+min+' : '+sec);
                         if(min >= 2)
                         {
                             clearInterval(timer);
