@@ -28,7 +28,7 @@
                                     </a>
                                 </li>
                                 <?php
-                                    if($this->userType != GUEST_USER)
+                                    if($this->userType != OFFERS_USER)
                                     {
                                         ?>
                                         <li>

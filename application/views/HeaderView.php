@@ -14,7 +14,14 @@
                 <?php
                 if(isSessionVariableSet($this->isUserSession) === true)
                 {
-                    if($this->userType != GUEST_USER)
+                    if($this->userType == WALLET_USER)
+                    {
+                        ?>
+                        <li><a href="<?php echo base_url().'wallet';?>"><i class="fa fa-money"></i> Wallet Check</a></li>
+                        <li><a href="<?php echo base_url().'empDetails';?>"><i class="fa fa-users"></i> Wallet Users</a></li>
+                        <?php
+                    }
+                    elseif($this->userType != OFFERS_USER)
                     {
                         ?>
                         <li><a href="<?php echo base_url();?>"><i class="fa fa-home"></i> Home</a></li>
@@ -75,14 +82,13 @@
                                 <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <!--<li class="divider"></li>-->
-                                <li><a href="<?php echo base_url();?>login/settings"><i class="fa fa-cog"></i> Settings</a></li>
                                 <?php
-                                    /*if($this->userType != SERVER_USER)
+                                    if($this->userType != WALLET_USER)
                                     {
-                                        */?><!--
-                                        <li><a href="<?php /*echo base_url();*/?>login/pinChange/<?php /*echo $this->userId;*/?>"><i class="fa fa-cog"></i> Change Pin</a></li>
-                                        --><?php
-/*                                    }*/
+                                        ?>
+                                        <li><a href="<?php echo base_url();?>login/settings"><i class="fa fa-cog"></i> Settings</a></li>
+                                        <?php
+                                    }
                                 ?>
                                 <li><a href="<?php echo base_url(); ?>login/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
                             </ul>

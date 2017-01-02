@@ -82,6 +82,8 @@
                                                     case WALLET_USER:
                                                         echo 'Wallet Manager';
                                                         break;
+                                                    case OFFERS_USER:
+                                                        echo 'Guest';
                                                 }
                                             ?>
                                         </td>

@@ -11,7 +11,7 @@
         <?php
         if(isSessionVariableSet($this->isUserSession) === true)
         {
-            if($this->userType != GUEST_USER)
+            if($this->userType != OFFERS_USER)
             {
                 ?>
                 <div class="container-fluid">

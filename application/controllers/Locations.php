@@ -20,7 +20,7 @@ class Locations extends MY_Controller {
         {
             redirect(base_url());
         }
-        if($this->userType == GUEST_USER)
+        if($this->userType == GUEST_USER || $this->userType == OFFERS_USER)
         {
             redirect(base_url());
         }

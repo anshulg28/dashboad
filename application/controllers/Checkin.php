@@ -23,7 +23,7 @@ class Checkin extends MY_Controller {
         {
             redirect(base_url());
         }
-        if($this->userType == GUEST_USER)
+        if($this->userType == GUEST_USER || $this->userType == OFFERS_USER)
         {
             redirect(base_url());
         }
@@ -59,7 +59,7 @@ class Checkin extends MY_Controller {
         if(!isset($this->currentLocation) || isSessionVariableSet($this->currentLocation) === false)
         {
             $this->session->set_userdata('page_url', base_url(uri_string()));
-            if($this->userType != GUEST_USER)
+            if($this->userType != GUEST_USER || $this->userType == OFFERS_USER)
             {
                 redirect(base_url().'location-select');
             }

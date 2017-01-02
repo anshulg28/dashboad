@@ -26,7 +26,7 @@ class Mailers extends MY_Controller {
         {
             redirect(base_url().'home');
         }
-        if($this->userType == GUEST_USER)
+        if($this->userType == GUEST_USER || $this->userType == OFFERS_USER)
         {
             redirect(base_url());
         }

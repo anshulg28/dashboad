@@ -24,7 +24,7 @@ class Mugclub extends MY_Controller {
 		{
 			redirect(base_url());
 		}
-        if(isset($this->userType) && $this->userType == GUEST_USER)
+        if(isset($this->userType) && $this->userType == GUEST_USER || $this->userType == OFFERS_USER)
         {
             redirect(base_url());
         }
@@ -61,7 +61,7 @@ class Mugclub extends MY_Controller {
         {
             redirect(base_url());
         }
-        if(isset($this->userType) && $this->userType == GUEST_USER)
+        if(isset($this->userType) && $this->userType == GUEST_USER || $this->userType == OFFERS_USER)
         {
             redirect(base_url());
         }

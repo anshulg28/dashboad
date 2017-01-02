@@ -80,7 +80,7 @@ class Login extends MY_Controller {
                 }
                 else
                 {
-                    if($userResult['userType'] == '4' && $userResult['userId'] != '8')
+                    if($userResult['userType'] == '4')
                     {
                         $data['status'] = false;
                         $data['errorMsg'] = 'User Not allowed!';
