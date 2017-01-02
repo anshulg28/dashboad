@@ -556,6 +556,53 @@ input::-webkit-inner-spin-button {
     height:25px;
     background-size: 100% 100%;
 }
+
+/* Wallet css */
+.walletPage .wallet-action-btns li
+{
+    margin:5px;
+}
+.walletPage .tbl-responsive
+{
+  overflow: auto;
+}
+.walletPage .tbl-responsive table
+{
+    margin:0 auto;
+}
+.walletPage .wallet-check-panel
+{
+    margin-top:50px;
+    background: #fcf8e3;
+}
+.walletPage .mdl-card__supporting-text
+{
+    width:100%;
+}
+.walletPage .mdl-card__title
+{
+    display:block;
+}
+.walletPage table.dataTable td,.walletPage table.dataTable th
+{
+    text-align:left;
+}
+.mdl-tooltip
+{
+    will-change:unset;
+}﻿
+.walletPage .mdl-card__title
+{
+display:block;
+}
+.walletPage #staffTable_wrapper
+{
+    width:100%;
+}
+.walletPage .my-timer
+{
+    font-size:20px;
+}
 @media screen and (max-width: 1024px)
 {
     .mailPage .mail-content

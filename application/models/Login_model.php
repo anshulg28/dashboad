@@ -84,7 +84,7 @@ class Login_Model extends CI_Model
 
         $query = "SELECT userId,ifActive,attemptTimes,emailId "
             ."FROM doolally_usersmaster "
-            ."where (userType IN(1,2,3) OR userId = 8) AND mobNum = '".$mobNum."'";
+            ."where (userType IN(0,1,2,3,5) OR userId = 8) AND mobNum = '".$mobNum."'";
 
         $result = $this->db->query($query)->row_array();
 
@@ -105,7 +105,7 @@ class Login_Model extends CI_Model
     {
         $query = "SELECT userId,ifActive "
             ."FROM doolally_usersmaster "
-            ."where (userType IN(1,2,3) OR userId = 8) AND mobNum = '".$mobNum."' AND userOtp = ".$otp;
+            ."where (userType IN(0,1,2,3,5) OR userId = 8) AND mobNum = '".$mobNum."' AND userOtp = ".$otp;
 
         $result = $this->db->query($query)->row_array();
 

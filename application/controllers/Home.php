@@ -233,5 +233,575 @@ class Home extends MY_Controller {
 
         echo json_encode($data);
     }
-    
+
+    /* Wallet Managing functions */
+
+    function checkWallet()
+    {
+        $data = array();
+
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $data['checkins'] = $this->dashboard_model->getAllCheckins();
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('WalletCheckView', $data);
+    }
+    function walletManage($id)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $wallet = $this->dashboard_model->getWalletTrans($id);
+        $data = array();
+        if(isset($wallet['status']) && $wallet['status'] === true)
+        {
+            $data['walletDetails'] = $wallet['walletDetails'];
+        }
+
+        $data['walletBalance'] = $this->dashboard_model->getWalletBalance($id);
+        $data['walletId'] = $id;
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('WalletView', $data);
+    }
+    function getWallet()
+    {
+        $post = $this->input->post();
+        $data = array();
+        $isMobile = false;
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+
+        if(isset($post['userInput']) && is_numeric($post['userInput']))
+        {
+            $isMobile = true;
+            $walletBal = $this->dashboard_model->getBalanceByMob($post['userInput']);
+        }
+        else
+        {
+            $walletBal = $this->dashboard_model->getBalanceByEmp($post['userInput']);
+        }
+        if(isset($walletBal) && myIsMultiArray($walletBal))
+        {
+            if(!$isMobile && isset($walletBal['mobNum']))
+            {
+                $mob = $walletBal['mobNum'];
+                $newOtp = mt_rand(10000,999999);
+
+                $details = array(
+                    'userOtp'=> $newOtp
+                );
+                $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
+
+                $numbers = array('91'.$mob);
+
+                $postDetails = array(
+                    'apiKey' => TEXTLOCAL_API,
+                    'numbers' => implode(',', $numbers),
+                    'sender'=> urlencode('DOLALY'),
+                    'message' => rawurlencode($newOtp.' is Your OTP for wallet')
+                );
+                $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                if($smsStatus['status'] == 'failure')
+                {
+                    if(isset($smsStatus['warnings']))
+                    {
+                        $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                    }
+                    else
+                    {
+                        $data['errorMsg'] = $smsStatus['errors'][0]['message'];
+                    }
+                }
+            }
+            elseif($isMobile)
+            {
+                $mob = $post['userInput'];
+                $newOtp = mt_rand(10000,999999);
+
+                $details = array(
+                    'userOtp'=> $newOtp
+                );
+                $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
+
+                $numbers = array('91'.$mob);
+
+                $postDetails = array(
+                    'apiKey' => TEXTLOCAL_API,
+                    'numbers' => implode(',', $numbers),
+                    'sender'=> urlencode('DOLALY'),
+                    'message' => rawurlencode($newOtp.' is Your OTP for wallet')
+                );
+                $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                if($smsStatus['status'] == 'failure')
+                {
+                    if(isset($smsStatus['warnings']))
+                    {
+                        $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                    }
+                    else
+                    {
+                        $data['errorMsg'] = $smsStatus['errors'][0]['message'];
+                    }
+                }
+            }
+            $data['status'] = true;
+            $data['balance'] = $walletBal;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+        echo json_encode($data);
+    }
+
+    function checkOtp()
+    {
+        $post = $this->input->post();
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        if(isset($post['mob']) && isset($post['otp']))
+        {
+            $userOtp = $this->dashboard_model->checkStaffOtp($post['mob'], $post['otp']);
+            if($userOtp['status'] == false)
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'Invalid OTP';
+            }
+            else
+            {
+                $data['status'] = true;
+            }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'OTP or Mobile Error';
+        }
+
+        echo json_encode($data);
+    }
+
+    function requestStaffOtp()
+    {
+        $post = $this->input->post();
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        if(isset($post['mob']))
+        {
+            $walletBal = $this->dashboard_model->getBalanceByMob($post['mob']);
+            $newOtp = mt_rand(10000,999999);
+
+            $details = array(
+                'userOtp'=> $newOtp
+            );
+            $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
+
+            $numbers = array('91'.$post['mob']);
+
+            $postDetails = array(
+                'apiKey' => TEXTLOCAL_API,
+                'numbers' => implode(',', $numbers),
+                'sender'=> urlencode('DOLALY'),
+                'message' => rawurlencode($newOtp.' is Your OTP for wallet')
+            );
+            $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+            if($smsStatus['status'] == 'failure')
+            {
+                if(isset($smsStatus['warnings']))
+                {
+                    $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                }
+                else
+                {
+                    $data['errorMsg'] = $smsStatus['errors'][0]['message'];
+                }
+            }
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Mobile Number error!';
+        }
+
+        echo json_encode($data);
+    }
+    function checkinStaff()
+    {
+        $post = $this->input->post();
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+
+        $checkin = $this->dashboard_model->checkStaffChecked($post['empId']);
+        if($checkin['status'] === true)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Employee Already Checked In';
+        }
+        else
+        {
+            if($post['walletBalance'] > 0)
+            {
+                $details = array(
+                    'staffName'=> $post['staffName'],
+                    'walletBalance'=> $post['walletBalance'],
+                    'empId'=> $post['empId']
+                );
+                $this->dashboard_model->saveCheckinLog($details);
+                $data['status'] = true;
+            }
+            else
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'Zero or Negative balance!';
+            }
+        }
+        echo  json_encode($data);
+    }
+
+    function clearBill($id)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $this->dashboard_model->clearCheckinLog($id);
+        redirect(base_url().'check');
+    }
+    function staffBill($id)
+    {
+        $data = array();
+
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $checkinDetail = $this->dashboard_model->getCheckinById($id);
+        if (isset($checkinDetail) && myIsMultiArray($checkinDetail))
+        {
+            $data['billDetails'] = $this->dashboard_model->getBalanceByEmp($checkinDetail[0]['empId']);
+        }
+
+        $data['checkinId'] = $id;
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('staffBillView', $data);
+    }
+    function updateWallet($id)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+        $oldBal = $post['oldBalance'];
+        $finalBal = 0;
+        $dorc = 1;
+        $gotAmount = 0;
+        if(isset($post['addAmt']) && $post['addAmt'] != '')
+        {
+            $addBal = $post['addAmt'];
+            $gotAmount = $post['addAmt'];
+            $finalBal = $oldBal + $addBal;
+            $dorc = 2;
+        }
+        elseif(isset($post['subAmt']) && $post['subAmt'] != '')
+        {
+            $subBal = $post['subAmt'];
+            $gotAmount = $post['subAmt'];
+            $finalBal = $oldBal - $subBal;
+        }
+
+        $walletRecord = array(
+            'staffId' => $id,
+            'amount' => $gotAmount,
+            'amtAction' => $dorc,
+            'notes' => $post['notes'],
+            'updatedBy' => $this->userName
+        );
+        $this->dashboard_model->updateWalletLog($walletRecord);
+
+        $details = array(
+            'walletBalance' => $finalBal
+        );
+        $this->dashboard_model->updateStaffRecord($id,$details);
+        $data['status'] = true;
+        echo json_encode($data);
+    }
+    function saveStaff()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+
+        $id = $this->dashboard_model->saveStaffRecord($post);
+
+        $walletRecord = array(
+            'staffId' => $id,
+            'amount' => '1500',
+            'amtAction' => '2',
+            'notes' => 'New Staff Added',
+            'updatedBy' => $this->userName
+        );
+        $this->dashboard_model->updateWalletLog($walletRecord);
+
+        redirect(base_url());
+    }
+    function updateStaff()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+        $oldBal = $post['oldBalance'];
+        unset($post['oldBalance']);
+
+        $walletDiff = 0;
+        $dorc = 1;
+        if( $oldBal > $post['walletBalance'])
+        {
+            $walletDiff = $oldBal - $post['walletBalance'];
+            $dorc = 1;
+        }
+        elseif($oldBal < $post['walletBalance'])
+        {
+            $walletDiff = $post['walletBalance'] - $oldBal;
+            $dorc = 2;
+        }
+        $this->dashboard_model->updateStaffRecord($post['id'],$post);
+        if($walletDiff != 0)
+        {
+            $walletRecord = array(
+                'staffId' => $post['id'],
+                'amount' => $walletDiff,
+                'amtAction' => $dorc,
+                'notes' => 'Staff details updated',
+                'updatedBy' => $this->userName
+            );
+            $this->dashboard_model->updateWalletLog($walletRecord);
+        }
+        redirect(base_url());
+    }
+    function addStaff()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $data = array();
+
+        //$locArray = $this->locations_model->getAllLocations();
+        //$data['locations'] = $locArray;
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+
+        $this->load->view('StaffAddView', $data);
+
+    }
+
+    function blockStaff($id)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $this->dashboard_model->blockStaffRecord($id);
+        redirect(base_url().'empDetails');
+    }
+    function freeStaff($id)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $this->dashboard_model->freeStaffRecord($id);
+        redirect(base_url().'empDetails');
+    }
+
+    function staffEdit($id)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $data = array();
+        $staff = $this->dashboard_model->getStaffById($id);
+
+        if(isset($staff['status']) && $staff['status'] === true)
+        {
+            $data['staffDetails'] = $staff['staffDetails'];
+        }
+        $locArray = $this->locations_model->getAllLocations();
+        $data['locations'] = $locArray;
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+
+        $this->load->view('StaffEditView', $data);
+
+    }
+    function empDetails()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        if($this->userType == SERVER_USER)
+        {
+            redirect(base_url().'wallet');
+        }
+        $data = array();
+        $staff = $this->dashboard_model->getAllStaffs();
+        if(isset($staff['status']) &&$staff['status'] === true)
+        {
+            $data['staffList'] = $staff['staffList'];
+        }
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+
+        $this->load->view('StaffView', $data);
+
+    }
+    function getCoupon()
+    {
+        $post = $this->input->post();
+
+        $data = array();
+        //$coupon = $this->dashboard_model->getOneCoupon();
+
+        if(isset($post['empId']) && isStringSet($post['empId']))
+        {
+            $staffDetails = $this->dashboard_model->getStaffByEmpId($post['empId']);
+
+            //$this->dashboard_model->setCouponUsed($coupon['id']);
+            $billLog = array(
+                'billNum' => $post['billNum'],
+                'offerId' => null,
+                'staffId' => $staffDetails[0]['id'],
+                'billAmount' => $post['billAmount'],
+                'insertedDT' => date('Y-m-d H:i:s')
+            );
+            $this->dashboard_model->saveBillLog($billLog);
+            $this->dashboard_model->clearCheckinLog($post['checkInId']);
+            $oldBalance = $post['walletBalance'];
+            $usedAmt = $post['billAmount'];
+            $finalBal = $oldBalance - $usedAmt;
+            $walletRecord = array(
+                'staffId' => $staffDetails[0]['id'],
+                'amount' => $usedAmt,
+                'amtAction' => '1',
+                'notes' => 'Wallet Balance Used',
+                'updatedBy' => 'system'
+            );
+            $this->dashboard_model->updateWalletLog($walletRecord);
+
+            $details = array(
+                'walletBalance' => $finalBal
+            );
+            $this->dashboard_model->updateStaffRecord($staffDetails[0]['id'],$details);
+
+            $numbers = array('91'.$post['mobNum']);
+
+            $postDetails = array(
+                'apiKey' => TEXTLOCAL_API,
+                'numbers' => implode(',', $numbers),
+                'sender'=> urlencode('DOLALY'),
+                'message' => rawurlencode('Available Wallet Balance: '.$finalBal)
+            );
+            $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+            if($smsStatus['status'] == 'failure')
+            {
+                if(isset($smsStatus['warnings']))
+                {
+                    $data['smsError'] = $smsStatus['warnings'][0]['message'];
+                }
+                else
+                {
+                    $data['smsError'] = $smsStatus['errors'][0]['message'];
+                }
+            }
+            $data['status'] = true;
+            //$data['couponCode'] = $coupon['offerCode'];
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'No Employee Information Available';
+        }
+
+        echo json_encode($data);
+    }
+
+    function smsErrorCodes($code)
+    {
+        $returnVal = '';
+        switch($code)
+        {
+            case 4:
+                $returnVal = 'No recipients specified.';
+                break;
+            case 5:
+                $returnVal = 'No message content.';
+                break;
+            case 6:
+                $returnVal = 'Message too long.';
+                break;
+            case 7:
+                $returnVal = 'Insufficient credits.';
+                break;
+            case 32:
+                $returnVal = 'Invalid number format.';
+                break;
+            case 33:
+                $returnVal = 'You have supplied too many numbers.';
+                break;
+            case 43:
+                $returnVal = 'Invalid sender name.';
+                break;
+            case 44:
+                $returnVal = 'No sender name specified.';
+                break;
+            case 51:
+                $returnVal = 'No valid numbers specified.';
+                break;
+            case 192:
+                $returnVal = 'You cannot send message at this time.';
+                break;
+        }
+        return $returnVal;
+    }
 }

@@ -765,4 +765,241 @@ class Dashboard_Model extends CI_Model
 
         return $result;
     }
+
+    /* Wallet related function */
+    public function getAllCheckins()
+    {
+        $query = "SELECT *"
+            ." FROM staffcheckinmaster"
+            ." WHERE staffStatus = 1";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function getBalanceByMob($mobnum)
+    {
+        $query = "SELECT sm.id, sm.mobNum, sm.empId, sm.firstName, sm.middleName, sm.lastName, sm.walletBalance, sm.ifActive"
+            ." FROM staffmaster sm"
+            ." WHERE sm.mobNum = '".$mobnum."'";
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+
+    public function getBalanceByEmp($empId)
+    {
+        $query = "SELECT sm.id, sm.mobNum, sm.empId, sm.firstName, sm.middleName, sm.lastName, sm.walletBalance, sm.ifActive"
+            ." FROM staffmaster sm"
+            ." WHERE sm.empId = '".$empId."'";
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+    public function checkStaffChecked($empId)
+    {
+        $query = "SELECT *"
+            ." FROM staffcheckinmaster"
+            ." WHERE empId = '".$empId."' AND staffStatus = 1";
+
+        $result = $this->db->query($query)->result_array();
+        $data['checkin'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+    public function getCheckinById($id)
+    {
+        $query = "SELECT *"
+            ." FROM staffcheckinmaster"
+            ." WHERE staffStatus = 1 AND id = ".$id;
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+
+    public function saveCheckinLog($details)
+    {
+        $details['updateDT'] = date('Y-m-d H:i:s');
+        $details['staffStatus'] = '1';
+
+        $this->db->insert('staffcheckinmaster', $details);
+        return true;
+    }
+
+    public function clearCheckinLog($id)
+    {
+        $details['updateDT'] = date('Y-m-d H:i:s');
+        $details['staffStatus'] = '2';
+
+        $this->db->where('id', $id);
+        $this->db->update('staffcheckinmaster', $details);
+        return true;
+    }
+    public function saveBillLog($details)
+    {
+        $this->db->insert('staffbillingmaster', $details);
+        return true;
+    }
+    public function getWalletTrans($id)
+    {
+        $query = "SELECT wlm.amount, wlm.amtAction, wlm.notes, wlm.loggedDT, wlm.updatedBy"
+            ." FROM walletlogmaster wlm"
+            ." WHERE wlm.staffId = ".$id;
+
+        $result = $this->db->query($query)->result_array();
+        $data['walletDetails'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+    public function getWalletBalance($id)
+    {
+        $query = "SELECT sm.firstName, sm.middleName, sm.lastName, sm.walletBalance"
+            ." FROM staffmaster sm"
+            ." WHERE sm.id = ".$id;
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function updateWalletLog($details)
+    {
+        $details['loggedDT'] = date('Y-m-d H:i:s');
+
+        $this->db->insert('walletlogmaster', $details);
+        return true;
+    }
+
+    public function updateStaffRecord($id,$details)
+    {
+        $this->db->where('id', $id);
+        $this->db->update('staffmaster', $details);
+        return true;
+    }
+    public function walletLogsBatch($details)
+    {
+        $this->db->insert_batch('walletlogmaster', $details);
+        return true;
+    }
+    public function smsLogsBatch($details)
+    {
+        $this->db->insert_batch('smsmaster', $details);
+        return true;
+    }
+    public function saveStaffRecord($details)
+    {
+        $details['insertedDT'] = date('Y-m-d H:i:s');
+        $details['ifActive'] = '1';
+
+        $this->db->insert('staffmaster', $details);
+        $insert_id = $this->db->insert_id();
+        return $insert_id;
+    }
+    public function blockStaffRecord($id)
+    {
+        $details = array(
+            'ifActive'=> '0'
+        );
+        $this->db->where('id', $id);
+        $this->db->update('staffmaster', $details);
+        return true;
+    }
+
+    public function freeStaffRecord($id)
+    {
+        $details = array(
+            'ifActive'=> '1'
+        );
+        $this->db->where('id', $id);
+        $this->db->update('staffmaster', $details);
+        return true;
+    }
+    public function getStaffById($id)
+    {
+        $query = "SELECT *"
+            ." FROM staffmaster"
+            ." WHERE id = ".$id;
+
+        $result = $this->db->query($query)->result_array();
+        $data['staffDetails'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+    public function getAllStaffs()
+    {
+        $query = "SELECT sm.id, sm.empId, sm.firstName, sm.middleName, sm.lastName,
+                   sm.walletBalance, sm.mobNum, sm.insertedDT, sm.ifActive"
+            ." FROM staffmaster sm";
+
+        $result = $this->db->query($query)->result_array();
+        $data['staffList'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+    public function getStaffByEmpId($empid)
+    {
+        $query = "SELECT *"
+            ." FROM staffmaster"
+            ." WHERE empId = '".$empid."'";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+
+    public function checkStaffOtp($mob, $otp)
+    {
+        $query = "SELECT walletBalance "
+            ."FROM staffmaster "
+            ."where mobNum = '".$mob."' AND userOtp = ".$otp;
+
+        $result = $this->db->query($query)->row_array();
+
+        $data = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+
 }

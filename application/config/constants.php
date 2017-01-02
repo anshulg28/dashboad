@@ -103,6 +103,7 @@ defined('BIRTHDAY_MAIL') OR define('BIRTHDAY_MAIL',3);
 defined('CUSTOM_MAIL') OR define('CUSTOM_MAIL',0);
 
 /* User Type */
+defined('ROOT_USER') OR define('ROOT_USER',0);
 defined('ADMIN_USER') OR define('ADMIN_USER',1);
 defined('EXECUTIVE_USER') OR define('EXECUTIVE_USER',2);
 defined('SERVER_USER') OR define('SERVER_USER',3);
