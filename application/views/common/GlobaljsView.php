@@ -113,7 +113,7 @@
 
 <?php
     if(isSessionVariableSet($this->isUserSession) === true && isSessionVariableSet($this->userType)
-        && ($this->userType == ADMIN_USER || $this->userType == EXECUTIVE_USER) )
+        && ($this->userType == ROOT_USER || $this->userType == ADMIN_USER || $this->userType == EXECUTIVE_USER) )
     {
         ?>
             function checkExpiredMugs()
