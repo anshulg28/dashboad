@@ -83,9 +83,11 @@ class Mugclub_Model extends CI_Model
     }
     public function getMugDataById($mugId)
     {
-        $query = "SELECT * "
-            ."FROM mugmaster "
-            ."where mugId = ".$mugId;
+        $query = "SELECT mugId,mugTag,homeBase,l.locName,firstName,lastName,mobileNo, emailId, birthDate, membershipEnd,"
+            ."invoiceDate,invoiceNo,invoiceAmt,membershipStart,oldHomeBase,m.ifActive,notes "
+            ."FROM mugmaster m "
+            ."LEFT JOIN locationmaster l ON id = m.homeBase"
+            ." Where mugId = ".$mugId;
 
         $result = $this->db->query($query)->result_array();
 
@@ -236,9 +238,10 @@ class Mugclub_Model extends CI_Model
 
     public function verifyMobileNo($mobNo)
     {
-        $query = "SELECT * "
-            ."FROM mugmaster "
-            ."where mobileNo = '".$mobNo."'";
+        $query = "SELECT mugId,mugTag,homeBase,l.locName,firstName,lastName,mobileNo, emailId, birthDate, membershipEnd "
+            ."FROM mugmaster m "
+            ."LEFT JOIN locationmaster l ON id = m.homeBase"
+            ." Where mobileNo = '".$mobNo."'";
 
         $result = $this->db->query($query)->row_array();
 

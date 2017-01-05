@@ -18,9 +18,9 @@
         3. For paid events, we will collect money from the customer on your behalf. This is to ensure complete refund in case of cancelled events.
         Instamojo is our payment partner. Please check out their credentials here - www.instamojo.com<br><br>
 
-        4. You can access your events from your <a href="<?php echo base_url().'mobile?page/event_dash';?>" target="_blank">My Events</a>. Your dashboard is a place where information on the number of sign ups, fees collected, payout details will be available to you. You can also edit your event or cancel your event from this dashboard.<br><br>
+        4. You can access your events from your <a href="<?php echo base_url().'?page/event_dash';?>" target="_blank">My Events</a>. Your dashboard is a place where information on the number of sign ups, fees collected, payout details will be available to you. You can also edit your event or cancel your event from this dashboard.<br><br>
 
-        5. For events below 5000, organisers will be reimbursed by cash on the day of the event. For events greater than 5000, we will hand over a cheque in the name of organiser.<br><br>
+        5. For paid events, we will hand over a cheque in the name of organiser, once the event is over.<br><br>
 
         In case you have any questions/queries please don't hesitate to write to me at this mail address or you can reach me at
         <?php echo $mailData['senderPhone'] .' ('.$mailData['senderName'].')';?><br><br>

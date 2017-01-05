@@ -13,6 +13,8 @@
         Username: <?php echo $mailData['creatorEmail'];?><br>
         Password: Your Mobile Number<br><br>
 
+        You can access your events from the <a href="<?php echo base_url().'?page/event_dash';?>" target="_blank">My Events</a> section. This is a place where information on date, timings, organiser will be available to you. You can also cancel your attendance from this dashboard.<br><br>
+
         Cheers!<br>
         Doolally
     </p>

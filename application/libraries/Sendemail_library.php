@@ -329,6 +329,30 @@ class Sendemail_library
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
     }
 
+    public function mugEditSendMail($userData)
+    {
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/mugEditMailView', $data, true);
+
+        $fromEmail = 'admin@doolally.in';
+        if(isset($userData['senderEmail']) && isStringSet($userData['senderEmail']))
+        {
+            $fromEmail = $userData['senderEmail'];
+        }
+        $cc = '';
+        $fromName  = 'Doolally';
+        if(isset($userData['senderName']) && isStringSet($userData['senderName']))
+        {
+            $fromName = ucfirst($userData['senderName']);
+        }
+
+        $subject = 'Mug Member Edited';
+        $toEmail = 'tresha@doolally.in';
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
+    }
+
     public function sendEmail($to, $cc = '', $from, $fromName, $subject, $content, $attachment = array())
     {
         $CI =& get_instance();

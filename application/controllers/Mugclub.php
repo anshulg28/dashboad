@@ -235,6 +235,46 @@ class Mugclub extends MY_Controller {
             }
             else
             {
+                $changes = array();
+                foreach($mugExists['mugList'] as $key => $row)
+                {
+                    foreach($row as $subKey => $subRow)
+                    {
+                        if(myInArray($subKey,array_keys($params)))
+                        {
+                            if($subRow != $params[$subKey])
+                            {
+                                $newKey = $this->mapMugKeys($subKey);
+                                $changes[$newKey] = $subRow.':'.$params[$subKey];
+                            }
+                        }
+                    }
+                    //var_dump($row);
+                }
+
+                if(myIsMultiArray($changes) && $this->userType == EXECUTIVE_USER)
+                {
+                    if(isset($mugId))
+                    {
+                        $mugDetail['mugId'] = $mugId;
+                    }
+                    else
+                    {
+                        $mugDetail['mugId'] = $params['mugId'];
+                    }
+                    $mugDetail['changes'] = $changes;
+                    $senderName = 'Doolally';
+                    $senderEmail = 'events@doolally.in';
+                    if(isStringSet($this->userEmail) && isStringSet($this->userName))
+                    {
+                        $senderEmail = $this->userEmail;
+                        $senderName = $this->userName;
+                    }
+                    $mugDetail['senderName'] = $senderName;
+                    $mugDetail['senderEmail'] = $senderEmail;
+
+                    $this->sendemail_library->mugEditSendMail($mugDetail);
+                }
                 if(isset($post['ifMail']) && $post['ifMail'] == '1')
                 {
                     $this->sendemail_library->signUpWelcomeSendMail($params);
@@ -692,5 +732,56 @@ class Mugclub extends MY_Controller {
         }
         
         echo json_encode($data);
+    }
+
+    function mapMugKeys($key)
+    {
+        $returnTxt = '';
+        switch($key)
+        {
+            case 'mugId':
+                $returnTxt = 'Mug_Number';
+                break;
+            case 'mugTag':
+                $returnTxt = 'Mug_Tag';
+                break;
+            case 'homeBase':
+                $returnTxt = 'HomeBase';
+                break;
+            case 'firstName':
+                $returnTxt = 'First_Name';
+                break;
+            case 'lastName':
+                $returnTxt = 'Last_Name';
+                break;
+            case 'mobileNo':
+                $returnTxt = 'Mobile_Number';
+                break;
+            case 'emailId':
+                $returnTxt = 'Email_Id';
+                break;
+            case 'birthDate':
+                $returnTxt = 'Birth_Date';
+                break;
+            case 'invoiceDate':
+                $returnTxt = 'Invoice_Date';
+                break;
+            case 'invoiceNo':
+                $returnTxt = 'Invoice_No';
+                break;
+            case 'invoiceAmt':
+                $returnTxt = 'Invoice_Amount';
+                break;
+            case 'membershipStart':
+                $returnTxt = 'MemberShip_Start';
+                break;
+            case 'membershipEnd':
+                $returnTxt = 'MemberShip_End';
+                break;
+            case 'notes':
+                $returnTxt = 'Notes';
+                break;
+        }
+        return $returnTxt;
     }
 }

@@ -133,18 +133,21 @@
                                             <td><?php echo $row['emailId'];?></td>
                                             <td><?php echo $row['mobileNo'];?></td>
                                             <td><?php echo $row['locName'];?></td>
-                                            <td><?php echo $row['birthDate'];?></td>
-                                            <td><?php echo $row['membershipStart'];?></td>
-                                            <td><?php echo $row['membershipEnd'];?></td>
+                                            <td><?php $d = date_create($row['birthDate']); echo date_format($d,DATE_FORMAT_UI); ?></td>
+                                            <td><?php $d = date_create($row['membershipStart']); echo date_format($d,DATE_FORMAT_UI); ?></td>
+                                            <td><?php $d = date_create($row['membershipEnd']); echo date_format($d,DATE_FORMAT_UI);?></td>
                                             <td><a data-toggle="tooltip" title="Edit" href="<?php echo base_url().'mugclub/edit/'.$row['mugId'];?>">
                                                     <i class="glyphicon glyphicon-edit"></i></a>&nbsp;
                                                 <?php
                                                 if($this->userType != SERVER_USER)
                                                 {
-                                                    ?>
-                                                    <a data-toggle="tooltip" class="mugDelete-icon" title="Delete" data-mugId = "<?php echo $row['mugId'];?>">
-                                                        <i class="fa fa-trash-o"></i></a>&nbsp;
-                                                    <?php
+                                                    if($this->userType != EXECUTIVE_USER)
+                                                    {
+                                                        ?>
+                                                        <a data-toggle="tooltip" class="mugDelete-icon" title="Delete" data-mugId = "<?php echo $row['mugId'];?>">
+                                                            <i class="fa fa-trash-o"></i></a>&nbsp;
+                                                        <?php
+                                                    }
                                                     if(isset($row['membershipEnd']) && $row['membershipEnd'] <= date('Y-m-d', strtotime('+1 month')))
                                                     {
                                                         ?>
