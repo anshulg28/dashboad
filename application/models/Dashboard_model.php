@@ -817,6 +817,27 @@ class Dashboard_Model extends CI_Model
 
         return $data;
     }
+
+    public function checkStaffById($empId)
+    {
+        $query = "SELECT *"
+            ." FROM staffmaster"
+            ." WHERE empId = '".$empId."'";
+
+        $result = $this->db->query($query)->result_array();
+        $data['checkin'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+
     public function getCheckinById($id)
     {
         $query = "SELECT *"

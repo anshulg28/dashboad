@@ -16,6 +16,7 @@
             </a>
             <h3>Add Employee</h3>
             <form action="<?php echo base_url();?>saveStaff" method="post">
+                <div class="error-dup"></div>
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
                     <input class="mdl-textfield__input" type="text" name="empId" id="empId" required>
                     <label class="mdl-textfield__label" for="empId">Employee Id</label>
@@ -55,4 +56,34 @@
 </body>
 <?php echo $globalJs; ?>
 
+<script>
+    $(document).on('focusout','#empId', function(){
+        if($(this).val() != '')
+        {
+            var empId = $(this).val();
+
+            $.ajax({
+                type:'POST',
+                dataType:'json',
+                url:base_url+'home/checkEmpId',
+                data: {empId:empId},
+                success: function(data){
+                    if(data.status == true)
+                    {
+                        $('.error-dup').css('color','green').html('Employee Id Available!');
+                        $('button[type="submit"]').removeAttr('disabled');
+                    }
+                    else
+                    {
+                        $('.error-dup').css('color','red').html('Employee Already Exists!');
+                        $('button[type="submit"]').attr('disabled','disabled');
+                    }
+                },
+                error: function(){
+
+                }
+            });
+        }
+    });
+</script>
 </html>

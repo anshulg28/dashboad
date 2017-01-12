@@ -35,7 +35,7 @@
                                     <li>
                                         <label for="location">Location</label>
                                         <?php
-                                        if($this->userType == ADMIN_USER)
+                                        if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
                                         {
                                             ?>
                                             <select id="location" onchange="refreshBars(this)" class="form-control">
@@ -356,7 +356,7 @@
                                 <label for="feedbackLoc">Location</label>
                                 <?php
                                 $commonLoc = array();
-                                if($this->userType == ADMIN_USER)
+                                if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
                                 {
                                     $commonLoc[] = 'overall';
                                     ?>
@@ -516,7 +516,7 @@
                                                 if($row['fnb']['itemType'] == "2")
                                                 {
                                                     ?>
-                                                    <a data-toggle="tooltip" class="beer-tags" title="Tag Location" href="#" data-fnbId="<?php echo $row['fnb']['fnbId'];?>">
+                                                    <a data-toggle="tooltip" class="beer-tags fnb-tracker" title="Tag Location" href="#" data-fnbId="<?php echo $row['fnb']['fnbId'];?>">
                                                         <i class="fa fa-15x fa-tags my-success-text"></i></a>
                                                     <?php
                                                 }
@@ -525,14 +525,14 @@
                                                 if($row['fnb']['ifActive'] == ACTIVE)
                                                 {
                                                     ?>
-                                                    <a data-toggle="tooltip" title="Active" href="<?php echo base_url().'dashboard/setFnbDeActive/'.$row['fnb']['fnbId'];?>">
+                                                    <a data-toggle="tooltip" class="fnb-tracker" title="Active" href="<?php echo base_url().'dashboard/setFnbDeActive/'.$row['fnb']['fnbId'];?>">
                                                         <i class="fa fa-15x fa-lightbulb-o my-success-text"></i></a>
                                                     <?php
                                                 }
                                                 else
                                                 {
                                                     ?>
-                                                    <a data-toggle="tooltip" title="Not Active" href="<?php echo base_url().'dashboard/setFnbActive/'.$row['fnb']['fnbId'];?>">
+                                                    <a data-toggle="tooltip" class="fnb-tracker" title="Not Active" href="<?php echo base_url().'dashboard/setFnbActive/'.$row['fnb']['fnbId'];?>">
                                                         <i class="fa fa-15x fa-lightbulb-o my-error-text"></i></a>
                                                     <?php
                                                 }
@@ -728,7 +728,7 @@
                                                     if($row['eventData']['ifApproved'] == EVENT_WAITING)
                                                     {
                                                         ?>
-                                                        <a data-toggle="tooltip" title="Approve" href="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
+                                                        <a data-toggle="tooltip" title="Approve" class="even-tracker" href="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-check my-success-text"></i></a>
                                                         <a data-toggle="tooltip" title="Decline" href="<?php echo base_url().'dashboard/decline/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-times my-error-text"></i></a>
@@ -737,21 +737,21 @@
                                                     elseif($row['eventData']['ifApproved'] == EVENT_APPROVED && $row['eventData']['ifActive'] == ACTIVE)
                                                     {
                                                         ?>
-                                                        <a data-toggle="tooltip" title="Active" href="<?php echo base_url().'dashboard/setEventDeActive/'.$row['eventData']['eventId'];?>">
+                                                        <a data-toggle="tooltip" title="Active" class="even-tracker" href="<?php echo base_url().'dashboard/setEventDeActive/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-lightbulb-o my-success-text"></i></a>
                                                         <?php
                                                     }
                                                     elseif($row['eventData']['ifApproved'] == EVENT_APPROVED && $row['eventData']['ifActive'] == NOT_ACTIVE)
                                                     {
                                                         ?>
-                                                        <a data-toggle="tooltip" title="Not Active" href="<?php echo base_url().'dashboard/setEventActive/'.$row['eventData']['eventId'];?>">
+                                                        <a data-toggle="tooltip" title="Not Active" class="even-tracker" href="<?php echo base_url().'dashboard/setEventActive/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-lightbulb-o my-error-text"></i></a>
                                                         <?php
                                                     }
                                                     elseif($row['eventData']['ifApproved'] == EVENT_DECLINED)
                                                     {
                                                         ?>
-                                                        <a data-toggle="tooltip" title="Declined" href="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
+                                                        <a data-toggle="tooltip" title="Declined" class="even-tracker" href="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-ban my-error-text"></i></a>
                                                         <?php
                                                     }
@@ -768,11 +768,29 @@
                                                     <?php
                                                 }
                                                 ?>
-                                                    <a data-toggle="tooltip" title="Edit"
+                                                    <a data-toggle="tooltip" title="Edit" class="even-tracker"
                                                        href="<?php echo base_url().'dashboard/editEvent/'.$row['eventData']['eventId']?>">
                                                         <i class="fa fa-15x fa-pencil-square-o my-black-text"></i></a>
-                                                    <a data-toggle="tooltip" class="eventDelete-icon" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Delete" href="#">
+                                                    <a data-toggle="tooltip" class="eventDelete-icon even-tracker" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Delete" href="#">
                                                         <i class="fa fa-trash-o fa-15x"></i></a>&nbsp;
+                                                    <?php
+                                                        if($row['eventData']['isRegFull'] == '1')
+                                                        {
+                                                            ?>
+                                                            <a data-toggle="tooltip" title="Open Registration" class="even-tracker"
+                                                               href="<?php echo base_url().'dashboard/openReg/'.$row['eventData']['eventId'];?>">
+                                                                <i class="fa fa-15x fa-check-circle-o"></i></a>&nbsp;
+                                                            <?php
+                                                        }
+                                                        else
+                                                        {
+                                                            ?>
+                                                            <a data-toggle="tooltip" title="Close Registration" class="even-tracker"
+                                                               href="<?php echo base_url().'dashboard/closeReg/'.$row['eventData']['eventId'];?>">
+                                                                <i class="fa fa-15x fa-times-circle-o"></i></a>&nbsp;
+                                                            <?php
+                                                        }
+                                                    ?>
                                                 </td>
                                             </tr>
                                             <?php
@@ -942,7 +960,7 @@
                         {
                             ?>
                             <div class="mdl-grid table-responsive">
-                                <table id="main-event-table" class="table table-hover table-bordered table-striped">
+                                <table id="main-comp-event-table" class="table table-hover table-bordered table-striped">
                                     <thead>
                                     <tr>
                                         <th>Event Id</th>
@@ -1034,7 +1052,7 @@
                 </div>
                 <div class="modal-body">
                     <?php
-                    if($this->userType == ADMIN_USER)
+                    if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
                     {
                         ?>
                         <select id="location-feed" onchange="refreshFeeds(this)" class="form-control">
@@ -1486,7 +1504,7 @@
         lapsersBar.animate(lapsers[selectedLoc]);  // Value from 0.0 to 1.0
 
         <?php
-            if($this->userType == ADMIN_USER)
+            if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
             {
                 ?>
                     setTimeout(saveDashBoardRecord(),5000);
@@ -2297,9 +2315,42 @@
     {
         $('#eventpanel input[name="attachment"]').val(filesEventsArr.join());
     }
-    $('#main-event-table, #main-fnb-table').DataTable({
+    $('#main-comp-event-table').DataTable({
         "ordering": false
     });
+    var evenTable,fnbTable;
+
+    if(localStorageUtil.getLocal('tabEventPage') != null)
+    {
+        $('.nav-pills a[href="#eventpanel"]').tab('show');
+        evenTable =  $('#main-event-table').DataTable({
+            "displayStart": localStorageUtil.getLocal('tabEventPage') * 10,
+            "ordering": false
+        });
+        localStorageUtil.delLocal('tabEventPage');
+    }
+    else
+    {
+        evenTable =  $('#main-event-table').DataTable({
+            "ordering": false
+        });
+    }
+    if(localStorageUtil.getLocal('tabFnbPage') != null)
+    {
+        $('.nav-pills a[href="#fnbpanel"]').tab('show');
+        fnbTable =  $('#main-fnb-table').DataTable({
+            "displayStart": localStorageUtil.getLocal('tabFnbPage') * 10,
+            "ordering": false
+        });
+        localStorageUtil.delLocal('tabFnbPage');
+    }
+    else
+    {
+        fnbTable =  $('#main-fnb-table').DataTable({
+            "ordering": false
+        });
+    }
+
     $('[data-toggle="tooltip"]').tooltip();
     $(document).on('click','.view-photos', function(){
         var pics = $(this).attr('data-imgs').split(',');
@@ -2342,4 +2393,13 @@
         });
     });
 </script>
+<script>
+    $(document).on('click','.even-tracker', function(){
+        localStorageUtil.setLocal('tabEventPage',evenTable.page());
+    });
+    $(document).on('click','.fnb-tracker', function(){
+        localStorageUtil.setLocal('tabFnbPage',fnbTable.page());
+    });
+</script>
+
 </html>

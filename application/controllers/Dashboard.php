@@ -338,6 +338,7 @@ class Dashboard extends MY_Controller {
         $details = array(
             'itemType'=> $post['itemType'],
             'itemName' => $post['itemName'],
+            'itemHeadline'=> $post['itemHeadline'],
             'itemDescription' => $post['itemDescription'],
             'priceFull' => $post['priceFull'],
             'priceHalf' => $post['priceHalf'],
@@ -932,6 +933,31 @@ class Dashboard extends MY_Controller {
         $this->dashboard_model->eventAttDelete($picId);
         $data['status'] = true;
         echo json_encode($data);
+    }
+
+    function openReg($eventId)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $details = array(
+            'isRegFull' => '0'
+        );
+        $this->dashboard_model->updateEventRecord($details,$eventId);
+        redirect(base_url().'dashboard');
+    }
+    function closeReg($eventId)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $details = array(
+            'isRegFull' => '1'
+        );
+        $this->dashboard_model->updateEventRecord($details,$eventId);
+        redirect(base_url().'dashboard');
     }
 
     //For Fnb Section

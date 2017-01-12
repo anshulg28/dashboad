@@ -194,13 +194,22 @@ class Home extends MY_Controller {
                         'message' => rawurlencode($newOtp.' is Your OTP for login')
                     );
                     $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                    $email = $userCheck['emailId'];
+                    if(isset($email) && $email != '')
+                    {
+                        $mailData = array(
+                            'emailId' => $email,
+                            'otp' =>$newOtp
+                        );
+                        $this->sendemail_library->otpSendMail($mailData);
+                    }
                     if($smsStatus['status'] == 'failure')
                     {
                         $data['status'] = false;
-                        $details = array(
+                        /*$details = array(
                             'attemptTimes'=> $userCheck['attemptTimes']
                         );
-                        $this->login_model->updateUserRecord($userCheck['userId'],$details);
+                        $this->login_model->updateUserRecord($userCheck['userId'],$details);*/
                         if(isset($smsStatus['warnings']))
                         {
                             $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
@@ -671,6 +680,33 @@ class Home extends MY_Controller {
 
         $this->load->view('StaffEditView', $data);
 
+    }
+    function checkEmpId()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+        $data = array();
+
+        if(isset($post['empId']))
+        {
+            $staffCheck = $this->dashboard_model->checkStaffById($post['empId']);
+            if($staffCheck['status'] == true)
+            {
+                $data['status'] = true;
+            }
+            else
+                {
+
+            }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'No Employee Id Provided!';
+        }
     }
     function empDetails()
     {

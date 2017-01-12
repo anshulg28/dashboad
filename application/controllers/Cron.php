@@ -21,7 +21,7 @@ class Cron extends MY_Controller
         $this->load->view('Page404View');
     }
 
-    public function feedsFetch()
+        public function feedsFetch()
     {
 
         $twitter = $this->getTwitterFeeds();
@@ -331,6 +331,8 @@ class Cron extends MY_Controller
             $allFeeds = $this->sortNjoin($twitter,$instagram, $facebook);
         }
 
+        //$this->firstTimeFunc($allFeeds);
+        $this->splitAndStoreFeeds($allFeeds);
         /*$firstHalf = array_slice($allFeeds,0,20,true);
         $secondHalf = array_slice($allFeeds,20,count($allFeeds),true);*/
 
@@ -343,12 +345,238 @@ class Cron extends MY_Controller
         $this->cron_model->updateFeedByType($firstPost, "4");*/
 
         //Second Half
+    }
+
+    function firstTimeFunc($allFeeds)
+    {
+        $newFeeds = array();
+        foreach($allFeeds as $key => $row)
+        {
+            switch($row['socialType'])
+            {
+                case 'f':
+                    if(isset($row['picture']))
+                    {
+                        preg_match('/(=http:|=https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['picture']),$matches);
+                        if(myIsArray($matches))
+                        {
+                            $fileArray = explode('/',$matches[0]);
+                            $fileName= $fileArray[count($fileArray)-1];
+                            if(copy($row['picture'],'../mobile/socialimages/facebook/'.$fileName))
+                            {
+                                $row['picture'] = MOBILE_URL.'socialimages/facebook/'.$fileName;
+                            }
+                        }
+                    }
+                    $newFeeds[] = array(
+                        'feedId'=> $row['id'],
+                        'feedText' => json_encode($row),
+                        'updateDateTime' => date('Y-m-d H:i:s')
+                    );
+                    break;
+                case 'i':
+                    if(isset($row['image']))
+                    {
+                        preg_match('/(http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['image']),$matches);
+                        if(myIsArray($matches))
+                        {
+                            $fileArray = explode('/',$matches[0]);
+                            $fileName= $fileArray[count($fileArray)-1];
+                            if(copy($row['image'],'../mobile/socialimages/instagram/'.$fileName))
+                            {
+                                $row['image'] = MOBILE_URL.'socialimages/instagram/'.$fileName;
+                            }
+                        }
+                    }
+                    $newFeeds[] = array(
+                        'feedId'=> $row['id'],
+                        'feedText' => json_encode($row),
+                        'updateDateTime' => date('Y-m-d H:i:s')
+                    );
+                    break;
+                case 't':
+                    if(isset($row['extended_entities']['media'][0]['media_url_https']))
+                    {
+                        preg_match('/(http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['extended_entities']['media'][0]['media_url_https']),$matches);
+                        if(myIsArray($matches))
+                        {
+                            $fileArray = explode('/',$matches[0]);
+                            $fileName= $fileArray[count($fileArray)-1];
+                            if(copy($row['extended_entities']['media'][0]['media_url_https'],'../mobile/socialimages/twitter/'.$fileName))
+                            {
+                                $row['extended_entities']['media'][0]['media_url_https'] = MOBILE_URL.'socialimages/twitter/'.$fileName;
+                            }
+                        }
+                    }
+                    $newFeeds[] = array(
+                        'feedId'=> $row['id_str'],
+                        'feedText' => json_encode($row),
+                        'updateDateTime' => date('Y-m-d H:i:s')
+                    );
+                    break;
+            }
+        }
+
+        $this->cron_model->insertFeedBatch($newFeeds);
 
         $secondPost = array(
             'feedText' => json_encode($allFeeds),
-            'feedType' => '0'
+            'feedType' => '0',
+            'postsCount' => count($allFeeds)
         );
         $this->cron_model->updateFeedByType($secondPost, "0");
+    }
+
+    function splitAndStoreFeeds($allFeeds)
+    {
+        $topFeed = $this->cron_model->getAllViewFeeds();
+
+        $viewIds= array();
+        foreach($topFeed as $key => $row)
+        {
+            $viewIds[] = $row['feedId'];
+        }
+        $newFeeds = array();
+        $newMainFeeds = array();
+        $foundId = false;
+        foreach($allFeeds as $key => $row)
+        {
+            switch($row['socialType'])
+            {
+                case 'f':
+                    if(!myInArray($row['id'],$viewIds))
+                    {
+                        if(isset($row['picture']))
+                        {
+                            preg_match('/(=http:|=https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['picture']),$matches);
+                            if(myIsArray($matches))
+                            {
+                                $fileArray = explode('/',$matches[0]);
+                                $fileName= $fileArray[count($fileArray)-1];
+                                if(copy($row['picture'],'../mobile/socialimages/facebook/'.$fileName))
+                                {
+                                    $row['picture'] = MOBILE_URL.'socialimages/facebook/'.$fileName;
+                                }
+                            }
+                        }
+                        $newFeeds[] = array(
+                            'feedId'=> $row['id'],
+                            'feedText' => json_encode($row),
+                            'updateDateTime' => date('Y-m-d H:i:s')
+                        );
+                        $newMainFeeds[] = json_encode($row);
+                    }
+                    else
+                    {
+                        $foundId = true;
+                    }
+                    break;
+                case 'i':
+                    if(!myInArray($row['id'],$viewIds))
+                    {
+                        if(isset($row['image']))
+                        {
+                            preg_match('/(http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['image']),$matches);
+                            if(myIsArray($matches))
+                            {
+                                $fileArray = explode('/',$matches[0]);
+                                $fileName= $fileArray[count($fileArray)-1];
+                                if(copy($row['image'],'../mobile/socialimages/instagram/'.$fileName))
+                                {
+                                    $row['image'] = MOBILE_URL.'socialimages/instagram/'.$fileName;
+                                }
+                            }
+                        }
+                        $newFeeds[] = array(
+                            'feedId'=> $row['id'],
+                            'feedText' => json_encode($row),
+                            'updateDateTime' => date('Y-m-d H:i:s')
+                        );
+                        $newMainFeeds[] = json_encode($row);
+                    }
+                    else
+                    {
+                        $foundId = true;
+                    }
+                    break;
+                case 't':
+                    if(!myInArray($row['id'],$viewIds))
+                    {
+                        if(isset($row['extended_entities']['media'][0]['media_url_https']))
+                        {
+                            preg_match('/(http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['extended_entities']['media'][0]['media_url_https']),$matches);
+                            if(myIsArray($matches))
+                            {
+                                $fileArray = explode('/',$matches[0]);
+                                $fileName= $fileArray[count($fileArray)-1];
+                                if(copy($row['image'],'../mobile/socialimages/twitter/'.$fileName))
+                                {
+                                    $row['image'] = MOBILE_URL.'socialimages/twitter/'.$fileName;
+                                }
+                            }
+                        }
+                        $newFeeds[] = array(
+                            'feedId'=> $row['id_str'],
+                            'feedText' => json_encode($row),
+                            'updateDateTime' => date('Y-m-d H:i:s')
+                        );
+                        $newMainFeeds[] = json_encode($row);
+                    }
+                    else
+                    {
+                        $foundId = true;
+                    }
+                    break;
+            }
+            if($foundId == true)
+            {
+                break;
+            }
+        }
+
+        if($foundId && myIsArray($newFeeds))
+        {
+            $mergedFeeds = array_merge($newFeeds,$topFeed);
+            $finalFeeds = array_slice($mergedFeeds,0,150);
+            $this->cron_model->clearViewFeeds();
+            $this->cron_model->insertFeedBatch($finalFeeds);
+
+            //Fetch Main Feed
+            $mainFeed = $this->cron_model->getLastMainFeed();
+
+            $mainFeedRow = json_decode($mainFeed['feedText'],true);
+            $mainFeedRow = array_merge($newMainFeeds,$mainFeedRow);
+
+            if(count($mainFeedRow) > 150)
+            {
+                $feedPart1 = array_slice($mainFeedRow,0,150);
+                $feedPart2 = array_slice($mainFeedRow,150,count($mainFeedRow)-1);
+
+                $details = array(
+                    'feedText' => json_encode($feedPart1),
+                    'feedType' => '0',
+                    'postsCount' => count($feedPart1)
+                );
+                $this->cron_model->updateFeedById($details,$mainFeed['id']);
+
+                $details = array(
+                    'feedText' => json_encode($feedPart2),
+                    'feedType' => '0',
+                    'postsCount' => count($feedPart2)
+                );
+                $this->cron_model->insertFeedByType($details);
+            }
+            else
+            {
+                $details = array(
+                    'feedText' => json_encode($mainFeedRow),
+                    'feedType' => '0',
+                    'postsCount' => count($mainFeedRow)
+                );
+                $this->cron_model->updateFeedById($details,$mainFeed['id']);
+            }
+
+        }
     }
 
     function sortNjoin($arr1 = array(), $arr2 = array(), $arr3 = array())

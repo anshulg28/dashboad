@@ -72,6 +72,14 @@ class Cron_Model extends CI_Model
         $this->db->update('socialfeedmaster', $post);
         return true;
     }
+    public function updateFeedById($post,$feedId)
+    {
+        $post['updateDateTime'] = date('Y-m-d H:i:s');
+
+        $this->db->where('id', $feedId);
+        $this->db->update('socialfeedmaster', $post);
+        return true;
+    }
     public function insertFeedByType($post)
     {
         $post['updateDateTime'] = date('Y-m-d H:i:s');
@@ -79,7 +87,41 @@ class Cron_Model extends CI_Model
         $this->db->insert('socialfeedmaster', $post);
         return true;
     }
+    public function insertFeedBatch($details)
+    {
+        $this->db->insert_batch('socialviewmaster', $details);
+        return true;
+    }
+    public function getTopViewFeed()
+    {
+        $query = "SELECT * "
+            ."FROM socialviewmaster LIMIT 1";
 
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+    public function getAllViewFeeds()
+    {
+        $query = "SELECT feedId,feedText,updateDateTime "
+            ."FROM socialviewmaster";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function clearViewFeeds()
+    {
+        $this->db->truncate('socialviewmaster');
+    }
+    public function getLastMainFeed()
+    {
+        $query = "SELECT * FROM socialfeedmaster WHERE feedType = 0 ORDER BY id DESC LIMIT 1";
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
     public function findCompletedEvents()
     {
         $query = "SELECT * "

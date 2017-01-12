@@ -16,8 +16,7 @@
         Don't hurry or anything, it's valid till hell freezes over! Also, this is valid at any of our Mumbai taprooms.<br><br>
 
         Thanks,<br>
-        <?php echo trim(ucfirst($this->userFirstName));?>, Doolally<br><br>
-        Pro Tip: If you aren't in a hurry to redeem, here's a secret. We're working on our new breakfast menu. It should be ready by the end of the month.
+        <?php echo trim(ucfirst($this->userFirstName));?>, Doolally
     </p>
 
 </body>

@@ -133,9 +133,42 @@
                                             <td><?php echo $row['emailId'];?></td>
                                             <td><?php echo $row['mobileNo'];?></td>
                                             <td><?php echo $row['locName'];?></td>
-                                            <td><?php $d = date_create($row['birthDate']); echo date_format($d,DATE_FORMAT_UI); ?></td>
-                                            <td><?php $d = date_create($row['membershipStart']); echo date_format($d,DATE_FORMAT_UI); ?></td>
-                                            <td><?php $d = date_create($row['membershipEnd']); echo date_format($d,DATE_FORMAT_UI);?></td>
+                                            <td>
+                                                <?php
+                                                if(isset($row['birthDate']))
+                                                {
+                                                    $d = date_create($row['birthDate']); echo date_format($d,DATE_FORMAT_UI);
+                                                }
+                                                else
+                                                {
+                                                    echo '';
+                                                }
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                if(isset($row['membershipStart']))
+                                                {
+                                                    $d = date_create($row['membershipStart']); echo date_format($d,DATE_FORMAT_UI);
+                                                }
+                                                else
+                                                {
+                                                    echo '';
+                                                }
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                if(isset($row['membershipEnd']))
+                                                {
+                                                    $d = date_create($row['membershipEnd']); echo date_format($d,DATE_FORMAT_UI);
+                                                }
+                                                else
+                                                {
+                                                    echo '';
+                                                }
+                                                ?>
+                                            </td>
                                             <td><a data-toggle="tooltip" title="Edit" href="<?php echo base_url().'mugclub/edit/'.$row['mugId'];?>">
                                                     <i class="glyphicon glyphicon-edit"></i></a>&nbsp;
                                                 <?php

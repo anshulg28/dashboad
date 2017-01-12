@@ -28,7 +28,7 @@ class Sendemail_library
         {
             $fromEmail = $this->CI->userEmail;
         }
-        $cc        = 'priyanka@doolally.in,tresha@doolally.in,daksha@doolally.in,shweta@doolally.in';
+        $cc        = 'priyanka@doolally.in,tresha@doolally.in,daksha@doolally.in,shweta@doolally.in,richa@doolally.in';
         $fromName  = 'Doolally';
         if(isset($this->CI->userFirstName))
         {
@@ -255,7 +255,7 @@ class Sendemail_library
         {
             $fromEmail = $this->CI->userEmail;
         }
-        $cc        = 'priyanka@doolally.in,tresha@doolally.in,daksha@doolally.in,shweta@doolally.in';
+        $cc        = 'priyanka@doolally.in,tresha@doolally.in,daksha@doolally.in,shweta@doolally.in,richa@doolally.in';
         $fromName  = 'Doolally';
         if(isset($this->CI->userFirstName))
         {
