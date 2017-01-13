@@ -395,6 +395,10 @@ class Home extends MY_Controller {
             }
             else
             {
+                $details = array(
+                    'userOtp' => null
+                );
+                $this->dashboard_model->updateStaffRecord($userOtp['id'],$details);
                 $data['status'] = true;
             }
         }
@@ -552,6 +556,7 @@ class Home extends MY_Controller {
             'amount' => $gotAmount,
             'amtAction' => $dorc,
             'notes' => $post['notes'],
+            'loggedDT' => date('Y-m-d H:i:s'),
             'updatedBy' => $this->userName
         );
         $this->dashboard_model->updateWalletLog($walletRecord);
@@ -578,6 +583,7 @@ class Home extends MY_Controller {
             'amount' => '1500',
             'amtAction' => '2',
             'notes' => 'New Staff Added',
+            'loggedDT' => date('Y-m-d H:i:s'),
             'updatedBy' => $this->userName
         );
         $this->dashboard_model->updateWalletLog($walletRecord);
@@ -614,6 +620,7 @@ class Home extends MY_Controller {
                 'amount' => $walletDiff,
                 'amtAction' => $dorc,
                 'notes' => 'Staff details updated',
+                'loggedDT' => date('Y-m-d H:i:s'),
                 'updatedBy' => $this->userName
             );
             $this->dashboard_model->updateWalletLog($walletRecord);
@@ -742,55 +749,73 @@ class Home extends MY_Controller {
         if(isset($post['empId']) && isStringSet($post['empId']))
         {
             $staffDetails = $this->dashboard_model->getStaffByEmpId($post['empId']);
-
-            //$this->dashboard_model->setCouponUsed($coupon['id']);
-            $billLog = array(
-                'billNum' => $post['billNum'],
-                'offerId' => null,
-                'staffId' => $staffDetails[0]['id'],
-                'billAmount' => $post['billAmount'],
-                'insertedDT' => date('Y-m-d H:i:s')
-            );
-            $this->dashboard_model->saveBillLog($billLog);
-            $this->dashboard_model->clearCheckinLog($post['checkInId']);
-            $oldBalance = $post['walletBalance'];
-            $usedAmt = $post['billAmount'];
-            $finalBal = $oldBalance - $usedAmt;
-            $walletRecord = array(
-                'staffId' => $staffDetails[0]['id'],
-                'amount' => $usedAmt,
-                'amtAction' => '1',
-                'notes' => 'Wallet Balance Used',
-                'updatedBy' => 'system'
-            );
-            $this->dashboard_model->updateWalletLog($walletRecord);
-
-            $details = array(
-                'walletBalance' => $finalBal
-            );
-            $this->dashboard_model->updateStaffRecord($staffDetails[0]['id'],$details);
-
-            $numbers = array('91'.$post['mobNum']);
-
-            $postDetails = array(
-                'apiKey' => TEXTLOCAL_API,
-                'numbers' => implode(',', $numbers),
-                'sender'=> urlencode('DOLALY'),
-                'message' => rawurlencode('Available Wallet Balance: '.$finalBal)
-            );
-            $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
-            if($smsStatus['status'] == 'failure')
+            $billCheck = $this->dashboard_model->checkBillNum($post['billNum']);
+            if(!myIsArray($billCheck))
             {
-                if(isset($smsStatus['warnings']))
+                //$this->dashboard_model->setCouponUsed($coupon['id']);
+                $billLog = array(
+                    'billNum' => $post['billNum'],
+                    'offerId' => null,
+                    'staffId' => $staffDetails[0]['id'],
+                    'billAmount' => $post['billAmount'],
+                    'insertedDT' => date('Y-m-d H:i:s')
+                );
+                $this->dashboard_model->saveBillLog($billLog);
+                $this->dashboard_model->clearCheckinLog($post['checkInId']);
+                $oldBalance = $post['walletBalance'];
+                $usedAmt = $post['billAmount'];
+                $finalBal = $oldBalance - $usedAmt;
+                $walletRecord = array(
+                    'staffId' => $staffDetails[0]['id'],
+                    'amount' => $usedAmt,
+                    'amtAction' => '1',
+                    'notes' => 'Wallet Balance Used',
+                    'loggedDT' => date('Y-m-d H:i:s'),
+                    'updatedBy' => 'system'
+                );
+                $this->dashboard_model->updateWalletLog($walletRecord);
+
+                $details = array(
+                    'walletBalance' => $finalBal
+                );
+                $this->dashboard_model->updateStaffRecord($staffDetails[0]['id'],$details);
+
+                $numbers = array('91'.$post['mobNum']);
+
+                $postDetails = array(
+                    'apiKey' => TEXTLOCAL_API,
+                    'numbers' => implode(',', $numbers),
+                    'sender'=> urlencode('DOLALY'),
+                    'message' => rawurlencode('Available Wallet Balance: '.$finalBal)
+                );
+                $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                if($smsStatus['status'] == 'failure')
                 {
-                    $data['smsError'] = $smsStatus['warnings'][0]['message'];
+                    if(isset($smsStatus['warnings']))
+                    {
+                        $data['smsError'] = $smsStatus['warnings'][0]['message'];
+                    }
+                    else
+                    {
+                        $data['smsError'] = $smsStatus['errors'][0]['message'];
+                    }
                 }
-                else
-                {
-                    $data['smsError'] = $smsStatus['errors'][0]['message'];
-                }
+                $data['status'] = true;
             }
-            $data['status'] = true;
+            else
+            {
+                $billLog = array(
+                    'billNum' => $post['billNum'],
+                    'offerId' => null,
+                    'staffId' => $staffDetails[0]['id'],
+                    'billAmount' => $post['billAmount'],
+                    'insertedDT' => date('Y-m-d H:i:s')
+                );
+                $this->dashboard_model->saveFailBillLog($billLog);
+
+                $data['status'] = false;
+                $data['errorMsg'] = 'Bill Number Already Associated!';
+            }
             //$data['couponCode'] = $coupon['offerCode'];
         }
         else

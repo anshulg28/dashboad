@@ -848,6 +848,16 @@ class Dashboard_Model extends CI_Model
 
         return $result;
     }
+    public function checkBillNum($billNum)
+    {
+        $query = "SELECT *"
+            ." FROM staffbillingmaster"
+            ." WHERE billNum = ".$billNum;
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
 
     public function saveCheckinLog($details)
     {
@@ -860,7 +870,7 @@ class Dashboard_Model extends CI_Model
 
     public function clearCheckinLog($id)
     {
-        $details['updateDT'] = date('Y-m-d H:i:s');
+        //$details['updateDT'] = date('Y-m-d H:i:s');
         $details['staffStatus'] = '2';
 
         $this->db->where('id', $id);
@@ -870,6 +880,11 @@ class Dashboard_Model extends CI_Model
     public function saveBillLog($details)
     {
         $this->db->insert('staffbillingmaster', $details);
+        return true;
+    }
+    public function saveFailBillLog($details)
+    {
+        $this->db->insert('staffbillingfailmaster', $details);
         return true;
     }
     public function getWalletTrans($id)
@@ -903,8 +918,6 @@ class Dashboard_Model extends CI_Model
     }
     public function updateWalletLog($details)
     {
-        $details['loggedDT'] = date('Y-m-d H:i:s');
-
         $this->db->insert('walletlogmaster', $details);
         return true;
     }
@@ -1004,7 +1017,7 @@ class Dashboard_Model extends CI_Model
 
     public function checkStaffOtp($mob, $otp)
     {
-        $query = "SELECT walletBalance "
+        $query = "SELECT id, walletBalance "
             ."FROM staffmaster "
             ."where mobNum = '".$mob."' AND userOtp = ".$otp;
 

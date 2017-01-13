@@ -80,7 +80,7 @@
                                                 Settle Bill
                                             </a>
                                             <?php
-                                            if(isSessionVariableSet($this->isUserSession) === true)
+                                            if(isSessionVariableSet($this->userType) === true && ($this->userType == WALLET_USER || $this->userType == ROOT_USER) )
                                             {
                                                 ?>
                                                 <a href="<?php echo  base_url().'clearBill/'.$row['id'];?>" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
