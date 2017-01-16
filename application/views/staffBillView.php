@@ -16,40 +16,15 @@
                     <h2 class="">Complete Billing</h2>
                 </div>
                 <div class="mdl-card__supporting-text tbl-responsive">
-                    <?php
-                        if(isset($billDetails) && myIsMultiArray($billDetails))
+                   <!-- --><?php
+/*                        if(isset($billDetails) && myIsMultiArray($billDetails))
                         {
-                            ?>
+                            */?>
                             <form id="staffBillForm" action="<?php echo base_url();?>getCoupon" method="post">
-                                <input type="hidden" name="checkInId" value="<?php echo $checkinId;?>"/>
-                                <input type="hidden" name="walletBalance" value="<?php echo $billDetails['walletBalance'];?>"/>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label add-wallet">
-                                    <input class="mdl-textfield__input" type="text" id="empId" name="empId"
-                                           value="<?php echo $billDetails['empId'];?>" readonly>
-                                    <label class="mdl-textfield__label" for="empId">Employee Id</label>
+                                    <input class="mdl-textfield__input" type="text" id="empId" name="empId">
+                                    <label class="mdl-textfield__label" for="empId">Employee Id Or Mobile No.</label>
                                 </div>
-                                <br>
-                                <?php
-                                    if(isset($billDetails['mobNum']) && $billDetails['mobNum'] != '')
-                                    {
-                                        ?>
-                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label add-wallet">
-                                            <input class="mdl-textfield__input" type="number" id="mobNum" name="mobNum"
-                                                   value="<?php echo $billDetails['mobNum'];?>" readonly>
-                                            <label class="mdl-textfield__label" for="mobNum">Phone Number</label>
-                                        </div>
-                                        <?php
-                                    }
-                                    else
-                                    {
-                                        ?>
-                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label add-wallet">
-                                            <input class="mdl-textfield__input" type="number" id="mobNum" name="mobNum">
-                                            <label class="mdl-textfield__label" for="mobNum">Phone Number</label>
-                                        </div>
-                                        <?php
-                                    }
-                                ?>
                                 <br>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label add-wallet">
                                     <input class="mdl-textfield__input" type="text" id="billNum" name="billNum">
@@ -61,7 +36,16 @@
                                     <label class="mdl-textfield__label" for="billAmount">Amount</label>
                                 </div>
                                 <br>
-                                <button type="submit" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label add-wallet">
+                                    <input class="mdl-textfield__input" type="number" id="userOtp" name="userOtp">
+                                    <label class="mdl-textfield__label" for="userOtp">Enter OTP</label>
+                                </div>
+                                <div class="timer fa-15x"></div>
+                                <br>
+                                <button type="button" id="gen-bill-otp" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">
+                                    Generate OTP
+                                </button>
+                                <button type="submit" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect hide">
                                     Clear Bill
                                 </button>
                             </form>
@@ -70,13 +54,13 @@
                             </button>
                             <h3 class="Coupon-view hide"></h3>-->
                             <?php
-                        }
-                        else
+/*                        }*/
+                        /*else
                         {
-                            ?>
+                            */?><!--
                             <h3>No Bill To Settle</h3>
-                            <?php
-                        }
+                            --><?php
+/*                        }*/
                     ?>
                 </div>
             </div>
@@ -92,7 +76,7 @@
 
     $(document).on('submit','#staffBillForm', function(e){
         e.preventDefault();
-        if($('#billNum').val() != '' && $('#billAmount').val() != '')
+        if($('#billNum').val() != '' && $('#billAmount').val() != '' && $('#userOtp').val() != '')
         {
             showCustomLoader();
             $.ajax({
@@ -114,7 +98,7 @@
                         else
                         {
                             bootbox.alert('Bill Settled!', function(){
-                                window.location.href = base_url+'check';
+                                window.location.href = base_url+'wallet';
                             });
                             /*setTimeout(function(){
                                 $('#viewCoupon').removeClass('hide');
@@ -141,6 +125,64 @@
 
     $(document).on('click','#viewCoupon', function(){
         $('.Coupon-view').removeClass('hide');
+    });
+
+    $(document).on('click','#gen-bill-otp', function(){
+        var empId = $('#empId').val();
+
+        if(empId == '')
+        {
+            bootbox.alert('Please Provide Employee Id or Mobile Number');
+            return false;
+        }
+        showCustomLoader();
+        $.ajax({
+            type:'POST',
+            dataType:'json',
+            url: base_url+'home/requestWalletOtp',
+            data:{empId: empId},
+            success: function(data){
+                hideCustomLoader();
+
+                if(data.status == true)
+                {
+                    bootbox.alert('OTP Send Successfully!');
+                    $('#gen-bill-otp').addClass('hide');
+                    $('button[type="submit"]').removeClass('hide');
+                    var min = 0;
+                    var sec = 0;
+                    timer = setInterval(function(){
+                        sec +=1;
+                        if(sec == 60)
+                        {
+                            min += 1;
+                            sec = 0;
+                        }
+                        $('.walletPage .timer').html('Wait(5 mins): '+min+' : '+sec);
+                        if(min >= 5)
+                        {
+                            clearInterval(timer);
+                        }
+                    },1000);
+                    setTimeout(function(){
+                        $('.walletPage .timer').html('');
+                        $('.walletPage #gen-bill-otp').removeClass('hide');
+                        //$('button[type="submit"]').addClass('hide');
+                        clearInterval(timer);
+                    },(5*60*1000));
+                }
+                else
+                {
+                    bootbox.alert(data.errorMsg);
+                }
+
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
+
     });
 
 </script>

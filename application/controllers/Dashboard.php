@@ -624,7 +624,7 @@ class Dashboard extends MY_Controller {
         $post['endTime'] = date('H:i', strtotime($post['endTime']));
         $eventId = $this->dashboard_model->saveEventRecord($post);
 
-        $eventShareLink = base_url().'mobile?page/events/EV-'.$eventId.'/'.encrypt_data('EV-'.$eventId);
+        $eventShareLink = MOBILE_URL.'mobile?page/events/EV-'.$eventId.'/'.encrypt_data('EV-'.$eventId);
 
         $details = array(
           'eventShareLink'=> $eventShareLink

@@ -122,6 +122,25 @@ class Cron_Model extends CI_Model
 
         return $result;
     }
+
+    public function getMoreLatestFeeds($count)
+    {
+        if($count == 0)
+        {
+            $query = "SELECT id,feedText FROM socialfeedmaster
+                  WHERE feedType = 0 ORDER BY updateDateTime DESC LIMIT ".$count.",".($count+1);
+        }
+        else
+        {
+            $query = "SELECT id,feedText FROM socialfeedmaster
+                  WHERE feedType = 0 ORDER BY updateDateTime DESC LIMIT ".$count.",".$count;
+        }
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+
     public function findCompletedEvents()
     {
         $query = "SELECT * "

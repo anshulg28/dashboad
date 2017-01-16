@@ -347,84 +347,83 @@ class Cron extends MY_Controller
         //Second Half
     }
 
-    function firstTimeFunc($allFeeds)
+    function firstTimeFunc()
     {
-        $newFeeds = array();
-        foreach($allFeeds as $key => $row)
+
+        $viewFeeds = $this->cron_model->getAllViewFeeds();
+        $viewIds = array();
+        foreach($viewFeeds as $key => $row)
         {
+            $viewIds[] = $row['feedId'];
+        }
+
+        $oldFeeds = $this->cron_model->getMoreLatestFeeds(1);
+        $firstId = $oldFeeds['id'];
+        $oldFeeds = json_decode($oldFeeds['feedText'],true);
+
+        $arrayExists = array();
+        $arrayNew = array();
+
+        foreach($oldFeeds as $key => $row)
+        {
+            $row = json_decode($row,true);
             switch($row['socialType'])
             {
                 case 'f':
-                    if(isset($row['picture']))
+                    if(myInArray($row['id'],$viewIds))
                     {
-                        preg_match('/(=http:|=https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['picture']),$matches);
-                        if(myIsArray($matches))
-                        {
-                            $fileArray = explode('/',$matches[0]);
-                            $fileName= $fileArray[count($fileArray)-1];
-                            if(copy($row['picture'],'../mobile/socialimages/facebook/'.$fileName))
-                            {
-                                $row['picture'] = MOBILE_URL.'socialimages/facebook/'.$fileName;
-                            }
-                        }
+                        $arrayExists[] = $row;
                     }
-                    $newFeeds[] = array(
-                        'feedId'=> $row['id'],
-                        'feedText' => json_encode($row),
-                        'updateDateTime' => date('Y-m-d H:i:s')
-                    );
+                    else
+                    {
+                        $arrayNew[] = $row;
+                    }
                     break;
                 case 'i':
-                    if(isset($row['image']))
+                    if(myInArray($row['id'],$viewIds))
                     {
-                        preg_match('/(http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['image']),$matches);
-                        if(myIsArray($matches))
-                        {
-                            $fileArray = explode('/',$matches[0]);
-                            $fileName= $fileArray[count($fileArray)-1];
-                            if(copy($row['image'],'../mobile/socialimages/instagram/'.$fileName))
-                            {
-                                $row['image'] = MOBILE_URL.'socialimages/instagram/'.$fileName;
-                            }
-                        }
+                        $arrayExists[] = $row;
                     }
-                    $newFeeds[] = array(
-                        'feedId'=> $row['id'],
-                        'feedText' => json_encode($row),
-                        'updateDateTime' => date('Y-m-d H:i:s')
-                    );
+                    else
+                    {
+                        $arrayNew[] = $row;
+                    }
                     break;
                 case 't':
-                    if(isset($row['extended_entities']['media'][0]['media_url_https']))
+                    if(myInArray($row['id_str'],$viewIds))
                     {
-                        preg_match('/(http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['extended_entities']['media'][0]['media_url_https']),$matches);
-                        if(myIsArray($matches))
-                        {
-                            $fileArray = explode('/',$matches[0]);
-                            $fileName= $fileArray[count($fileArray)-1];
-                            if(copy($row['extended_entities']['media'][0]['media_url_https'],'../mobile/socialimages/twitter/'.$fileName))
-                            {
-                                $row['extended_entities']['media'][0]['media_url_https'] = MOBILE_URL.'socialimages/twitter/'.$fileName;
-                            }
-                        }
+                        $arrayExists[] = $row;
                     }
-                    $newFeeds[] = array(
-                        'feedId'=> $row['id_str'],
-                        'feedText' => json_encode($row),
-                        'updateDateTime' => date('Y-m-d H:i:s')
-                    );
+                    else
+                    {
+                        $arrayNew[] = $row;
+                    }
                     break;
             }
         }
 
-        $this->cron_model->insertFeedBatch($newFeeds);
+        $lastestFeeds = $this->cron_model->getMoreLatestFeeds(0);
+        $lastId = $lastestFeeds['id'];
+        $lastestFeeds = json_decode($lastestFeeds['feedText'], true);
 
-        $secondPost = array(
-            'feedText' => json_encode($allFeeds),
-            'feedType' => '0',
-            'postsCount' => count($allFeeds)
+        if(myIsArray($arrayExists))
+        {
+            $finalNew = array_merge($lastestFeeds, $arrayExists);
+        }
+        $detailPost = array(
+            'feedText' => json_encode($finalNew),
+            'postsCount' => count($finalNew)
         );
-        $this->cron_model->updateFeedByType($secondPost, "0");
+
+        $this->cron_model->updateFeedById($detailPost,$lastId);
+
+        $detailPost = array(
+            'feedText' => json_encode($arrayNew),
+            'postsCount' => count($arrayNew)
+        );
+
+        $this->cron_model->updateFeedById($detailPost,$firstId);
+
     }
 
     function splitAndStoreFeeds($allFeeds)
@@ -500,7 +499,7 @@ class Cron extends MY_Controller
                     }
                     break;
                 case 't':
-                    if(!myInArray($row['id'],$viewIds))
+                    if(!myInArray($row['id_str'],$viewIds))
                     {
                         if(isset($row['extended_entities']['media'][0]['media_url_https']))
                         {

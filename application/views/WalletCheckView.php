@@ -16,7 +16,14 @@
                     <h2 class="">Check Wallet Balance</h2>
                 </div>
                 <div class="mdl-card__supporting-text tbl-responsive">
-                    <form id="walletCheckForm" action="<?php echo base_url();?>getWallet" method="post">
+                    <button type="button" id="check-staff-balance" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                        Check Balance
+                    </button>&nbsp;&nbsp;
+                    <a href="<?php echo base_url().'staffBill' ?>" id="settle-bill-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+                        Settle Bill
+                    </a>
+                    <br>
+                    <form id="walletCheckForm" class="hide" action="<?php echo base_url();?>getWallet" method="post">
                         <ul class="list-inline">
                             <li>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label add-wallet">
@@ -26,12 +33,12 @@
                             </li>
                             <li>
                                 <button type="submit" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">
-                                    Verify
+                                    Check
                                 </button>
                             </li>
                         </ul>
                     </form>
-                    <div class="wallet-otp-view hide">
+                   <!-- <div class="wallet-otp-view hide">
                         <div class="my-timer"></div>
                         <button type="button" id="ask-staff-otp" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent hide">
                             Request OTP
@@ -44,12 +51,12 @@
                         <button type="button" id="check-staff-otp" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
                             Show Balance
                         </button>
-                    </div>
+                    </div>-->
                     <h3 class="walletBalance-view hide"></h3>
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored hide"
+                    <!--<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored hide"
                             id="checkinBtn">
                         Check-Inn
-                    </button>
+                    </button>-->
                     <br>
                     <?php
                         if(isset($checkins) && myIsMultiArray($checkins))
@@ -111,13 +118,17 @@
 <script>
     var empDetails = {};
     var timer = null;
+
+    $(document).on('click','#check-staff-balance', function(){
+        $('#walletCheckForm').removeClass('hide');
+    });
     $(document).on('submit','#walletCheckForm', function(e){
         e.preventDefault();
         if($('#userInput').val() != '')
         {
-            $('.walletPage .wallet-otp-view').addClass('hide');
+            //$('.walletPage .wallet-otp-view').addClass('hide');
             $('.walletBalance-view').empty();
-            $('#checkinBtn').addClass('hide');
+            //$('#checkinBtn').addClass('hide');
             showCustomLoader();
             $.ajax({
                 url: $(this).attr('action'),
@@ -132,7 +143,7 @@
                         if(data.balance.ifActive == '0')
                         {
                             $('.walletBalance-view').empty().html('Employee Account Disabled!').removeClass('hide');
-                            $('#checkinBtn').addClass('hide');
+                            //$('#checkinBtn').addClass('hide');
                         }
                         else
                         {
@@ -162,7 +173,7 @@
                             }
                             $('.walletBalance-view').empty().html(newHtml);
 
-                            if(data.balance.mobNum != '')
+                            /*if(data.balance.mobNum != '')
                             {
                                 $('.walletPage #userMob').val(data.balance.mobNum);
                                 $('.walletPage .wallet-otp-view').removeClass('hide');
@@ -191,7 +202,11 @@
                             else
                             {
                                 $('.walletBalance-view').removeClass('hide');
-                            }
+                            }*/
+                            setTimeout(function(){
+                                window.location.reload();
+                            },30000);
+                            $('.walletBalance-view').removeClass('hide');
                         }
 
                         if(typeof data.errorMsg != 'undefined')
@@ -221,7 +236,7 @@
         }
     });
 
-    $(document).on('click','#checkinBtn', function(){
+    /*$(document).on('click','#checkinBtn', function(){
         if(empDetails['staffName'] != '')
         {
             showCustomLoader();
@@ -336,6 +351,6 @@
                 bootbox.alert('Some Error Occurred!');
             }
         });
-    });
+    });*/
 </script>
 </html>
