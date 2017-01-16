@@ -759,7 +759,7 @@ class Home extends MY_Controller {
                 $walletBal = $this->dashboard_model->getBalanceByEmp($post['empId']);
             }
 
-            if(!isset($walletBal['mobNum']) && $walletBal['mobNum'] != '')
+            if(isset($walletBal['mobNum']) && $walletBal['mobNum'] != '')
             {
                 $newOtp = mt_rand(10000,999999);
 
