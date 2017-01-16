@@ -759,34 +759,42 @@ class Home extends MY_Controller {
                 $walletBal = $this->dashboard_model->getBalanceByEmp($post['empId']);
             }
 
-            $newOtp = mt_rand(10000,999999);
-
-            $details = array(
-                'userOtp'=> $newOtp
-            );
-            $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
-
-            $numbers = array('91'.$walletBal['mobNum']);
-
-            $postDetails = array(
-                'apiKey' => TEXTLOCAL_API,
-                'numbers' => implode(',', $numbers),
-                'sender'=> urlencode('DOLALY'),
-                'message' => rawurlencode($newOtp.' is Your OTP for wallet')
-            );
-            $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
-            if($smsStatus['status'] == 'failure')
+            if(!isset($walletBal['mobNum']) && $walletBal['mobNum'] != '')
             {
-                if(isset($smsStatus['warnings']))
+                $newOtp = mt_rand(10000,999999);
+
+                $details = array(
+                    'userOtp'=> $newOtp
+                );
+                $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
+
+                $numbers = array('91'.$walletBal['mobNum']);
+
+                $postDetails = array(
+                    'apiKey' => TEXTLOCAL_API,
+                    'numbers' => implode(',', $numbers),
+                    'sender'=> urlencode('DOLALY'),
+                    'message' => rawurlencode($newOtp.' is Your OTP for wallet')
+                );
+                $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                if($smsStatus['status'] == 'failure')
                 {
-                    $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                    if(isset($smsStatus['warnings']))
+                    {
+                        $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                    }
+                    else
+                    {
+                        $data['errorMsg'] = $smsStatus['errors'][0]['message'];
+                    }
                 }
-                else
-                {
-                    $data['errorMsg'] = $smsStatus['errors'][0]['message'];
-                }
+                $data['status'] = true;
             }
-            $data['status'] = true;
+            else
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'No Mobile Number Available!';
+            }
         }
         else
         {
