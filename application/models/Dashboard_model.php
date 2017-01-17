@@ -1036,4 +1036,22 @@ class Dashboard_Model extends CI_Model
         return $data;
     }
 
+    /* Meta Tag Sharing function */
+    public function getRecentMeta()
+    {
+        $query = "SELECT *"
+            ." FROM custommetatags"
+            ." ORDER BY id DESC";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function saveMetaRecord($details)
+    {
+        $details['updateDT'] = date('Y-m-d H:i:s');
+
+        $this->db->insert('custommetatags', $details);
+        return true;
+    }
 }

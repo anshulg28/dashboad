@@ -133,6 +133,7 @@ class Dashboard extends MY_Controller {
                 $data['fnbData'][$key]['fnbAtt'] = $this->dashboard_model->getFnbAttById($row['fnbId']);
             }
         }
+        $data['shareMeta'] = $this->dashboard_model->getRecentMeta();
         //$data['feedbacks'];
 		$data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
 		$data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
@@ -1056,6 +1057,17 @@ class Dashboard extends MY_Controller {
         }
         redirect(base_url().'dashboard');
 
+    }
+
+    function saveEventMeta()
+    {
+        $post = $this->input->post();
+
+        if(isset($post['metaTitle']) && isset($post['metaDescription']))
+        {
+            $this->dashboard_model->saveMetaRecord($post);
+        }
+        redirect(base_url().'dashboard');
     }
 
 }

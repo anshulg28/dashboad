@@ -75,6 +75,15 @@
                                                 </div>
                                             </a>
                                         </li>
+                                        <li>
+                                            <a href="<?php echo base_url().'wallet';?>">
+                                                <div class="menuWrap">
+                                                    <i class="fa fa-money fa-2x"></i>
+                                                    <br>
+                                                    <span>Wallet Check</span>
+                                                </div>
+                                            </a>
+                                        </li>
                                     <?php
                                         if($this->userType == ROOT_USER)
                                         {

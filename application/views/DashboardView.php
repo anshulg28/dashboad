@@ -671,6 +671,14 @@
                     <li class="active"><a data-toggle="tab" href="#eventView">Event Records</a></li>
                     <li><a data-toggle="tab" href="#eventAdd">Add Event</a></li>
                     <li><a data-toggle="tab" href="#compEvents">Completed</a></li>
+                    <?php
+                        if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
+                        {
+                            ?>
+                            <li><a data-toggle="tab" href="#metaTab">Event Sharing</a></li>
+                            <?php
+                        }
+                    ?>
                 </ul>
 
                 <div class="tab-content">
@@ -1036,6 +1044,69 @@
                         }
                         ?>
                     </div>
+                    <?php
+                    if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
+                    {
+                        ?>
+                        <div id="metaTab" class="tab-pane fade">
+                            <div class="mdl-grid">
+                                <div class="mdl-cell mdl-cell--2-col"></div>
+                                <div class="mdl-cell mdl-cell--8-col">
+                                    <form action="<?php echo base_url();?>dashboard/saveEventMeta" method="post" enctype="multipart/form-data">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
+                                            <input class="mdl-textfield__input" type="text" name="metaTitle" id="shareTitle">
+                                            <label class="mdl-textfield__label" for="shareTitle">Sharing Title</label>
+                                        </div>
+                                        <br>
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
+                                            <label class="mdl-textfield__label" for="shareDesc">Sharing Description</label>
+                                            <textarea class="mdl-textfield__input my-singleBorder" rows="5" name="metaDescription" id="shareDesc"></textarea>
+                                        </div>
+                                        <br>
+                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Save</button>
+                                    </form>
+                                    <br>
+                                    <br>
+                                    <?php
+                                        if(isset($shareMeta) && myIsArray($shareMeta))
+                                        {
+                                            ?>
+                                            <div class="mdl-grid table-responsive">
+                                                <table class="table table-hover table-bordered table-striped">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Id</th>
+                                                        <th>Title</th>
+                                                        <th>Description</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <?php
+                                                    foreach($shareMeta as $key => $row)
+                                                    {
+                                                        ?>
+                                                        <tr>
+                                                            <th scope="row"><?php echo $row['id'];?></th>
+                                                            <td><?php echo $row['metaTitle'];?></td>
+                                                            <td><?php echo $row['metaDescription'];?></td>
+                                                        </tr>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <?php
+
+                                        }
+                                    ?>
+                                </div>
+                                <div class="mdl-cell mdl-cell--2-col"></div>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                    ?>
                 </div>
             </section>
 
