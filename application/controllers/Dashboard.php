@@ -576,6 +576,10 @@ class Dashboard extends MY_Controller {
 
     public function uploadEventFiles()
     {
+        /*if(strpos($_SERVER['HTTP_HOST'],'doolally.io'))
+        {
+
+        }*/
         if(isSessionVariableSet($this->isUserSession) === false)
         {
             redirect(base_url());
@@ -1068,6 +1072,40 @@ class Dashboard extends MY_Controller {
             $this->dashboard_model->saveMetaRecord($post);
         }
         redirect(base_url().'dashboard');
+    }
+
+    //upload img for meta tag
+    public function uploadMetaFiles()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $attchmentArr = '';
+        $this->load->library('upload');
+        if(isset($_FILES))
+        {
+            if($_FILES['attachment']['error'] != 1)
+            {
+                $config = array();
+                $config['upload_path'] = '../mobile/asset/images/'; // FOOD_PATH_THUMB; //'uploads/food/';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size']      = '0';
+                $config['overwrite']     = TRUE;
+
+                $this->upload->initialize($config);
+                $this->upload->do_upload('attachment');
+                $upload_data = $this->upload->data();
+
+                //$attchmentArr = $upload_data['full_path'];
+                $attchmentArr=  $this->image_thumb($upload_data['file_path'],$upload_data['file_name']); //$upload_data['file_name'];
+                echo $attchmentArr;
+            }
+            else
+            {
+                echo 'Some Error Occurred!';
+            }
+        }
     }
 
 }

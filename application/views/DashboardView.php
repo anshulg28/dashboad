@@ -1063,9 +1063,19 @@
                                             <textarea class="mdl-textfield__input my-singleBorder" rows="5" name="metaDescription" id="shareDesc"></textarea>
                                         </div>
                                         <br>
-                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Save</button>
+                                        <div class="myUploadPanel text-left">
+                                            <input type="file" class="form-control" onchange="metaUploadChange(this)" />
+                                            <input type="hidden" name="metaImg" />
+                                        </div>
+                                        <br>
+                                        <button onclick="fillMetaImgs()" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Save</button>
                                     </form>
                                     <br>
+                                    <div class="progress hide">
+                                        <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
                                     <br>
                                     <?php
                                         if(isset($shareMeta) && myIsArray($shareMeta))
@@ -1078,6 +1088,7 @@
                                                         <th>Id</th>
                                                         <th>Title</th>
                                                         <th>Description</th>
+                                                        <th>Image</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -1089,6 +1100,19 @@
                                                             <th scope="row"><?php echo $row['id'];?></th>
                                                             <td><?php echo $row['metaTitle'];?></td>
                                                             <td><?php echo $row['metaDescription'];?></td>
+                                                            <?php
+                                                                if(isset($row['metaImg']))
+                                                                {
+                                                                    $imgs = array(MOBILE_URL.'asset/images/thumb/'.$row['metaImg']);
+                                                                    ?>
+                                                                    <td>
+                                                                        <a class="view-photos" data-toggle="tooltip" title="View Photo" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
+                                                                            <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
+                                                                    </td>
+                                                                    <?php
+
+                                                                }
+                                                            ?>
                                                         </tr>
                                                         <?php
                                                     }
@@ -1109,7 +1133,6 @@
                     ?>
                 </div>
             </section>
-
         </main>
     </div>
     <div id="feedback-modal" class="modal fade" role="dialog">
@@ -2349,8 +2372,8 @@
     function eventUploadChange(ele)
     {
 
-        $('#eventpanel button[type="submit"]').attr('disabled','true');
-        $('#eventpanel .progress').removeClass('hide');
+        $('#eventpanel #eventAdd button[type="submit"]').attr('disabled','true');
+        $('#eventpanel #eventAdd .progress').removeClass('hide');
         var xhr = [];
         var totalFiles = ele.files.length;
         for(var i=0;i<totalFiles;i++)
@@ -2359,10 +2382,10 @@
             (xhr[i].upload || xhr[i]).addEventListener('progress', function(e) {
                 var done = e.position || e.loaded;
                 var total = e.totalSize || e.total;
-                $('.progress-bar').css('width', Math.round(done/total*100)+'%').attr('aria-valuenow', Math.round(done/total*100)).html(parseInt(Math.round(done/total*100))+'%');
+                $('#eventAdd .progress-bar').css('width', Math.round(done/total*100)+'%').attr('aria-valuenow', Math.round(done/total*100)).html(parseInt(Math.round(done/total*100))+'%');
             });
             xhr[i].addEventListener('load', function(e) {
-                $('#eventpanel button[type="submit"]').removeAttr('disabled');
+                $('#eventpanel #eventAdd button[type="submit"]').removeAttr('disabled');
             });
             xhr[i].open('post', '<?php echo base_url();?>dashboard/uploadEventFiles', true);
 
@@ -2471,6 +2494,48 @@
     $(document).on('click','.fnb-tracker', function(){
         localStorageUtil.setLocal('tabFnbPage',fnbTable.page());
     });
+
+    var filesMetaArr = [];
+    function metaUploadChange(ele)
+    {
+
+        $('#metaTab button[type="submit"]').attr('disabled','true');
+        $('#metaTab .progress').removeClass('hide');
+        var xhr = [];
+        var totalFiles = ele.files.length;
+        for(var i=0;i<totalFiles;i++)
+        {
+            xhr[i] = new XMLHttpRequest();
+            (xhr[i].upload || xhr[i]).addEventListener('progress', function(e) {
+                var done = e.position || e.loaded;
+                var total = e.totalSize || e.total;
+                $('#metaTab .progress-bar').css('width', Math.round(done/total*100)+'%').attr('aria-valuenow', Math.round(done/total*100)).html(parseInt(Math.round(done/total*100))+'%');
+            });
+            xhr[i].addEventListener('load', function(e) {
+                $('#metaTab button[type="submit"]').removeAttr('disabled');
+            });
+            xhr[i].open('post', '<?php echo base_url();?>dashboard/uploadMetaFiles', true);
+
+            var data = new FormData;
+            data.append('attachment', ele.files[i]);
+            xhr[i].send(data);
+            xhr[i].onreadystatechange = function(e) {
+                if (e.srcElement.readyState == 4 && e.srcElement.status == 200) {
+                    if(e.srcElement.responseText == 'Some Error Occurred!')
+                    {
+                        bootbox.alert('File size Limit 30MB');
+                        return false;
+                    }
+                    filesMetaArr.push(e.srcElement.responseText);
+                }
+            }
+        }
+    }
+
+    function fillMetaImgs()
+    {
+        $('#metaTab input[name="metaImg"]').val(filesMetaArr.join());
+    }
 </script>
 
 </html>
