@@ -629,6 +629,7 @@ class Cron extends MY_Controller
 
         $data = array();
         $walletLog = array();
+        //getting all staff
         $totalStaff = $this->dashboard_model->getAllStaffs();
 
         $mynums = array('8879103942', '9975027683', '9167333659','7045657944','7666192320','8652599420','9987217825','9870553445');
@@ -640,11 +641,13 @@ class Cron extends MY_Controller
         {
             foreach($totalStaff['staffList'] as $key => $row)
             {
+                //checking if staff is active and mobile number exists
                 if($row['ifActive'] == '1' && $row['mobNum'] != '')
                 {
                     $oldBalance = $row['walletBalance'];
                     $usedAmt = 1500;
                     $finalBal = $oldBalance + $usedAmt;
+                    //Equalizing wallet balance to max Rs 6000
                     if($finalBal > 6000)
                     {
                         $accessBal = $finalBal - 6000;
@@ -656,6 +659,7 @@ class Cron extends MY_Controller
                         $smsCredits[] = $usedAmt;
                     }
 
+                    //Update the staff record and creating a wallet log
                     $data = array(
                         'walletBalance' => $finalBal
                     );
@@ -668,6 +672,7 @@ class Cron extends MY_Controller
                         'amount' => $usedAmt,
                         'amtAction' => '2',
                         'notes' => 'Monthly Balance Credit',
+                        'loggedDT' => date('Y-m-d H:i:s'),
                         'updatedBy' => 'system'
                     );
                 }
@@ -681,6 +686,7 @@ class Cron extends MY_Controller
 
                 for($i=0;$i<count($smsNums);$i++)
                 {
+                    // Sending SMS to each number
                     $postDetails = array(
                         'apiKey' => TEXTLOCAL_API,
                         'numbers' => implode(',', array($smsNums[$i])),
@@ -690,6 +696,7 @@ class Cron extends MY_Controller
                     $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
 
 
+                    //Creating a sms log (failure or success)
                     if($smsStatus['status'] == 'failure')
                     {
                         if(isset($smsStatus['warnings']))

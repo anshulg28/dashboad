@@ -124,7 +124,7 @@
                             <table id="main-mugclub-table" class="table table-hover table-bordered table-striped my-checkIn-search-table">
                                 <thead>
                                 <tr>
-                                    <th class="hide">Mug #</th>
+                                    <th class="">Mug #</th>
                                     <th>Name</th>
                                     <th>Mobile #</th>
                                     <th>Birth Date</th>
@@ -155,7 +155,7 @@
                                                 <!--<td class="hide location-info"><?php /*echo $row['homeBase'];*/?></td>
                                                 <td class="hide membershipEnd-info"><?php /*echo $row['membershipEnd'];*/?></td>
                                                 <td class="hide mugNumber-info"><?php /*echo $row['mugId'];*/?></td>-->
-                                                <td class="hide">
+                                                <td class="">
                                                     <span class="infoLabel hide">Mug #</span>
                                                     <span class="infoData mugNumber-info"><?php echo $row['mugId'];?></span>
                                                 </td>
@@ -177,7 +177,18 @@
                                                 </td>-->
                                                 <td>
                                                     <span class="infoLabel hide">Birth Date</span>
-                                                    <span class="infoData"><?php $d = date_create($row['birthDate']); echo date_format($d,DATE_FORMAT_UI);?></span>
+                                                    <span class="infoData">
+                                                        <?php
+                                                        if(isset($row['birthDate']))
+                                                        {
+                                                            $d = date_create($row['birthDate']); echo date_format($d,DATE_FORMAT_UI);
+                                                        }
+                                                        else
+                                                        {
+                                                            echo '';
+                                                        }
+                                                        ?>
+                                                    </span>
                                                 </td>
                                                 <!--<td class="hide">
                                                     <span class="infoLabel hide">Home Base</span>

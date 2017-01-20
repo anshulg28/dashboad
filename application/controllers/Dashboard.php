@@ -336,17 +336,41 @@ class Dashboard extends MY_Controller {
         {
             redirect(base_url());
         }
-        $details = array(
-            'itemType'=> $post['itemType'],
-            'itemName' => $post['itemName'],
-            'itemHeadline'=> $post['itemHeadline'],
-            'itemDescription' => $post['itemDescription'],
-            'priceFull' => $post['priceFull'],
-            'priceHalf' => $post['priceHalf'],
-            'insertedBy' => $this->userId
-        );
+        if($post['itemType'] == '1')
+        {
+            $sortNum = $this->dashboard_model->getTopSortNum();
+            $newNum = ((int)$sortNum['sortOrder'])+1;
+            $details = array(
+                'itemType'=> $post['itemType'],
+                'itemName' => $post['itemName'],
+                'itemHeadline'=> $post['itemHeadline'],
+                'itemDescription' => $post['itemDescription'],
+                'priceFull' => $post['priceFull'],
+                'priceHalf' => $post['priceHalf'],
+                'sortOrder' => $newNum,
+                'insertedBy' => $this->userId
+            );
+        }
+        else
+        {
+            $details = array(
+                'itemType'=> $post['itemType'],
+                'itemName' => $post['itemName'],
+                'itemHeadline'=> $post['itemHeadline'],
+                'itemDescription' => $post['itemDescription'],
+                'priceFull' => $post['priceFull'],
+                'priceHalf' => $post['priceHalf'],
+                'insertedBy' => $this->userId
+            );
+        }
         $fnbId = $this->dashboard_model->saveFnbRecord($details);
 
+        $fnbShareLink = MOBILE_URL.'?page/fnbshare/fnb-'.$fnbId;
+
+        $fnbLink = array(
+            'fnbShareLink' => $fnbShareLink
+        );
+        $this->dashboard_model->updateFnbRecord($fnbLink,$fnbId);
         if(isset($post['attachment']) && isStringSet($post['attachment']))
         {
             $img_names = explode(',',$post['attachment']);

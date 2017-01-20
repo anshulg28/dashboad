@@ -423,6 +423,15 @@ class Dashboard_Model extends CI_Model
         return $result;
     }
 
+    public function getTopSortNum()
+    {
+        $query = "SELECT sortOrder FROM fnbmaster
+                    where ifActive = 1 and itemType = 1
+                    order by sortOrder desc";
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+
     //Event Related Functions
 
     public function saveEventRecord($details)
@@ -716,6 +725,7 @@ class Dashboard_Model extends CI_Model
 
         return $result;
     }
+
     public function saveEventRegis($details)
     {
         $details['createdDT'] = date('Y-m-d H:i:s');
