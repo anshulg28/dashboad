@@ -294,15 +294,14 @@ class Home extends MY_Controller {
             redirect(base_url());
         }
 
-        if(isset($post['userInput']) && is_numeric($post['userInput']))
+        if(isset($post['userInput']))
         {
-            $isMobile = true;
-            $walletBal = $this->dashboard_model->getBalanceByMob($post['userInput']);
+            $walletBal = $this->dashboard_model->getBalanceByInput($post['userInput']);
         }
-        else
+        /*else
         {
             $walletBal = $this->dashboard_model->getBalanceByEmp($post['userInput']);
-        }
+        }*/
         if(isset($walletBal) && myIsMultiArray($walletBal))
         {
             /*if(!$isMobile && isset($walletBal['mobNum']))
@@ -597,7 +596,7 @@ class Home extends MY_Controller {
             redirect(base_url());
         }
         $post = $this->input->post();
-        $oldBal = $post['oldBalance'];
+        /*$oldBal = $post['oldBalance'];
         unset($post['oldBalance']);
 
         $walletDiff = 0;
@@ -611,9 +610,9 @@ class Home extends MY_Controller {
         {
             $walletDiff = $post['walletBalance'] - $oldBal;
             $dorc = 2;
-        }
+        }*/
         $this->dashboard_model->updateStaffRecord($post['id'],$post);
-        if($walletDiff != 0)
+        /*if($walletDiff != 0)
         {
             $walletRecord = array(
                 'staffId' => $post['id'],
@@ -624,7 +623,7 @@ class Home extends MY_Controller {
                 'updatedBy' => $this->userName
             );
             $this->dashboard_model->updateWalletLog($walletRecord);
-        }
+        }*/
         redirect(base_url().'empDetails');
     }
     function addStaff()
@@ -750,14 +749,15 @@ class Home extends MY_Controller {
         }
         if(isset($post['empId']))
         {
-            if(is_numeric($post['empId']))
+            $walletBal = $this->dashboard_model->getBalanceByInput($post['empId']);
+            /*if(is_numeric($post['empId']))
             {
-                $walletBal = $this->dashboard_model->getBalanceByMob($post['empId']);
-            }
-            else
+
+            }*/
+            /*else
             {
                 $walletBal = $this->dashboard_model->getBalanceByEmp($post['empId']);
-            }
+            }*/
 
             if(isset($walletBal['mobNum']) && $walletBal['mobNum'] != '')
             {
@@ -814,14 +814,8 @@ class Home extends MY_Controller {
 
         if(isset($post['empId']) && isStringSet($post['empId']))
         {
-            if(is_numeric($post['empId']))
-            {
-                $staffDetails = $this->dashboard_model->getBalanceByMob($post['empId']);
-            }
-            else
-            {
-                $staffDetails = $this->dashboard_model->getBalanceByEmp($post['empId']);
-            }
+            $staffDetails = $this->dashboard_model->getBalanceByInput($post['empId']);
+
             //$staffDetails = $this->dashboard_model->getStaffByEmpId($post['empId']);
             $userOtp = $this->dashboard_model->checkStaffOtp($staffDetails['mobNum'], $post['userOtp']);
             if($userOtp['status'] == false)
@@ -838,12 +832,14 @@ class Home extends MY_Controller {
                 $billCheck = $this->dashboard_model->checkBillNum($post['billNum']);
                 if(!myIsArray($billCheck))
                 {
+                    $postBillNum = $post['billNum'];
+                    $postBillAmt = $post['billAmount'];
                     //$this->dashboard_model->setCouponUsed($coupon['id']);
                     $billLog = array(
-                        'billNum' => $post['billNum'],
+                        'billNum' => $postBillNum,
                         'offerId' => null,
                         'staffId' => $staffDetails['id'],
-                        'billAmount' => $post['billAmount'],
+                        'billAmount' => $postBillAmt,
                         'insertedDT' => date('Y-m-d H:i:s')
                     );
                     $this->dashboard_model->saveBillLog($billLog);
@@ -851,7 +847,7 @@ class Home extends MY_Controller {
 
                     //Wallet Balance Calculation
                     $oldBalance = $staffDetails['walletBalance']; // $post['walletBalance'];
-                    $usedAmt = $post['billAmount'];
+                    $usedAmt = $postBillAmt;
                     $finalBal = $oldBalance - $usedAmt;
                     $walletRecord = array(
                         'staffId' => $staffDetails['id'],

@@ -787,11 +787,11 @@ class Dashboard_Model extends CI_Model
 
         return $result;
     }
-    public function getBalanceByMob($mobnum)
+    public function getBalanceByInput($mobnum)
     {
         $query = "SELECT sm.id, sm.mobNum, sm.empId, sm.firstName, sm.middleName, sm.lastName, sm.walletBalance, sm.ifActive"
             ." FROM staffmaster sm"
-            ." WHERE sm.mobNum = '".$mobnum."'";
+            ." WHERE sm.mobNum = '".$mobnum."' OR sm.empId = '".$mobnum."'";
 
         $result = $this->db->query($query)->row_array();
 
@@ -901,7 +901,8 @@ class Dashboard_Model extends CI_Model
     {
         $query = "SELECT wlm.amount, wlm.amtAction, wlm.notes, wlm.loggedDT, wlm.updatedBy"
             ." FROM walletlogmaster wlm"
-            ." WHERE wlm.staffId = ".$id;
+            ." WHERE wlm.staffId = ".$id
+            ." ORDER BY loggedDT ASC";
 
         $result = $this->db->query($query)->result_array();
         $data['walletDetails'] = $result;
@@ -995,11 +996,56 @@ class Dashboard_Model extends CI_Model
 
         return $data;
     }
-    public function getAllStaffs()
+    public function getAllStaffs($ifActive = '', $mobNum = '')
     {
-        $query = "SELECT sm.id, sm.empId, sm.firstName, sm.middleName, sm.lastName,
+        if($ifActive != '' && $mobNum != '')
+        {
+            $query = "SELECT sm.id, sm.empId, sm.firstName, sm.middleName, sm.lastName,
                    sm.walletBalance, sm.mobNum, sm.insertedDT, sm.ifActive"
-            ." FROM staffmaster sm";
+                ." FROM staffmaster sm WHERE sm.ifActive = 1 AND sm.mobNum != '' AND sm.mobNum IS NOT NULL";
+        }
+        else
+        {
+            $query = "SELECT sm.id, sm.empId, sm.firstName, sm.middleName, sm.lastName,
+                   sm.walletBalance, sm.mobNum, sm.insertedDT, sm.ifActive"
+                ." FROM staffmaster sm";
+        }
+
+        $result = $this->db->query($query)->result_array();
+        $data['staffList'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+    public function getStaffsByPeriod($period)
+    {
+        $query= "SELECT *"
+            ." FROM staffmaster WHERE ifActive = 1 AND mobNum != '' AND mobNum IS NOT NULL "
+            ."AND isRecurring = 1 AND recurringFrequency LIKE '%monthly%'";
+        switch ($period)
+        {
+            case 'monthly':
+                $query= "SELECT *"
+                    ." FROM staffmaster WHERE ifActive = 1 AND mobNum != '' AND mobNum IS NOT NULL "
+                    ."AND isRecurring = 1 AND recurringFrequency LIKE '%monthly%'";
+                break;
+            case 'quarterly':
+                $query= "SELECT *"
+                    ." FROM staffmaster WHERE ifActive = 1 AND mobNum != '' AND mobNum IS NOT NULL "
+                    ."AND isRecurring = 1 AND recurringFrequency LIKE '%quarterly%'";
+                break;
+            case 'yearly':
+                $query= "SELECT *"
+                    ." FROM staffmaster WHERE ifActive = 1 AND mobNum != '' AND mobNum IS NOT NULL "
+                    ."AND isRecurring = 1 AND recurringFrequency LIKE '%yearly%'";
+        }
 
         $result = $this->db->query($query)->result_array();
         $data['staffList'] = $result;
@@ -1063,5 +1109,24 @@ class Dashboard_Model extends CI_Model
 
         $this->db->insert('custommetatags', $details);
         return true;
+    }
+
+    public function checkWalletLog($id)
+    {
+        $query = "SELECT * from walletlogmaster 
+                  WHERE amtAction = 2 AND notes LIKE '%New Staff Added%' AND staffId = ".$id;
+
+        $result = $this->db->query($query)->result_array();
+
+        $data = array();
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+        return $data;
     }
 }

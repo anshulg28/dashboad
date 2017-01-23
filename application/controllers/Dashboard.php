@@ -14,6 +14,7 @@ class Dashboard extends MY_Controller {
 
     function __construct()
     {
+        //Loading all the models on start
         parent::__construct();
         $this->load->model('dashboard_model');
         $this->load->model('mugclub_model');
@@ -23,6 +24,7 @@ class Dashboard extends MY_Controller {
         ini_set('upload_max_filesize', "50M");
     }
 
+    /* Main Function (entry point) */
     public function index()
 	{
         if(isSessionVariableSet($this->isUserSession) === false || $this->userType == SERVER_USER)
@@ -36,6 +38,7 @@ class Dashboard extends MY_Controller {
         $data['locations'] = $locArray;
         if($this->userType == EXECUTIVE_USER)
         {
+            //Get assigned location for community manager
             $userInfo = $this->users_model->getUserDetailsById($this->userId);
             $allLocs = explode(',',$userInfo['userData'][0]['assignedLoc']);
 
@@ -53,6 +56,7 @@ class Dashboard extends MY_Controller {
         $data['Irregulars'] = $this->dashboard_model->getIrregulars($startDate,$endDate,$locArray);
         $data['lapsers'] = $this->dashboard_model->getLapsers($startDate,$endDate,$locArray);
 
+        //getting graph data for dashboard
         $graphData = $this->dashboard_model->getAllDashboardRecord();
         if($graphData['status'] === true)
         {
@@ -79,6 +83,7 @@ class Dashboard extends MY_Controller {
         }
         $feedbacks = $this->dashboard_model->getAllFeedbacks($locArray);
 
+        //Feedback net promoters code calculation
         foreach($feedbacks['feedbacks'][0] as $key => $row)
         {
             $keySplit = explode('_',$key);
@@ -648,7 +653,48 @@ class Dashboard extends MY_Controller {
             $attachement = $post['attachment'];
             unset($post['attachment']);
         }
-        $post['userId'] = $this->userId;
+
+        $userId = $this->userId;
+        if(isset($post['creatorPhone']) && isset($post['creatorEmail']))
+        {
+            $userStatus = $this->checkPublicUser($post['creatorEmail'],$post['creatorPhone']);
+
+            if($userStatus['status'] === false)
+            {
+                $userId = $userStatus['userData']['userId'];
+            }
+            else
+            {
+                $userName = explode(' ',$post['creatorName']);
+                if(count($userName)< 2)
+                {
+                    $userName[1] = '';
+                }
+
+                $user = array(
+                    'userName' => $post['creatorEmail'],
+                    'firstName' => $userName[0],
+                    'lastName' => $userName[1],
+                    'password' => md5($post['creatorPhone']),
+                    'LoginPin' => null,
+                    'isPinChanged' => null,
+                    'emailId' => $post['creatorEmail'],
+                    'mobNum' => $post['creatorPhone'],
+                    'userType' => '4',
+                    'assignedLoc' => null,
+                    'ifActive' => '1',
+                    'insertedDate' => date('Y-m-d H:i:s'),
+                    'updateDate' => date('Y-m-d H:i:s'),
+                    'updatedBy' => $post['creatorName'],
+                    'lastLogin' => date('Y-m-d H:i:s')
+                );
+
+                $userId = $this->users_model->savePublicUser($user);
+            }
+        }
+
+        $post['userId'] = $userId;
+
         $post['startTime'] = date('H:i', strtotime($post['startTime']));
         $post['endTime'] = date('H:i', strtotime($post['endTime']));
         $eventId = $this->dashboard_model->saveEventRecord($post);
@@ -707,12 +753,14 @@ class Dashboard extends MY_Controller {
 
     function updateEvent()
     {
+        //checking for session
         if(isSessionVariableSet($this->isUserSession) === false)
         {
             redirect(base_url());
         }
         $post = $this->input->post();
 
+        //Saperating attachment
         if(isset($post['attachment']))
         {
             $attachement = $post['attachment'];
@@ -1130,6 +1178,23 @@ class Dashboard extends MY_Controller {
                 echo 'Some Error Occurred!';
             }
         }
+    }
+
+    public function checkPublicUser($email, $mob)
+    {
+        $uData = array();
+        $userExists = $this->users_model->checkUserDetails($email, $mob);
+
+        if($userExists['status'] === true)
+        {
+            $uData['status'] = false;
+            $uData['userData'] = $userExists['userData'];
+        }
+        else
+        {
+            $uData['status'] = true;
+        }
+        return $uData;
     }
 
 }

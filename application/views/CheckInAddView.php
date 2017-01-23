@@ -570,6 +570,36 @@
         var selectedRow = $(this).parent()[0];
         var currentRowLocation,membershipEnd;
         var mugList = myMugDataInfo.mugList;
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: base_url + 'check-ins/verify',
+            data: {mugNum: $(selectedRow).find('.mugNumber-info')[0].innerText},
+            success: function (data) {
+                hideCustomLoader();
+                if (data.status === true) {
+                    var mugList = data.mugList;
+
+                    fillMugData(mugList[0]);
+                    fillMissingParams(mugList[0]);
+                    checkMissingInfo();
+                    $('#searchModal').modal('hide');
+                    /*return false;
+                    var myFormatedData = {
+                        'Mug #': mugList[0].mugId,
+                        'Name': mugList[0].firstName + ' ' + mugList[0].lastName,
+                        'Mug Tag': mugList[0].mugTag,
+                        'Mobile #': mugList[0].mobileNo,
+                        'Email': mugList[0].emailId,
+                        'Birth Date': formatJsDate(mugList[0].birthDate),
+                        'Home Base': mugList[0].locName,
+                        'Expiry Date': formatJsDate(mugList[0].membershipEnd)
+                    };*/
+                }
+            }
+        });
+        /*console.log($(selectedRow).find('.mugNumber-info')[0].innerText);
         for(var mugIndex in mugList)
         {
             if(mugList[mugIndex].mugId == $(selectedRow).find('.mugNumber-info')[0].innerText)
@@ -580,7 +610,7 @@
                 $('#searchModal').modal('hide');
                 return false;
             }
-        }
+        }*/
     /*    var myBigStatusHtml = '<ul>';
         $(selectedRow).find('td').each(function(i,val){
             if($(val).hasClass('location-info'))

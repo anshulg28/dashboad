@@ -130,6 +130,15 @@ class Cron extends MY_Controller
             return $twitterFeeds['statuses'];
         }
     }
+
+    public function checkTweetValid()
+    {
+        $this->twitter->tmhOAuth->reconfigure();
+        $responseCode = $this->twitter->tmhOAuth->request('GET','https://api.twitter.com/1.1/statuses/show/821638303996846080.json');
+        // If 200 then found else 404 not found!
+        echo '<pre>';
+        var_dump($responseCode,$this->twitter->tmhOAuth->response['response']);
+    }
     public function getInstagramFeeds()
     {
         $instaFeeds = $this->curl_library->getInstagramPosts();
@@ -624,15 +633,15 @@ class Cron extends MY_Controller
 
     }
 
-    function creditBalance()
+    function creditMonthlyBalance()
     {
 
         $data = array();
         $walletLog = array();
         //getting all staff
-        $totalStaff = $this->dashboard_model->getAllStaffs();
+        $totalStaff = $this->dashboard_model->getStaffsByPeriod('monthly');
 
-        $mynums = array('8879103942', '9975027683', '9167333659','7045657944','7666192320','8652599420','9987217825','9870553445');
+        //$mynums = array('8879103942', '9769952644');
         $smsNums = array();
         $smsBalances = array();
         $smsCredits = array();
@@ -641,41 +650,39 @@ class Cron extends MY_Controller
         {
             foreach($totalStaff['staffList'] as $key => $row)
             {
-                //checking if staff is active and mobile number exists
-                if($row['ifActive'] == '1' && $row['mobNum'] != '')
+                $oldBalance = $row['walletBalance'];
+                $usedAmt = $row['recurringAmt'];
+                $finalBal = $oldBalance + $usedAmt;
+                //Equalizing wallet balance to max Rs 6000
+                if($row['isCapping'] == '1')
                 {
-                    $oldBalance = $row['walletBalance'];
-                    $usedAmt = 1500;
-                    $finalBal = $oldBalance + $usedAmt;
-                    //Equalizing wallet balance to max Rs 6000
-                    if($finalBal > 6000)
+                    if($finalBal > $row['cappingAmt'])
                     {
-                        $accessBal = $finalBal - 6000;
-                        $finalBal = $finalBal - $accessBal;
-                        $smsCredits[] = $usedAmt - $accessBal;
+                        $finalBal = $row['cappingAmt'];
+                        $smsCredits[] = $finalBal - $oldBalance;
                     }
                     else
                     {
                         $smsCredits[] = $usedAmt;
                     }
-
-                    //Update the staff record and creating a wallet log
-                    $data = array(
-                        'walletBalance' => $finalBal
-                    );
-                    $this->dashboard_model->updateStaffRecord($row['id'],$data);
-                    $smsNums[] = '91'.$row['mobNum'];
-                    $smsBalances[] = $finalBal;
-
-                    $walletLog[] = array(
-                        'staffId' => $row['id'],
-                        'amount' => $usedAmt,
-                        'amtAction' => '2',
-                        'notes' => 'Monthly Balance Credit',
-                        'loggedDT' => date('Y-m-d H:i:s'),
-                        'updatedBy' => 'system'
-                    );
                 }
+
+                //Update the staff record and creating a wallet log
+                $data = array(
+                    'walletBalance' => $finalBal
+                );
+                $this->dashboard_model->updateStaffRecord($row['id'],$data);
+                $smsNums[] = '91'.$row['mobNum'];
+                $smsBalances[] = $finalBal;
+
+                $walletLog[] = array(
+                    'staffId' => $row['id'],
+                    'amount' => $usedAmt,
+                    'amtAction' => '2',
+                    'notes' => 'Monthly Balance Credit',
+                    'loggedDT' => date('Y-m-d H:i:s'),
+                    'updatedBy' => 'system'
+                );
             }
 
             if(isset($data) && myIsMultiArray($data))
@@ -775,5 +782,30 @@ class Cron extends MY_Controller
                 break;
         }
         return $returnVal;
+    }
+
+    function putOldWalletLogs()
+    {
+        $allStaffs = $this->dashboard_model->getAllStaffs();
+
+        foreach($allStaffs['staffList'] as $key => $row)
+        {
+            if(isset($row['empId']) && $row['empId'] != '')
+            {
+                $walLog = $this->dashboard_model->checkWalletLog($row['id']);
+                if($walLog['status'] == false)
+                {
+                    $details = array(
+                        'staffId' => $row['id'],
+                        'amount' => '1500',
+                        'amtAction' => '2',
+                        'notes' => 'New Staff Added',
+                        'loggedDT' => $row['insertedDT'],
+                        'updatedBy' => 'anshul'
+                    );
+                    $this->dashboard_model->updateWalletLog($details);
+                }
+            }
+        }
     }
 }
