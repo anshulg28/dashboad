@@ -35,10 +35,20 @@ class Offers extends MY_Controller {
 
     public function check()
     {
+        $this->load->model('mugclub_model');
         $this->session->set_userdata('page_url', base_url(uri_string()));
         if(!isset($this->currentLocation) || isSessionVariableSet($this->currentLocation) === false)
         {
-            redirect(base_url().'location-select');
+            $gotLocId = $this->mugclub_model->fetchLocIdByMob($this->userId);
+            if(isset($gotLocId['id']))
+            {
+                $this->generalfunction_library->setSessionVariable("currentLocation",$gotLocId['id']);
+                $this->currentLocation = $gotLocId['id'];
+            }
+            else
+            {
+                redirect(base_url().'location-select');
+            }
         }
 
         $data = array();

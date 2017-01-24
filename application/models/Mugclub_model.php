@@ -522,4 +522,16 @@ class Mugclub_Model extends CI_Model
         return true;
     }
 
+    public function fetchLocIdByMob($userId)
+    {
+        $query = "SELECT lm.id
+                  FROM doolally_usersmaster du
+                  LEFT JOIN locationmaster lm ON lm.phoneNumber = du.mobNum
+                  WHERE du.userId = ".$userId;
+
+        $result  = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+
 }

@@ -56,12 +56,22 @@ class Checkin extends MY_Controller {
             redirect(base_url());
         }
 
+
         if(!isset($this->currentLocation) || isSessionVariableSet($this->currentLocation) === false)
         {
             $this->session->set_userdata('page_url', base_url(uri_string()));
             if($this->userType != GUEST_USER || $this->userType == OFFERS_USER)
             {
-                redirect(base_url().'location-select');
+                $gotLocId = $this->mugclub_model->fetchLocIdByMob($this->userId);
+                if(isset($gotLocId['id']))
+                {
+                    $this->generalfunction_library->setSessionVariable("currentLocation",$gotLocId['id']);
+                    $this->currentLocation = $gotLocId['id'];
+                }
+                else
+                {
+                    redirect(base_url().'location-select');
+                }
             }
         }
         //Getting All Mug List

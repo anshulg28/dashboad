@@ -62,9 +62,9 @@
                             <?php
                         }
                         ?>
-                        <li><a href="<?php echo base_url().'location-select';?>">
+                        <!--<li><a href="<?php /*echo base_url().'location-select';*/?>">
                                 <i class="glyphicon glyphicon-map-marker"></i> Change Location</a>
-                        </li>
+                        </li>-->
                         <?php
                     }
                     else
@@ -105,14 +105,14 @@
                     {
                         ?>
                         <?php
-                            if(isSessionVariableSet($this->currentLocation) === false)
+                            /*if(isSessionVariableSet($this->currentLocation) === false)
                             {
-                                ?>
-                                <li><a href="<?php echo base_url().'location-select';?>">
+                                */?><!--
+                                <li><a href="<?php /*echo base_url().'location-select';*/?>">
                                         <i class="glyphicon glyphicon-map-marker"></i> Change Location</a>
                                 </li>
-                                <?php
-                            }
+                                --><?php
+/*                            }*/
                         ?>
                         <li><a href="<?php echo base_url(); ?>login"><span class="glyphicon glyphicon-log-in"></span> Other Login</a></li>
                         <?php
