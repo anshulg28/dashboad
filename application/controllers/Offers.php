@@ -35,6 +35,10 @@ class Offers extends MY_Controller {
 
     public function check()
     {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
         $this->load->model('mugclub_model');
         $this->session->set_userdata('page_url', base_url(uri_string()));
         if(!isset($this->currentLocation) || isSessionVariableSet($this->currentLocation) === false)
@@ -294,7 +298,7 @@ class Offers extends MY_Controller {
         redirect(base_url().'offers/stats');
     }
 
-    public function offerCheck($offerCode)
+    public function offerCheck($offerCode,$toRedeem)
     {
         if(isSessionVariableSet($this->isUserSession) === false)
         {
@@ -315,7 +319,7 @@ class Offers extends MY_Controller {
                 $data['status'] = false;
                 $data['errorMsg'] = 'Sorry, this code has been redeemed before.';
             }
-            else
+            elseif($toRedeem == '1')
             {
                 $offerData = array();
                 $offerData['offerCode'] = $offerCode;
@@ -329,12 +333,17 @@ class Offers extends MY_Controller {
                 $data['status'] = true;
                 $data['offerType'] = $offerStatus['codeCheck']['offerType'];
             }
+            else
+            {
+                $data['status'] = true;
+                $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+            }
         }
 
         echo json_encode($data);
     }
 
-    public function oldOfferCheck($offerCode)
+    public function oldOfferCheck($offerCode, $toRedeem)
     {
         if(isSessionVariableSet($this->isUserSession) === false)
         {
@@ -355,7 +364,7 @@ class Offers extends MY_Controller {
                 $data['status'] = false;
                 $data['errorMsg'] = 'Sorry, this code has been redeemed before.';
             }
-            else
+            elseif($toRedeem == '1')
             {
                 $offerData = array();
                 $offerData['offerCode'] = $offerCode;
@@ -366,6 +375,11 @@ class Offers extends MY_Controller {
                 $offerData['isRedeemed'] = 1;
                 $offerData['useDateTime'] = date('Y-m-d H:i:s');
                 $this->offers_model->setoldOfferUsed($offerData);
+                $data['status'] = true;
+                $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+            }
+            else
+            {
                 $data['status'] = true;
                 $data['offerType'] = $offerStatus['codeCheck']['offerType'];
             }

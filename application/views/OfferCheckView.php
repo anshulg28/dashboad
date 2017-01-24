@@ -60,11 +60,22 @@
         var oldOffer = $('#oldOfferCode').val();
         var breakOffer = $('#breakOfferCode').val();
         var offerUrl,offerPrifix,finalCode;
-        if(newOffer != '' && oldOffer != '' && breakOffer != '')
+        if(newOffer != '' && oldOffer != '')
         {
             bootbox.alert('Enter Only 1 Code!');
             return false;
         }
+        if(oldOffer != '' && breakOffer != '')
+        {
+            bootbox.alert('Enter Only 1 Code!');
+            return false;
+        }
+        if(breakOffer != '' && newOffer != '')
+        {
+            bootbox.alert('Enter Only 1 Code!');
+            return false;
+        }
+
         if(newOffer == '' && oldOffer == '' && breakOffer == '')
         {
             bootbox.alert('Please Provide Offer Code!');
@@ -88,6 +99,59 @@
             offerUrl = base_url+'offers/oldOfferCheck/'+oldOffer;
             offerPrifix = 'TW';
         }
+
+        //Checking offer Code valid
+        showCustomLoader();
+        $.ajax({
+            type:"GET",
+            dataType:"json",
+            url: offerUrl+'/0',
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    if(data.offerType == 'Beer')
+                    {
+                        bootbox.alert('<label class="my-success-text">Coupon code is Valid for Beer</label>', function(){
+                            redeemOffer(offerPrifix, finalCode, offerUrl);
+                        });
+                    }
+                    else if(data.offerType == 'Breakfast2')
+                    {
+                        bootbox.alert('<label class="my-success-text">Coupon code is Valid for Breakfast for Two and Two Pints </label>',
+                        function(){
+                            redeemOffer(offerPrifix, finalCode, offerUrl);
+                        });
+                    }
+                    else if(data.offerType == 'Breakfast')
+                    {
+                        bootbox.alert('<label class="my-success-text">Coupon code is Valid for Breakfast and a Pint. </label>', function(){
+                            redeemOffer(offerPrifix, finalCode, offerUrl);
+                        });
+                    }
+                    else
+                    {
+                        bootbox.alert('<label class="my-success-text">Coupon code is Valid for '+data.offerType+' </label>', function(){
+                            redeemOffer(offerPrifix, finalCode, offerUrl);
+                        });
+                    }
+                }
+                else
+                {
+                    bootbox.alert('<label class="my-danger-text">'+data.errorMsg+'</label>');
+                }
+
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Unable To Connect To Server!');
+            }
+        });
+
+    });
+
+    function redeemOffer(offerPrifix, finalCode, offerUrl)
+    {
         bootbox.confirm("Sure you want to Redeem "+offerPrifix+"-"+finalCode+" ?", function(result) {
             if(result === true)
             {
@@ -96,7 +160,7 @@
                 $.ajax({
                     type:"GET",
                     dataType:"json",
-                    url:offerUrl,
+                    url:offerUrl+'/1',
                     success: function(data)
                     {
                         hideCustomLoader();
@@ -133,9 +197,7 @@
                 });
             }
         });
-
-    });
-
+    }
     $(document).on('keypress','#offerCode,#oldOfferCode', function(event){
 
         var keycode = (event.keyCode ? event.keyCode : event.which);
