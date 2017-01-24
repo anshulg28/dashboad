@@ -19,6 +19,15 @@
                         <div class="col-sm-12 text-center">
                             <ul class="list-inline my-mainMenuList">
                                 <li>
+                                    <a href="<?php echo base_url().'offers/check';?>">
+                                        <div class="menuWrap">
+                                            <i class="fa fa-trophy fa-2x"></i>
+                                            <br>
+                                            <span>Offer Check</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
                                     <a href="<?php echo base_url().'offers/generate';?>">
                                         <div class="menuWrap">
                                             <i class="fa fa-cogs fa-2x"></i>

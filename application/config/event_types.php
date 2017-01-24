@@ -23,6 +23,11 @@ $config['phons'] = array(
     'Shweta' => '7045170006',
     'Richa' => '7678039911'
 );
+$config['offerTimes'] = array(
+    '7-10',
+    '10-14',
+    '14-18'
+);
 $config['eventTypes'] = array(
     "Presentation",
     "Meet up",

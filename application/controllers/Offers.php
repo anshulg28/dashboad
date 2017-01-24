@@ -329,6 +329,22 @@ class Offers extends MY_Controller {
                 }
                 $offerData['isRedeemed'] = 1;
                 $offerData['useDateTime'] = date('Y-m-d H:i:s');
+                $offerTimes = $this->config->item('offerTimes');
+
+                foreach($offerTimes as $key)
+                {
+                    $keySplit = explode('-',$key);
+                    if((int)$keySplit[0] <= (int)date('H') && (int)date('H') <= (int)$keySplit[1] )
+                    {
+                        $offerData['usedTimeSpan'] = $key;
+                        break;
+                    }
+                }
+                if(!isset($offerData['usedTimeSpan']))
+                {
+                    $offerData['usedTimeSpan'] = '18-2';
+                }
+                $offerData['dayOfferUsed'] = date('D');
                 $this->offers_model->setOfferUsed($offerData);
                 $data['status'] = true;
                 $data['offerType'] = $offerStatus['codeCheck']['offerType'];
@@ -374,6 +390,22 @@ class Offers extends MY_Controller {
                 }
                 $offerData['isRedeemed'] = 1;
                 $offerData['useDateTime'] = date('Y-m-d H:i:s');
+                $offerTimes = $this->config->item('offerTimes');
+
+                foreach($offerTimes as $key)
+                {
+                    $keySplit = explode('-',$key);
+                    if((int)$keySplit[0] <= (int)date('H') && (int)date('H') <= (int)$keySplit[1] )
+                    {
+                        $offerData['usedTimeSpan'] = $key;
+                        break;
+                    }
+                }
+                if(!isset($offerData['usedTimeSpan']))
+                {
+                    $offerData['usedTimeSpan'] = '18-2';
+                }
+                $offerData['dayOfferUsed'] = date('D');
                 $this->offers_model->setoldOfferUsed($offerData);
                 $data['status'] = true;
                 $data['offerType'] = $offerStatus['codeCheck']['offerType'];
