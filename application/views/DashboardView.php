@@ -820,7 +820,7 @@
                         <div class="mdl-grid">
                             <div class="mdl-cell mdl-cell--2-col"></div>
                             <div class="mdl-cell mdl-cell--8-col text-center">
-                                <form action="<?php echo base_url();?>dashboard/saveEvent" method="post" enctype="multipart/form-data">
+                                <form id="dashboardEventAdd" action="<?php echo base_url();?>dashboard/saveEvent" method="post" enctype="multipart/form-data">
                                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
                                         <input class="mdl-textfield__input" type="text" name="eventName" id="eventName">
                                         <label class="mdl-textfield__label" for="eventName">Event Name</label>
@@ -2536,6 +2536,41 @@
     {
         $('#metaTab input[name="metaImg"]').val(filesMetaArr.join());
     }
+</script>
+
+<script>
+    $(document).on('submit','#dashboardEventAdd', function(e){
+        e.preventDefault();
+        if($(this).find('#creatorName').val() == '' &&
+            $(this).find('#creatorPhone').val() == '' &&
+            $(this).find('#creatorEmail').val() == '')
+        {
+            bootbox.alert('Organizer details required!');
+            return false;
+        }
+        showCustomLoader();
+        $.ajax({
+            type:"POST",
+            dataType:'json',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    window.location.reload();
+                }
+                else
+                {
+                    bootbox.alert(data.errorMsg);
+                }
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
+    });
 </script>
 
 </html>

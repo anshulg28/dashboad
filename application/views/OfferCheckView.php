@@ -112,26 +112,26 @@
                 {
                     if(data.offerType == 'Beer')
                     {
-                        bootbox.alert('<label class="my-success-text">Coupon code is Valid for Beer</label>', function(){
+                        bootbox.alert('<label class="my-success-text">Valid for One Beer</label>', function(){
                             redeemOffer(offerPrifix, finalCode, offerUrl);
                         });
                     }
                     else if(data.offerType == 'Breakfast2')
                     {
-                        bootbox.alert('<label class="my-success-text">Coupon code is Valid for Breakfast for Two and Two Pints </label>',
+                        bootbox.alert('<label class="my-success-text">Valid for Two Breakfasts and Two Beers </label>',
                         function(){
                             redeemOffer(offerPrifix, finalCode, offerUrl);
                         });
                     }
                     else if(data.offerType == 'Breakfast')
                     {
-                        bootbox.alert('<label class="my-success-text">Coupon code is Valid for Breakfast and a Pint. </label>', function(){
+                        bootbox.alert('<label class="my-success-text">Valid for One Breakfast and One Beer. </label>', function(){
                             redeemOffer(offerPrifix, finalCode, offerUrl);
                         });
                     }
                     else
                     {
-                        bootbox.alert('<label class="my-success-text">Coupon code is Valid for '+data.offerType+' </label>', function(){
+                        bootbox.alert('<label class="my-success-text">Valid for '+data.offerType+' </label>', function(){
                             redeemOffer(offerPrifix, finalCode, offerUrl);
                         });
                     }
@@ -152,7 +152,7 @@
 
     function redeemOffer(offerPrifix, finalCode, offerUrl)
     {
-        bootbox.confirm("Sure you want to Redeem "+offerPrifix+"-"+finalCode+" ?", function(result) {
+        bootbox.confirm("Would you like to redeem "+offerPrifix+"-"+finalCode+" now?", function(result) {
             if(result === true)
             {
                 showCustomLoader();

@@ -654,73 +654,107 @@ class Dashboard extends MY_Controller {
             unset($post['attachment']);
         }
 
-        $userId = $this->userId;
-        if(isset($post['creatorPhone']) && isset($post['creatorEmail']))
-        {
-            $userStatus = $this->checkPublicUser($post['creatorEmail'],$post['creatorPhone']);
-
-            if($userStatus['status'] === false)
-            {
-                $userId = $userStatus['userData']['userId'];
-            }
-            else
-            {
-                $userName = explode(' ',$post['creatorName']);
-                if(count($userName)< 2)
-                {
-                    $userName[1] = '';
-                }
-
-                $user = array(
-                    'userName' => $post['creatorEmail'],
-                    'firstName' => $userName[0],
-                    'lastName' => $userName[1],
-                    'password' => md5($post['creatorPhone']),
-                    'LoginPin' => null,
-                    'isPinChanged' => null,
-                    'emailId' => $post['creatorEmail'],
-                    'mobNum' => $post['creatorPhone'],
-                    'userType' => '4',
-                    'assignedLoc' => null,
-                    'ifActive' => '1',
-                    'insertedDate' => date('Y-m-d H:i:s'),
-                    'updateDate' => date('Y-m-d H:i:s'),
-                    'updatedBy' => $post['creatorName'],
-                    'lastLogin' => date('Y-m-d H:i:s')
-                );
-
-                $userId = $this->users_model->savePublicUser($user);
-            }
-        }
-
-        $post['userId'] = $userId;
-
-        $post['startTime'] = date('H:i', strtotime($post['startTime']));
-        $post['endTime'] = date('H:i', strtotime($post['endTime']));
-        $eventId = $this->dashboard_model->saveEventRecord($post);
-
-        $eventShareLink = MOBILE_URL.'mobile?page/events/EV-'.$eventId.'/'.encrypt_data('EV-'.$eventId);
-
-        $details = array(
-          'eventShareLink'=> $eventShareLink
+        $Edetails = array(
+            "startTime" => date('H:i', strtotime($post['startTime'])),
+            "endTime" => date('H:i', strtotime($post['endTime'])),
+            "eventPlace" => $post['eventPlace'],
+            "eventDate" => $post['eventDate']
         );
-        $this->dashboard_model->updateEventRecord($details,$eventId);
+        $eventSpace = $this->dashboard_model->checkEventSpace($Edetails);
 
-        if(isset($attachement))
+        $userId = $this->userId;
+        if($eventSpace['status'] === false)
         {
-            $img_names = explode(',',$attachement);
-            for($i=0;$i<count($img_names);$i++)
+            if(isset($post['creatorPhone']) && isset($post['creatorEmail']))
             {
-                $attArr = array(
-                    'eventId' => $eventId,
-                    'filename'=> $img_names[$i],
-                    'attachmentType' => '1'
-                );
-                $this->dashboard_model->saveEventAttachment($attArr);
-            }
-        }
+                $userStatus = $this->checkPublicUser($post['creatorEmail'],$post['creatorPhone']);
 
-        redirect(base_url().'dashboard');
+                if($userStatus['status'] === false)
+                {
+                    $userId = $userStatus['userData']['userId'];
+                }
+                else
+                {
+                    $userName = explode(' ',$post['creatorName']);
+                    if(count($userName)< 2)
+                    {
+                        $userName[1] = '';
+                    }
+
+                    $user = array(
+                        'userName' => $post['creatorEmail'],
+                        'firstName' => $userName[0],
+                        'lastName' => $userName[1],
+                        'password' => md5($post['creatorPhone']),
+                        'LoginPin' => null,
+                        'isPinChanged' => null,
+                        'emailId' => $post['creatorEmail'],
+                        'mobNum' => $post['creatorPhone'],
+                        'userType' => '4',
+                        'assignedLoc' => null,
+                        'ifActive' => '1',
+                        'insertedDate' => date('Y-m-d H:i:s'),
+                        'updateDate' => date('Y-m-d H:i:s'),
+                        'updatedBy' => $post['creatorName'],
+                        'lastLogin' => date('Y-m-d H:i:s')
+                    );
+
+                    $userId = $this->users_model->savePublicUser($user);
+                }
+            }
+
+            $post['userId'] = $userId;
+
+            $post['startTime'] = date('H:i', strtotime($post['startTime']));
+            $post['endTime'] = date('H:i', strtotime($post['endTime']));
+            $eventId = $this->dashboard_model->saveEventRecord($post);
+
+            $eventShareLink = MOBILE_URL.'?page/events/EV-'.$eventId.'/'.encrypt_data('EV-'.$eventId);
+
+            $details = array(
+                'eventShareLink'=> $eventShareLink,
+                'shortUrl' => null
+            );
+            $shortDWName = $this->googleurlapi->shorten($eventShareLink);
+            if($shortDWName !== false)
+            {
+                $details['shortUrl'] = $shortDWName;
+            }
+            $this->dashboard_model->updateEventRecord($details,$eventId);
+
+            $img_names = array();
+            if(isset($attachement))
+            {
+                $img_names = explode(',',$attachement);
+                for($i=0;$i<count($img_names);$i++)
+                {
+                    $attArr = array(
+                        'eventId' => $eventId,
+                        'filename'=> $img_names[$i],
+                        'attachmentType' => '1'
+                    );
+                    $this->dashboard_model->saveEventAttachment($attArr);
+                }
+            }
+            $mailEvent= array(
+                'creatorName' => $post['creatorName'],
+                'creatorEmail' => $post['creatorEmail'],
+                'creatorPhone' => $post['creatorPhone'],
+                'eventName' => $post['eventName'],
+                'eventPlace' => $post['eventPlace']
+            );
+
+            //$loc = $this->locations_model->getLocationDetailsById($post['eventPlace']);
+
+            $this->sendemail_library->newEventMail($mailEvent);
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Sorry, This time slot is already booked!';
+        }
+        echo json_encode($data);
 
     }
     
