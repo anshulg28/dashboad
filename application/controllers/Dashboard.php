@@ -1070,6 +1070,21 @@ class Dashboard extends MY_Controller {
         $this->dashboard_model->updateEventRecord($details,$eventId);
         redirect(base_url().'dashboard');
     }
+    public function getSignupList($eventId)
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status'] = false;
+        }
+        else
+        {
+            $data['status'] = true;
+            $data['joinData'] = $this->dashboard_model->getJoinersInfo($eventId);
+        }
+
+        echo json_encode($data);
+    }
 
     //For Fnb Section
     function setFnbActive($fnbId)

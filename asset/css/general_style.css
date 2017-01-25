@@ -501,6 +501,10 @@ input::-webkit-inner-spin-button {
     padding: 2px;
     border-radius: 20px;
 }
+.dashboard #peopleView-modal table tbody
+{
+    text-align:left;
+}
 .dashboard .mdl-radio__outer-circle, .dashboard .mdl-radio__inner-circle, .dashboard .mdl-radio__ripple-container
 {
     margin-left: 5px;

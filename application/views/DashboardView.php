@@ -799,6 +799,8 @@
                                                             <?php
                                                         }
                                                     ?>
+                                                    <a data-toggle="tooltip" class="eventSignups-icon even-tracker" data-eventName="<?php echo $row['eventData']['eventName'];?>" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Signup List" href="#">
+                                                        <i class="fa fa-users fa-15x"></i></a>&nbsp;
                                                 </td>
                                             </tr>
                                             <?php
@@ -1240,6 +1242,25 @@
                     </div>
                     <br>
                     <button type="button" class="btn btn-primary save-fnb-tags">Save</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="peopleView-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Signup List for <b><span class="eventName"></span></b></h4>
+                </div>
+                <div class="modal-body text-center">
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -2563,6 +2584,49 @@
                 else
                 {
                     bootbox.alert(data.errorMsg);
+                }
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
+    });
+
+    $(document).on('click','.eventSignups-icon', function(){
+        var eventId = $(this).attr('data-eventId');
+        var eventName = $(this).attr('data-eventName');
+        showCustomLoader();
+        $.ajax({
+            type:'GET',
+            dataType:'json',
+            url:base_url+'dashboard/getSignupList/'+eventId,
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    $('#peopleView-modal .eventName').html(eventName);
+                    if(typeof data.joinData != 'undefined' && data.joinData != null && data.joinData.length != 0)
+                    {
+                        var tblHtml = '<table class="table table-striped">';
+                        tblHtml += '<thead><tr><th>Name</th><th>Quantitiy</th><th>Signup Date/time</th>';
+                        tblHtml += '</tr></thead><tbody>';
+                        for(var i=0;i<data.joinData.length;i++)
+                        {
+                            tblHtml += '<tr>';
+                            tblHtml += '<td>'+data.joinData[i].firstName+' '+data.joinData[i].lastName+'</td>';
+                            tblHtml += '<td>'+data.joinData[i].quantity+'</td>';
+                            tblHtml += '<td>'+formatJsDate(data.joinData[i].createdDT)+'</td>';
+                            tblHtml += '</tr>';
+                        }
+                        tblHtml += '</tbody></table>';
+                        $('#peopleView-modal .modal-body').html(tblHtml);
+                    }
+                    else
+                    {
+                        $('#peopleView-modal .modal-body').html('No Sign ups');
+                    }
+                    $('#peopleView-modal').modal('show');
                 }
             },
             error: function(){
