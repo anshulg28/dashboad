@@ -33,7 +33,8 @@
                                     <li>
                                         <div class="panel panel-default">
                                             <div class="panel-heading">Total Beer Redeemed</div>
-                                            <div class="panel-body stats-nums"><?php echo $newOfferStats['offerStat']['TBeer'];?></div>
+                                            <div class="panel-body stats-nums"><?php echo $newOfferStats['offerStat']['TBeer'];?>/
+                                                <?php echo $newOfferStats['offerStat']['TCBeer'];?></div>
                                         </div>
                                     </li>
                                     <li>
@@ -45,7 +46,8 @@
                                     <li>
                                         <div class="panel panel-default">
                                             <div class="panel-heading">Total Breakfast Redeemed</div>
-                                            <div class="panel-body stats-nums"><?php echo $newOfferStats['offerStat']['TBreakfast'];?></div>
+                                            <div class="panel-body stats-nums"><?php echo $newOfferStats['offerStat']['TBreakfast'];?>/
+                                                <?php echo $newOfferStats['offerStat']['TCBreakfast'];?></div>
                                         </div>
                                     </li>
                                     <li>
@@ -154,7 +156,8 @@
                             <li>
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Total Beer Redeemed</div>
-                                    <div class="panel-body stats-nums"><?php echo $oldOfferStats['offerStat']['TBeer'];?></div>
+                                    <div class="panel-body stats-nums"><?php echo $oldOfferStats['offerStat']['TBeer'];?>/
+                                        <?php echo $oldOfferStats['offerStat']['TCBeer'];?></div>
                                 </div>
                             </li>
                             <li>
@@ -166,7 +169,8 @@
                             <li>
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Total Breakfast Redeemed</div>
-                                    <div class="panel-body stats-nums"><?php echo $oldOfferStats['offerStat']['TBreakfast'];?></div>
+                                    <div class="panel-body stats-nums"><?php echo $oldOfferStats['offerStat']['TBreakfast'];?>/
+                                        <?php echo $oldOfferStats['offerStat']['TCBreakfast'];?></div>
                                 </div>
                             </li>
                             <li>

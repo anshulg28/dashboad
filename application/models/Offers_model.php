@@ -196,9 +196,11 @@ class Offers_Model extends CI_Model
     public function getOffersStats()
     {
         $query= "SELECT DISTINCT (SELECT count(*) FROM offersmaster where isRedeemed = 1 AND offerType= 'Beer') AS 'TBeer',
+                (SELECT count(*) FROM offersmaster where offerType= 'Beer') AS 'TCBeer',
                 (SELECT count(*) FROM offersmaster where isRedeemed = 1 AND offerType='Beer' AND date(useDateTime) >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AS 'MBeer',
-                (SELECT count(*) FROM offersmaster where isRedeemed = 1 AND offerType= 'Breakfast') AS 'TBreakfast',
-                (SELECT count(*) FROM offersmaster where isRedeemed = 1 AND offerType='Breakfast' AND date(useDateTime) >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AS 'MBreakfast'
+                (SELECT count(*) FROM offersmaster where isRedeemed = 1 AND (offerType= 'Breakfast' OR offerType= 'Breakfast2')) AS 'TBreakfast',
+                (SELECT count(*) FROM offersmaster where (offerType= 'Breakfast' OR offerType= 'Breakfast2')) AS 'TCBreakfast',
+                (SELECT count(*) FROM offersmaster where isRedeemed = 1 AND (offerType='Breakfast' OR offerType= 'Breakfast2') AND date(useDateTime) >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AS 'MBreakfast'
                 FROM `offersmaster`";
 
         $result = $this->db->query($query)->row_array();
@@ -219,8 +221,10 @@ class Offers_Model extends CI_Model
     public function getOldOffersStats()
     {
         $query= "SELECT DISTINCT (SELECT count(*) FROM oldoffersmaster where isRedeemed = 1 AND offerType= 'Beer') AS 'TBeer',
+                (SELECT count(*) FROM oldoffersmaster where offerType= 'Beer') AS 'TCBeer',
                 (SELECT count(*) FROM oldoffersmaster where isRedeemed = 1 AND offerType='Beer' AND date(useDateTime) >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AS 'MBeer',
                 (SELECT (count(*)+59) FROM oldoffersmaster where isRedeemed = 1 AND offerType= 'Breakfast') AS 'TBreakfast',
+                (SELECT (count(*)+59) FROM oldoffersmaster where offerType= 'Breakfast') AS 'TCBreakfast',
                 (SELECT count(*) FROM oldoffersmaster where isRedeemed = 1 AND offerType='Breakfast' AND date(useDateTime) >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) AS 'MBreakfast'
                 FROM `oldoffersmaster`";
 
