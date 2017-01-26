@@ -170,7 +170,7 @@
                                 <div class="panel panel-default">
                                     <div class="panel-heading">Total Breakfast Redeemed</div>
                                     <div class="panel-body stats-nums"><?php echo $oldOfferStats['offerStat']['TBreakfast'];?>/
-                                        <?php echo $oldOfferStats['offerStat']['TCBreakfast'];?></div>
+                                        <?php echo $oldOfferStats['offerStat']['TC3Breakfast'];?></div>
                                 </div>
                             </li>
                             <li>

@@ -26,7 +26,7 @@
                         <label class="control-label col-sm-2" for="invoNum">Invoice Number :</label>
                         <div class="col-sm-10">
                             <input type="text" name="invoiceNo" class="form-control"
-                                   id="invoNum" placeholder="Eg: 0000"/>
+                                   id="invoNum" placeholder="Eg: 0000" required/>
                         </div>
                     </div>
                     <div class="form-group">
