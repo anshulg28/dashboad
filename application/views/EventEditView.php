@@ -242,7 +242,10 @@
     });
     function fillEventImgs()
     {
-        $('input[name="attachment"]').val(filesEventsArr.join());
+        if(filesEventsArr.length > 0)
+        {
+            $('input[name="attachment"]').val(filesEventsArr.join());
+        }
     }
     var filesEventsArr = [];
     function eventUploadChange(ele)
@@ -275,7 +278,18 @@
                         bootbox.alert('File size Limit 30MB');
                         return false;
                     }
-                    filesEventsArr.push(e.srcElement.responseText);
+                    var obj = $.parseJSON(e.srcElement.responseText);
+                    if(obj.status == false)
+                    {
+                        bootbox.alert(obj.errorMsg, function(){
+                            window.location.reload();
+                        });
+                        return false;
+                    }
+                    else
+                    {
+                        filesEventsArr.push(e.srcElement.responseText);
+                    }
                 }
             }
         }

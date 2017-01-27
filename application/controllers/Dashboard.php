@@ -609,9 +609,13 @@ class Dashboard extends MY_Controller {
         {
 
         }*/
+        $data = array();
         if(isSessionVariableSet($this->isUserSession) === false)
         {
-            redirect(base_url());
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout, Please Login Again!';
+            echo json_encode($data);
+            return false;
         }
         $attchmentArr = '';
         $this->load->library('upload');

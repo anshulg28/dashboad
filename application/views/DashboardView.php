@@ -2420,7 +2420,18 @@
                         bootbox.alert('File size Limit 30MB');
                         return false;
                     }
-                    filesEventsArr.push(e.srcElement.responseText);
+                    var obj = $.parseJSON(e.srcElement.responseText);
+                    if(obj.status == false)
+                    {
+                        bootbox.alert(obj.errorMsg, function(){
+                            window.location.reload();
+                        });
+                        return false;
+                    }
+                    else
+                    {
+                        filesEventsArr.push(e.srcElement.responseText);
+                    }
                 }
             }
         }
@@ -2428,7 +2439,10 @@
 
     function fillEventImgs()
     {
-        $('#eventpanel input[name="attachment"]').val(filesEventsArr.join());
+        if(filesEventsArr.length > 0)
+        {
+            $('#eventpanel input[name="attachment"]').val(filesEventsArr.join());
+        }
     }
     $('#main-comp-event-table').DataTable({
         "ordering": false
