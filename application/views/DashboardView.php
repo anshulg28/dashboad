@@ -1276,10 +1276,10 @@
 <script>
 
     $('#startDate').datetimepicker({
-        format: 'YYYY-MM-DD HH:mm:ss'
+        format: 'YYYY-MM-DD'
     });
     $('#endDate').datetimepicker({
-        format: 'YYYY-MM-DD HH:mm:ss'
+        format: 'YYYY-MM-DD'
     });
     var totalCheckins = {};
     var avgCheckins = {};
@@ -1698,6 +1698,11 @@
         if($('input[name="endDate"]').val() == '')
         {
             $('input[name="endDate"]').focus();
+            return false;
+        }
+        if($(this).find('input[name="startDate"]').val() >= $(this).find('input[name="endDate"]').val())
+        {
+            bootbox.alert('Start Date cannot be greater or equal to End Date');
             return false;
         }
         showCustomLoader();

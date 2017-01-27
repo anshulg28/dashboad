@@ -160,8 +160,8 @@ class Dashboard extends MY_Controller {
 
         $locArray = $this->locations_model->getAllLocations();
 
-        $startDate = $post['startDate'];
-        $endDate = $post['endDate'];
+        $startDate = $post['startDate'].' 07:00:00';
+        $endDate = $post['endDate'].' 01:30:00';
 
         $data['totalMugs'] = $this->mugclub_model->getAllMugsCount();
         $data['avgChecks'] = $this->dashboard_model->getAvgCheckins($startDate,$endDate,$locArray);
