@@ -188,7 +188,7 @@
                                     ?>
                                     <div class="myUploadPanel text-left">
                                         <input type="file" multiple class="form-control" onchange="eventUploadChange(this)" />
-                                        <input type="hidden" name="attachment" required/>
+                                        <input type="hidden" name="attachment"/>
                                     </div>
                                     <br>
                                     <button onclick="fillEventImgs()" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Submit</button>
@@ -231,6 +231,7 @@
                         if(data.status === true)
                         {
                             $(parent).fadeOut();
+                            $(parent).remove();
                         }
                     },
                     error: function(){
@@ -278,18 +279,36 @@
                         bootbox.alert('File size Limit 30MB');
                         return false;
                     }
-                    var obj = $.parseJSON(e.srcElement.responseText);
-                    if(obj.status == false)
+                    try
                     {
-                        bootbox.alert(obj.errorMsg, function(){
-                            window.location.reload();
-                        });
-                        return false;
+                        var obj = $.parseJSON(e.srcElement.responseText);
+                        if(obj.status == false)
+                        {
+                            bootbox.alert(obj.errorMsg, function(){
+                                window.location.reload();
+                            });
+                            return false;
+                        }
+                    }
+                    catch(excep)
+                    {
+                        filesEventsArr.push(e.srcElement.responseText);
+                    }
+                    /*if(e.srcElement.responseText.indexOf('status') != -1)
+                    {
+                        var obj = $.parseJSON(e.srcElement.responseText);
+                        if(obj.status == false)
+                        {
+                            bootbox.alert(obj.errorMsg, function(){
+                                window.location.reload();
+                            });
+                            return false;
+                        }
                     }
                     else
                     {
                         filesEventsArr.push(e.srcElement.responseText);
-                    }
+                    }*/
                 }
             }
         }
@@ -358,10 +377,13 @@
 
     $(document).on('submit','#event-dash-edit', function(e){
         e.preventDefault();
-        if($(this).find('input[name="attachment"]').val() == '')
+        if(typeof $(this).find('.pics-preview-panel').html() == 'undefined')
         {
-            bootbox.alert('Please provide the event image!');
-            return false;
+            if( $(this).find('input[name="attachment"]').val() == '')
+            {
+                bootbox.alert('Please provide the event image!');
+                return false;
+            }
         }
         if($(this).find('#eventName').val() == '')
         {

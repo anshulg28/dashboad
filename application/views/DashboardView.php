@@ -2425,15 +2425,18 @@
                         bootbox.alert('File size Limit 30MB');
                         return false;
                     }
-                    var obj = $.parseJSON(e.srcElement.responseText);
-                    if(obj.status == false)
+                    try
                     {
-                        bootbox.alert(obj.errorMsg, function(){
-                            window.location.reload();
-                        });
-                        return false;
+                        var obj = $.parseJSON(e.srcElement.responseText);
+                        if(obj.status == false)
+                        {
+                            bootbox.alert(obj.errorMsg, function(){
+                                window.location.reload();
+                            });
+                            return false;
+                        }
                     }
-                    else
+                    catch(excep)
                     {
                         filesEventsArr.push(e.srcElement.responseText);
                     }

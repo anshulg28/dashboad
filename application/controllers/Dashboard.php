@@ -804,32 +804,27 @@ class Dashboard extends MY_Controller {
         {
             $attachement = $post['attachment'];
             unset($post['attachment']);
-            $eventId = $post['eventId'];
-            unset($post['eventId']);
-            $post['startTime'] = date('H:i', strtotime($post['startTime']));
-            $post['endTime'] = date('H:i', strtotime($post['endTime']));
-            $this->dashboard_model->updateEventRecord($post,$eventId);
+        }
+        $eventId = $post['eventId'];
+        unset($post['eventId']);
+        $post['startTime'] = date('H:i', strtotime($post['startTime']));
+        $post['endTime'] = date('H:i', strtotime($post['endTime']));
+        $this->dashboard_model->updateEventRecord($post,$eventId);
 
-            if(isset($attachement) && $attachement != '')
-            {
-                $img_names = explode(',',$attachement);
-                for($i=0;$i<count($img_names);$i++)
-                {
-                    $attArr = array(
-                        'eventId' => $eventId,
-                        'filename'=> $img_names[$i],
-                        'attachmentType' => '1'
-                    );
-                    $this->dashboard_model->saveEventAttachment($attArr);
-                }
-            }
-            $data['status'] = true;
-        }
-        else
+        if(isset($attachement) && $attachement != '')
         {
-            $data['status'] = false;
-            $data['errorMsg'] = 'Event Image Required!';
+            $img_names = explode(',',$attachement);
+            for($i=0;$i<count($img_names);$i++)
+            {
+                $attArr = array(
+                    'eventId' => $eventId,
+                    'filename'=> $img_names[$i],
+                    'attachmentType' => '1'
+                );
+                $this->dashboard_model->saveEventAttachment($attArr);
+            }
         }
+        $data['status'] = true;
 
         echo json_encode($data);
 
