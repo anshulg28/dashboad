@@ -23,7 +23,7 @@
                                 <h2><i class="fa fa-calendar fa-1x"></i> Edit Event: <?php echo $row['eventData']['eventName'];?></h2>
                                 <hr>
                                 <br>
-                                <form action="<?php echo base_url();?>dashboard/updateEvent" method="post" class="form-horizontal" role="form">
+                                <form id="event-dash-edit" action="<?php echo base_url();?>dashboard/updateEvent" method="post" class="form-horizontal" role="form">
                                     <input type="hidden" name="eventId" value="<?php echo $row['eventData']['eventId'];?>"/>
                                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
                                         <input class="mdl-textfield__input" type="text" name="eventName"
@@ -188,7 +188,7 @@
                                     ?>
                                     <div class="myUploadPanel text-left">
                                         <input type="file" multiple class="form-control" onchange="eventUploadChange(this)" />
-                                        <input type="hidden" name="attachment" />
+                                        <input type="hidden" name="attachment" required/>
                                     </div>
                                     <br>
                                     <button onclick="fillEventImgs()" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Submit</button>
@@ -340,6 +340,89 @@
     }
     $(window).load(function(){
         costToggle();
+    });
+
+    $(document).on('submit','#event-dash-edit', function(e){
+        e.preventDefault();
+        if($(this).find('input[name="attachment"]').val() == '')
+        {
+            bootbox.alert('Please provide the event image!');
+            return false;
+        }
+        if($(this).find('#eventName').val() == '')
+        {
+            bootbox.alert('Event Name required!');
+            return false;
+        }
+        if($(this).find('#eventDescription').val() == '')
+        {
+            bootbox.alert('Event Description required!');
+            return false;
+        }
+        var d = new Date($(this).find('#eventDate').val());
+        var startT = $(this).find('#startTime').val();
+        var endT = $(this).find('#endTime').val();
+        if(d.getDay() == 6 || d.getDay() == 0)
+        {
+            if(startT < "07:00")
+            {
+                bootbox.alert('On weekends, events can be organised from 7 am to 2 pm!');
+                return false;
+            }
+            if(endT > "14:00")
+            {
+                bootbox.alert('On weekends, events can be organised from 7 am to 2 pm!');
+                return false;
+            }
+        }
+        else
+        {
+            if(startT < "07:00")
+            {
+                bootbox.alert('On weekdays, events can be organised from 7 am to 6 pm!');
+                return false;
+            }
+            if(endT > "18:00")
+            {
+                bootbox.alert('On weekdays, events can be organised from 7 am to 6 pm!');
+                return false;
+            }
+        }
+
+        if(startT > endT)
+        {
+            bootbox.alert('Event Time is not proper!');
+            return false;
+        }
+        if($(this).find('#creatorName').val() == '' &&
+            $(this).find('#creatorPhone').val() == '' &&
+            $(this).find('#creatorEmail').val() == '')
+        {
+            bootbox.alert('Organizer details required!');
+            return false;
+        }
+        showCustomLoader();
+        $.ajax({
+            type:"POST",
+            dataType:'json',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    window.location.href = base_url+'dashboard';
+                }
+                else
+                {
+                    bootbox.alert(data.errorMsg);
+                }
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
     });
 </script>
 

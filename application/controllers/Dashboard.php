@@ -793,34 +793,41 @@ class Dashboard extends MY_Controller {
             redirect(base_url());
         }
         $post = $this->input->post();
+        $data = array();
 
         //Saperating attachment
         if(isset($post['attachment']))
         {
             $attachement = $post['attachment'];
             unset($post['attachment']);
-        }
-        $eventId = $post['eventId'];
-        unset($post['eventId']);
-        $post['startTime'] = date('H:i', strtotime($post['startTime']));
-        $post['endTime'] = date('H:i', strtotime($post['endTime']));
-        $this->dashboard_model->updateEventRecord($post,$eventId);
+            $eventId = $post['eventId'];
+            unset($post['eventId']);
+            $post['startTime'] = date('H:i', strtotime($post['startTime']));
+            $post['endTime'] = date('H:i', strtotime($post['endTime']));
+            $this->dashboard_model->updateEventRecord($post,$eventId);
 
-        if(isset($attachement) && $attachement != '')
-        {
-            $img_names = explode(',',$attachement);
-            for($i=0;$i<count($img_names);$i++)
+            if(isset($attachement) && $attachement != '')
             {
-                $attArr = array(
-                    'eventId' => $eventId,
-                    'filename'=> $img_names[$i],
-                    'attachmentType' => '1'
-                );
-                $this->dashboard_model->saveEventAttachment($attArr);
+                $img_names = explode(',',$attachement);
+                for($i=0;$i<count($img_names);$i++)
+                {
+                    $attArr = array(
+                        'eventId' => $eventId,
+                        'filename'=> $img_names[$i],
+                        'attachmentType' => '1'
+                    );
+                    $this->dashboard_model->saveEventAttachment($attArr);
+                }
             }
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Event Image Required!';
         }
 
-        redirect(base_url().'dashboard');
+        echo json_encode($data);
 
     }
 
