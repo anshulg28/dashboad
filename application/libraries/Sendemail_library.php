@@ -353,6 +353,31 @@ class Sendemail_library
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
     }
 
+    public function checkinMissMail($userData)
+    {
+        $mailRecord = $this->CI->users_model->searchUserByLoc($userData['locId']);
+        $senderName = 'Doolally';
+        $senderEmail = 'admin@doolally.in';
+
+        $toEmail = 'tresha@doolally.in';
+        if($mailRecord['status'] === true)
+        {
+            $toEmail = $mailRecord['userData']['emailId'];
+        }
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/checkinMissInfoMailView', $data, true);
+
+        $fromEmail = $senderEmail;
+
+        $cc        = 'tresha@doolally.in';
+        $fromName  = $senderName;
+
+        $subject = 'Mug #'.$userData['mugId'].' has missing info';
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
+    }
+
     public function sendEmail($to, $cc = '', $from, $fromName, $subject, $content, $attachment = array())
     {
         $CI =& get_instance();

@@ -100,6 +100,17 @@ class Checkin_Model extends CI_Model
         return $data;
     }
 
+    public function fetchMugDataForMissingInfo($mugId)
+    {
+        $query = "SELECT firstName,lastName,mobileNo, emailId, birthDate"
+            ." FROM mugmaster "
+            ." Where mugId = ".$mugId;
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+
     public function filterCheckInParameters($post)
     {
         if(myIsArray($post))

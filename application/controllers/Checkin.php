@@ -158,6 +158,25 @@ class Checkin extends MY_Controller {
             }
             else
             {
+                $mugData = $this->checkin_model->fetchMugDataForMissingInfo($params['mugId']);
+                $missingData = array();
+                foreach($mugData as $key => $row)
+                {
+                    if($row == '' || !isset($row))
+                    {
+                        $missingData[] = $this->getProperFieldText($key);
+                    }
+                }
+
+                if(myIsArray($missingData))
+                {
+                    $mailData = array(
+                        'locId' => $this->currentLocation,
+                        'missingData' => implode(',',$missingData),
+                        'mugId' => $params['mugId']
+                    );
+                    $this->sendemail_library->checkinMissMail($mailData);
+                }
                 $this->checkin_model->saveCheckInRecord($params);
             }
         }
@@ -223,5 +242,29 @@ class Checkin extends MY_Controller {
 
             echo json_encode($verifyMugData);
         }
+    }
+
+    function getProperFieldText($gotParam)
+    {
+        $paramText = '';
+        switch ($gotParam)
+        {
+            case 'firstName':
+                $paramText = "First Name";
+                break;
+            case "lastName":
+                $paramText = "Last Name";
+                break;
+            case "mobileNo":
+                $paramText = "Mobile Number";
+                break;
+            case "emailId":
+                $paramText = "Email Address";
+                break;
+            case "birthDate":
+                $paramText = "Birthday";
+                break;
+        }
+        return $paramText;
     }
 }
