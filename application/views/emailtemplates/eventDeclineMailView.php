@@ -9,7 +9,7 @@
     <p>Dear <?php echo $mailData[0]['creatorName'] ?>,</p>
     <p>
         Sorry, your event has not been approved. Please read our guidelines once again while creating event<br><br>
-        You can try creating another event here..<a href="<?php echo base_url().'mobile?page/create_event';?>" target="_blank">Book an event</a><br><br>
+        You can try creating another event here..<a href="<?php echo MOBILE_URL.'mobile?page/create_event';?>" target="_blank">Book an event</a><br><br>
 
         In case you have any questions/queries please don't hesitate to write to me at this mail address or you can reach me at
         <?php echo $mailData['senderPhone'] .' ('.$mailData['senderName'].')';?><br><br>
