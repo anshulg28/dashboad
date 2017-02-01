@@ -1097,7 +1097,7 @@ class Dashboard_Model extends CI_Model
     {
         $query = "SELECT *"
             ." FROM custommetatags"
-            ." ORDER BY id DESC";
+            ." ORDER BY id DESC LIMIT 5";
 
         $result = $this->db->query($query)->result_array();
 

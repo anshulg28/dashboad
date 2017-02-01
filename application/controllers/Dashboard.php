@@ -428,9 +428,13 @@ class Dashboard extends MY_Controller {
     }
     public function uploadFiles()
     {
+        $data = array();
         if(isSessionVariableSet($this->isUserSession) === false)
         {
-            redirect(base_url());
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout, Please Login Again!';
+            echo json_encode($data);
+            return false;
         }
         $attchmentArr = '';
         $this->load->library('upload');
@@ -449,42 +453,72 @@ class Dashboard extends MY_Controller {
                 $config['overwrite']     = TRUE;
 
                 $this->upload->initialize($config);
-                $this->upload->do_upload('attachment');
-                $upload_data = $this->upload->data();
-
-                //$attchmentArr = $upload_data['full_path'];
-                $attchmentArr=  $this->image_thumb($upload_data['file_path'],$upload_data['file_name']); //$upload_data['file_name'];
-                echo $attchmentArr;
+                if(!$this->upload->do_upload('attachment'))
+                {
+                    log_message('error','Fnb: '.$this->upload->display_errors());
+                    $data['status'] = false;
+                    $data['errorMsg'] = $this->upload->display_errors();
+                    echo json_encode($data);
+                    return false;
+                }
+                else
+                {
+                    $upload_data = $this->upload->data();
+                    $attchmentArr= $this->image_thumb($upload_data['file_path'],$upload_data['file_name']);
+                    if($attchmentArr == 'error')
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Error in resizing image!';
+                        echo json_encode($data);
+                        return false;
+                    }
+                    else
+                    {
+                        echo $attchmentArr;
+                    }
+                }
             }
             else
             {
                 echo 'Some Error Occurred!';
             }
         }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'No Image Files Received!';
+            echo json_encode($data);
+            return false;
+        }
     }
     function image_thumb( $image_path, $img_name)
     {
         $image_thumb = $image_path.'thumb/'.$img_name;
 
-        //if ( !file_exists( $image_thumb ) ) {
-            // LOAD LIBRARY
-            $this->load->library( 'image_lib' );
+        // LOAD LIBRARY
+        $this->load->library( 'image_lib' );
 
-            // CONFIGURE IMAGE LIBRARY
-            $config['image_library']    = 'gd2';
-            $config['source_image']     = $image_path.$img_name;
-            $config['new_image']        = $image_thumb;
-            $config['quality']          = 90;
-            $config['maintain_ratio']   = TRUE;
-            $config['height']           = 480;
-            $config['width']            = 690;
+        // CONFIGURE IMAGE LIBRARY
+        $config['image_library']    = 'gd2';
+        $config['source_image']     = $image_path.$img_name;
+        $config['new_image']        = $image_thumb;
+        $config['quality']          = 90;
+        $config['maintain_ratio']   = TRUE;
+        $config['height']           = 480;
+        $config['width']            = 690;
 
-            $this->image_lib->initialize( $config );
-            $this->image_lib->resize();
+        $this->image_lib->initialize( $config );
+        if(!$this->image_lib->resize())
+        {
             $this->image_lib->clear();
-        //}
-
-        return $img_name;
+            log_message('error',$image_path.': '.$this->image_lib->display_errors());
+            return 'error';
+        }
+        else
+        {
+            $this->image_lib->clear();
+            return $img_name;
+        }
     }
 
     public function cropEventImage()
@@ -617,7 +651,7 @@ class Dashboard extends MY_Controller {
             echo json_encode($data);
             return false;
         }
-        $attchmentArr = '';
+
         $this->load->library('upload');
         if(isset($_FILES))
         {
@@ -630,17 +664,42 @@ class Dashboard extends MY_Controller {
                 $config['overwrite']     = TRUE;
 
                 $this->upload->initialize($config);
-                $this->upload->do_upload('attachment');
-                $upload_data = $this->upload->data();
-
-                //$attchmentArr = $upload_data['full_path'];
-                $attchmentArr= $this->image_thumb($upload_data['file_path'],$upload_data['file_name']);
-                echo $attchmentArr;
+                if(!$this->upload->do_upload('attachment'))
+                {
+                    log_message('error','Event: '.$this->upload->display_errors());
+                    $data['status'] = false;
+                    $data['errorMsg'] = $this->upload->display_errors();
+                    echo json_encode($data);
+                    return false;
+                }
+                else
+                {
+                    $upload_data = $this->upload->data();
+                    $attchmentArr= $this->image_thumb($upload_data['file_path'],$upload_data['file_name']);
+                    if($attchmentArr == 'error')
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Error in resizing image!';
+                        echo json_encode($data);
+                        return false;
+                    }
+                    else
+                    {
+                        echo $attchmentArr;
+                    }
+                }
             }
             else
             {
                 echo 'Some Error Occurred!';
             }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'No Image Files Received!';
+            echo json_encode($data);
+            return false;
         }
     }
 
@@ -1192,21 +1251,30 @@ class Dashboard extends MY_Controller {
 
     function saveEventMeta()
     {
-        $post = $this->input->post();
-
-        if(isset($post['metaTitle']) && isset($post['metaDescription']))
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
         {
-            $this->dashboard_model->saveMetaRecord($post);
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout, Please Login Again!';
+            echo json_encode($data);
+            return false;
         }
-        redirect(base_url().'dashboard');
+        $post = $this->input->post();
+        $this->dashboard_model->saveMetaRecord($post);
+        $data['status'] = true;
+        echo json_encode($data);
     }
 
     //upload img for meta tag
     public function uploadMetaFiles()
     {
+        $data = array();
         if(isSessionVariableSet($this->isUserSession) === false)
         {
-            redirect(base_url());
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout, Please Login Again!';
+            echo json_encode($data);
+            return false;
         }
         $attchmentArr = '';
         $this->load->library('upload');
@@ -1221,17 +1289,42 @@ class Dashboard extends MY_Controller {
                 $config['overwrite']     = TRUE;
 
                 $this->upload->initialize($config);
-                $this->upload->do_upload('attachment');
-                $upload_data = $this->upload->data();
-
-                //$attchmentArr = $upload_data['full_path'];
-                $attchmentArr=  $this->image_thumb($upload_data['file_path'],$upload_data['file_name']); //$upload_data['file_name'];
-                echo $attchmentArr;
+                if(!$this->upload->do_upload('attachment'))
+                {
+                    log_message('error','Meta: '.$this->upload->display_errors());
+                    $data['status'] = false;
+                    $data['errorMsg'] = $this->upload->display_errors();
+                    echo json_encode($data);
+                    return false;
+                }
+                else
+                {
+                    $upload_data = $this->upload->data();
+                    $attchmentArr= $this->image_thumb($upload_data['file_path'],$upload_data['file_name']);
+                    if($attchmentArr == 'error')
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Error in resizing image!';
+                        echo json_encode($data);
+                        return false;
+                    }
+                    else
+                    {
+                        echo $attchmentArr;
+                    }
+                }
             }
             else
             {
                 echo 'Some Error Occurred!';
             }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'No Image Files Received!';
+            echo json_encode($data);
+            return false;
         }
     }
 

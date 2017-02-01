@@ -652,7 +652,7 @@
                                         <input type="hidden" name="attachment" />
                                     </div>
                                     <br>
-                                    <button onclick="fillImgs()" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Submit</button>
+                                    <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Submit</button>
                                 </form>
                                 <br>
                                 <div class="progress hide">
@@ -952,7 +952,7 @@
                                     </div>
 
                                     <br>
-                                    <button onclick="fillEventImgs()" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Submit</button>
+                                    <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Submit</button>
                                 </form>
                                 <br>
                                 <div class="progress hide">
@@ -1054,7 +1054,7 @@
                             <div class="mdl-grid">
                                 <div class="mdl-cell mdl-cell--2-col"></div>
                                 <div class="mdl-cell mdl-cell--8-col">
-                                    <form action="<?php echo base_url();?>dashboard/saveEventMeta" method="post" enctype="multipart/form-data">
+                                    <form id="meta-event-form" action="<?php echo base_url();?>dashboard/saveEventMeta" method="post" enctype="multipart/form-data">
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
                                             <input class="mdl-textfield__input" type="text" name="metaTitle" id="shareTitle">
                                             <label class="mdl-textfield__label" for="shareTitle">Sharing Title</label>
@@ -1070,7 +1070,7 @@
                                             <input type="hidden" name="metaImg" />
                                         </div>
                                         <br>
-                                        <button onclick="fillMetaImgs()" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Save</button>
+                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Save</button>
                                     </form>
                                     <br>
                                     <div class="progress hide">
@@ -1103,7 +1103,7 @@
                                                             <td><?php echo $row['metaTitle'];?></td>
                                                             <td><?php echo $row['metaDescription'];?></td>
                                                             <?php
-                                                                if(isset($row['metaImg']))
+                                                                if(isset($row['metaImg']) && $row['metaImg'] != '')
                                                                 {
                                                                     $imgs = array(MOBILE_URL.'asset/images/thumb/'.$row['metaImg']);
                                                                     ?>
@@ -2229,14 +2229,27 @@
                         bootbox.alert('File size Limit 30MB');
                         return false;
                     }
-                    filesArr.push(e.srcElement.responseText);
+                    try
+                    {
+                        var obj = $.parseJSON(e.srcElement.responseText);
+                        if(obj.status == false)
+                        {
+                            bootbox.alert('<label class="my-danger-text">Error: '+obj.errorMsg+'</label>');
+                            return false;
+                        }
+                    }
+                    catch(excep)
+                    {
+                        filesArr.push(e.srcElement.responseText);
+                        fillImgs();
+                    }
                 }
             }
         }
     }
     function fillImgs()
     {
-        $('input[name="attachment"]').val(filesArr.join());
+        $('#fnbAdd input[name="attachment"]').val(filesArr.join());
     }
     $(document).on('click', '.beer-tags', function(){
         $('#beerLoc-modal .modal-body .tagged-locations').empty();
@@ -2430,15 +2443,14 @@
                         var obj = $.parseJSON(e.srcElement.responseText);
                         if(obj.status == false)
                         {
-                            bootbox.alert(obj.errorMsg, function(){
-                                window.location.reload();
-                            });
+                            bootbox.alert('<label class="my-danger-text">Error: '+obj.errorMsg+'</label>');
                             return false;
                         }
                     }
                     catch(excep)
                     {
                         filesEventsArr.push(e.srcElement.responseText);
+                        fillEventImgs();
                     }
                 }
             }
@@ -2569,7 +2581,20 @@
                         bootbox.alert('File size Limit 30MB');
                         return false;
                     }
-                    filesMetaArr.push(e.srcElement.responseText);
+                    try
+                    {
+                        var obj = $.parseJSON(e.srcElement.responseText);
+                        if(obj.status == false)
+                        {
+                            bootbox.alert('<label class="my-danger-text">Error: '+obj.errorMsg+'</label>');
+                            return false;
+                        }
+                    }
+                    catch(excep)
+                    {
+                        filesMetaArr.push(e.srcElement.responseText);
+                        fillMetaImgs();
+                    }
                 }
             }
         }
@@ -2597,32 +2622,6 @@
         var d = new Date($(this).find('#eventDate').val());
         var startT = $(this).find('#startTime').val();
         var endT = $(this).find('#endTime').val();
-        if(d.getDay() == 6 || d.getDay() == 0)
-        {
-            if(startT < "07:00")
-            {
-                bootbox.alert('On weekends, events can be organised from 7 am to 2 pm!');
-                return false;
-            }
-            if(endT > "14:00")
-            {
-                bootbox.alert('On weekends, events can be organised from 7 am to 2 pm!');
-                return false;
-            }
-        }
-        else
-        {
-            if(startT < "07:00")
-            {
-                bootbox.alert('On weekdays, events can be organised from 7 am to 6 pm!');
-                return false;
-            }
-            if(endT > "18:00")
-            {
-                bootbox.alert('On weekdays, events can be organised from 7 am to 6 pm!');
-                return false;
-            }
-        }
 
         if(startT > endT)
         {
@@ -2699,6 +2698,47 @@
                         $('#peopleView-modal .modal-body').html('No Sign ups');
                     }
                     $('#peopleView-modal').modal('show');
+                }
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
+    });
+
+    $(document).on('submit','#meta-event-form',function(e){
+        e.preventDefault();
+        if($(this).find('#shareTitle').val() == '')
+        {
+            bootbox.alert('Meta Title required!');
+            return false;
+        }
+        if($(this).find('#shareDesc').val() == '')
+        {
+            bootbox.alert('Meta Description required!');
+            return false;
+        }
+        if($(this).find('input[name="metaImg"]').val() == '')
+        {
+            bootbox.alert('Meta Image required!');
+            return false;
+        }
+        showCustomLoader();
+        $.ajax({
+            type:"POST",
+            dataType:'json',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    window.location.reload();
+                }
+                else
+                {
+                    bootbox.alert(data.errorMsg);
                 }
             },
             error: function(){

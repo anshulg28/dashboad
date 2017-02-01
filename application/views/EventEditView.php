@@ -191,7 +191,7 @@
                                         <input type="hidden" name="attachment"/>
                                     </div>
                                     <br>
-                                    <button onclick="fillEventImgs()" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Submit</button>
+                                    <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Submit</button>
                                     <br><br>
                                     <div class="progress hide">
                                         <div class="progress-bar progress-bar-striped active" role="progressbar"
@@ -215,6 +215,11 @@
 <?php echo $globalJs; ?>
 
 <script>
+    var oldStartT,oldEndT;
+    $(window).load(function(){
+        oldStartT = $('#startTime').val();
+        oldEndT = $('#endTime').val();
+    });
     $(document).on('click','.img-remove-icon', function(){
         var picId = $(this).attr('data-picId');
         var parent = $(this).parent();
@@ -284,31 +289,15 @@
                         var obj = $.parseJSON(e.srcElement.responseText);
                         if(obj.status == false)
                         {
-                            bootbox.alert(obj.errorMsg, function(){
-                                window.location.reload();
-                            });
+                            bootbox.alert('<label class="my-danger-text">Error: '+obj.errorMsg+'</label>');
                             return false;
                         }
                     }
                     catch(excep)
                     {
                         filesEventsArr.push(e.srcElement.responseText);
+                        fillEventImgs();
                     }
-                    /*if(e.srcElement.responseText.indexOf('status') != -1)
-                    {
-                        var obj = $.parseJSON(e.srcElement.responseText);
-                        if(obj.status == false)
-                        {
-                            bootbox.alert(obj.errorMsg, function(){
-                                window.location.reload();
-                            });
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        filesEventsArr.push(e.srcElement.responseText);
-                    }*/
                 }
             }
         }
@@ -376,6 +365,7 @@
     });
 
     $(document).on('submit','#event-dash-edit', function(e){
+        var ele = $(this);
         e.preventDefault();
         if(typeof $(this).find('.pics-preview-panel').html() == 'undefined')
         {
@@ -398,32 +388,6 @@
         var d = new Date($(this).find('#eventDate').val());
         var startT = $(this).find('#startTime').val();
         var endT = $(this).find('#endTime').val();
-        if(d.getDay() == 6 || d.getDay() == 0)
-        {
-            if(startT < "07:00")
-            {
-                bootbox.alert('On weekends, events can be organised from 7 am to 2 pm!');
-                return false;
-            }
-            if(endT > "14:00")
-            {
-                bootbox.alert('On weekends, events can be organised from 7 am to 2 pm!');
-                return false;
-            }
-        }
-        else
-        {
-            if(startT < "07:00")
-            {
-                bootbox.alert('On weekdays, events can be organised from 7 am to 6 pm!');
-                return false;
-            }
-            if(endT > "18:00")
-            {
-                bootbox.alert('On weekdays, events can be organised from 7 am to 6 pm!');
-                return false;
-            }
-        }
 
         if(startT > endT)
         {
@@ -437,28 +401,61 @@
             bootbox.alert('Organizer details required!');
             return false;
         }
-        showCustomLoader();
-        $.ajax({
-            type:"POST",
-            dataType:'json',
-            url: $(this).attr('action'),
-            data: $(this).serialize(),
-            success: function(data){
-                hideCustomLoader();
-                if(data.status === true)
+        if( oldStartT != startT || oldEndT != endT)
+        {
+            bootbox.confirm("Sure want to modify timings?", function(result) {
+                if(result === true)
                 {
-                    window.location.href = base_url+'dashboard';
+                    showCustomLoader();
+                    $.ajax({
+                        type:"POST",
+                        dataType:'json',
+                        url: $(ele).attr('action'),
+                        data: $(ele).serialize(),
+                        success: function(data){
+                            hideCustomLoader();
+                            if(data.status === true)
+                            {
+                                window.location.href = base_url+'dashboard';
+                            }
+                            else
+                            {
+                                bootbox.alert(data.errorMsg);
+                            }
+                        },
+                        error: function(){
+                            hideCustomLoader();
+                            bootbox.alert('Some Error Occurred!');
+                        }
+                    });
                 }
-                else
-                {
-                    bootbox.alert(data.errorMsg);
+            });
+        }
+        else
+        {
+            showCustomLoader();
+            $.ajax({
+                type:"POST",
+                dataType:'json',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function(data){
+                    hideCustomLoader();
+                    if(data.status === true)
+                    {
+                        window.location.href = base_url+'dashboard';
+                    }
+                    else
+                    {
+                        bootbox.alert(data.errorMsg);
+                    }
+                },
+                error: function(){
+                    hideCustomLoader();
+                    bootbox.alert('Some Error Occurred!');
                 }
-            },
-            error: function(){
-                hideCustomLoader();
-                bootbox.alert('Some Error Occurred!');
-            }
-        });
+            });
+        }
     });
 </script>
 
