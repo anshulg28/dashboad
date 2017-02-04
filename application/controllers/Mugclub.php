@@ -313,6 +313,24 @@ class Mugclub extends MY_Controller {
             else
             {
                 $params = $this->mugclub_model->filterMugParameters($post);
+                $saveMail = array();
+                foreach($params as $key => $row)
+                {
+                    $gotTxt = $this->getProperFieldText($key);
+                    if($gotTxt != 'error')
+                    {
+                        $saveMail[] = $gotTxt;
+                    }
+                }
+                if(myIsArray($saveMail))
+                {
+                    $mailData = array(
+                        'locId' => $this->currentLocation,
+                        'missingData' => implode(',',$saveMail),
+                        'mugId' => $params['mugId']
+                    );
+                    $this->sendemail_library->checkinInfoFillMail($mailData);
+                }
                 $this->mugclub_model->updateMugRecord($params);
                 $data['status'] = true;
             }
@@ -325,7 +343,31 @@ class Mugclub extends MY_Controller {
 
         echo json_encode($data);
     }
-
+    function getProperFieldText($gotParam)
+    {
+        $paramText = '';
+        switch ($gotParam)
+        {
+            case 'firstName':
+                $paramText = "First Name";
+                break;
+            case "lastName":
+                $paramText = "Last Name";
+                break;
+            case "mobileNo":
+                $paramText = "Mobile Number";
+                break;
+            case "emailId":
+                $paramText = "Email Address";
+                break;
+            case "birthDate":
+                $paramText = "Birthday";
+                break;
+            default:
+                $paramText = 'error';
+        }
+        return $paramText;
+    }
     public function deleteMugData($mugId)
     {
         $mugExists = $this->mugclub_model->getMugDataById($mugId);

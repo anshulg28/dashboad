@@ -456,7 +456,7 @@ class Cron extends MY_Controller
                     {
                         if(isset($row['picture']))
                         {
-                            preg_match('/(=http:|=https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['picture']),$matches);
+                            preg_match('/(=http:|=https:|http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['picture']),$matches);
                             if(myIsArray($matches))
                             {
                                 $fileArray = explode('/',$matches[0]);
@@ -517,9 +517,9 @@ class Cron extends MY_Controller
                             {
                                 $fileArray = explode('/',$matches[0]);
                                 $fileName= $fileArray[count($fileArray)-1];
-                                if(copy($row['image'],'../mobile/socialimages/twitter/'.$fileName))
+                                if(copy($row['extended_entities']['media'][0]['media_url_https'],'../mobile/socialimages/twitter/'.$fileName))
                                 {
-                                    $row['image'] = MOBILE_URL.'socialimages/twitter/'.$fileName;
+                                    $row['extended_entities']['media'][0]['media_url_https'] = MOBILE_URL.'socialimages/twitter/'.$fileName;
                                 }
                             }
                         }
