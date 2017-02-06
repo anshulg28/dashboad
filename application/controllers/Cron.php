@@ -15,6 +15,7 @@ class Cron extends MY_Controller
         $this->load->model('cron_model');
         $this->load->model('dashboard_model');
         $this->load->model('locations_model');
+        $this->load->model('mugclub_model');
     }
     public function index()
     {
@@ -806,6 +807,111 @@ class Cron extends MY_Controller
                     $this->dashboard_model->updateWalletLog($details);
                 }
             }
+        }
+    }
+
+    function saveDashboardStats()
+    {
+        $locArray = $this->locations_model->getAllLocations();
+
+        //Dashboard Data
+        $startDate = date('Y-m-d', strtotime('-1 month'));
+        $endDate = date('Y-m-d');
+        $totalMugs = $this->mugclub_model->getAllMugsCount();
+        $avgChecks = $this->dashboard_model->getAvgCheckins($startDate,$endDate,$locArray);
+        $Regulars = $this->dashboard_model->getRegulars($startDate,$endDate,$locArray);
+        $Irregulars = $this->dashboard_model->getIrregulars($startDate,$endDate,$locArray);
+        $Lapsers = $this->dashboard_model->getLapsers($startDate,$endDate,$locArray);
+
+        $avgCheckins = array();
+        $regulars = array();
+        $irregulars = array();
+        $lapsers = array();
+
+        if(isset($avgChecks))
+        {
+            for($i = 0;$i<count($avgChecks['checkInList']); $i++)
+            {
+                $mugkeys = array_keys($totalMugs);
+                if($totalMugs[$mugkeys[$i]] != 0)
+                {
+                    $checkinKeys = array_keys($avgChecks['checkInList']);
+                    $allStores = ((int)$avgChecks['checkInList'][$checkinKeys[$i]]/$totalMugs[$mugkeys[$i]]);
+                    $avgCheckins[] = round($allStores,2);
+                }
+                else
+                {
+                    $avgCheckins[] = 0;
+                }
+            }
+        }
+
+        if(isset($Regulars))
+        {
+            for($i = 0;$i<count($Regulars['regularCheckins']); $i++)
+            {
+                $mugkeys = array_keys($totalMugs);
+                if($totalMugs[$mugkeys[$i]] != 0)
+                {
+                    $checkinKeys = array_keys($Regulars['regularCheckins']);
+                    $allStores = ((int)$Regulars['regularCheckins'][$checkinKeys[$i]]/$totalMugs[$mugkeys[$i]]);
+                    $regulars[] = round($allStores,2);
+                }
+                else
+                {
+                    $regulars[] = 0;
+                }
+            }
+        }
+
+        if(isset($Irregulars))
+        {
+            for($i = 0;$i<count($Irregulars['irregularCheckins']); $i++)
+            {
+                $mugkeys = array_keys($totalMugs);
+                if($totalMugs[$mugkeys[$i]] != 0)
+                {
+                    $checkinKeys = array_keys($Irregulars['irregularCheckins']);
+                    $allStores = ((int)$Irregulars['irregularCheckins'][$checkinKeys[$i]]/$totalMugs[$mugkeys[$i]]);
+                    $irregulars[] = round($allStores,2);
+
+                }
+                else
+                {
+                    $irregulars[] = 0;
+                }
+            }
+        }
+
+        if(isset($Lapsers))
+        {
+            for($i = 0;$i<count($Lapsers['lapsers']); $i++)
+            {
+                $mugkeys = array_keys($totalMugs);
+                if($totalMugs[$mugkeys[$i]] != 0)
+                {
+                    $checkinKeys = array_keys($Lapsers['lapsers']);
+                    $allStores = ((int)$Lapsers['lapsers'][$checkinKeys[$i]]/$totalMugs[$mugkeys[$i]]);
+                    $lapsers[] = round($allStores,2);
+                }
+                else
+                {
+                    $lapsers[] = 0;
+                }
+            }
+        }
+
+        $details = array(
+            'avgCheckins'=> implode(',',$avgCheckins),
+            'regulars' => implode(',',$regulars),
+            'irregulars' => implode(',',$irregulars),
+            'lapsers' => implode(',',$lapsers)
+        );
+
+        $gotData = $this->dashboard_model->getDashboardRecord();
+        if($gotData['status'] === false)
+        {
+            $this->dashboard_model->saveDashboardRecord($details);
         }
     }
 }

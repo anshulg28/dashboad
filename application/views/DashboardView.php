@@ -1622,7 +1622,7 @@
             if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
             {
                 ?>
-                    setTimeout(saveDashBoardRecord(),5000);
+                    //setTimeout(saveDashBoardRecord(),5000);
                 <?php
             }
         ?>

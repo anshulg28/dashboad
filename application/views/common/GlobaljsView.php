@@ -32,8 +32,18 @@
 <script>
     $(document).on('submit','#mainLoginForm', function(e){
 
+        e.preventDefault();
+        if(typeof $(this).find('input[name="userOtp"]').val() != 'undefined')
+        {
+            if($(this).find('input[name="userOtp"]').val() == '')
+            {
+                bootbox.alert('OTP is Required!');
+                return false;
+            }
+        }
         $(this).find('.login-error-block').empty();
         $(this).find('button[type="submit"]').attr('disabled','disabled');
+        showCustomLoader();
         $.ajax({
             type:"POST",
             dataType:"json",
@@ -41,6 +51,7 @@
             data:$(this).serialize(),
             success: function(data)
             {
+                hideCustomLoader();
                 $('#mainLoginForm button[type="submit"]').removeAttr("disabled");
                 if(data.status == true)
                 {
@@ -53,11 +64,11 @@
             },
             error:function()
             {
+                hideCustomLoader();
                 $('#mainLoginForm button[type="submit"]').removeAttr("disabled");
                 $('.login-error-block').css('color','red').html('Some Error Occurred, Try Again!');
             }
         });
-        e.preventDefault();
     });
 </script>
 <!-- Loader Show and hide script -->
