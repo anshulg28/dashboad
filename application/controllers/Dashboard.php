@@ -50,7 +50,7 @@ class Dashboard extends MY_Controller {
         //Dashboard Data
         $startDate = date('Y-m-d', strtotime('-1 month'));
         $endDate = date('Y-m-d');
-        $data['totalMugs'] = $this->mugclub_model->getAllMugsCount();
+        $data['totalMugs'] = $this->mugclub_model->getAllMugsCount($locArray);
         $data['avgChecks'] = $this->dashboard_model->getAvgCheckins($startDate,$endDate,$locArray);
         $data['Regulars'] = $this->dashboard_model->getRegulars($startDate,$endDate,$locArray);
         $data['Irregulars'] = $this->dashboard_model->getIrregulars($startDate,$endDate,$locArray);
@@ -163,7 +163,7 @@ class Dashboard extends MY_Controller {
         $startDate = $post['startDate'].' 07:00:00';
         $endDate = $post['endDate'].' 01:30:00';
 
-        $data['totalMugs'] = $this->mugclub_model->getAllMugsCount();
+        $data['totalMugs'] = $this->mugclub_model->getAllMugsCount($locArray);
         $data['avgChecks'] = $this->dashboard_model->getAvgCheckins($startDate,$endDate,$locArray);
         $data['Regulars'] = $this->dashboard_model->getRegulars($startDate,$endDate,$locArray);
         $data['Irregulars'] = $this->dashboard_model->getIrregulars($startDate,$endDate,$locArray);

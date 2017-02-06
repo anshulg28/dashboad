@@ -817,7 +817,7 @@ class Cron extends MY_Controller
         //Dashboard Data
         $startDate = date('Y-m-d', strtotime('-1 month'));
         $endDate = date('Y-m-d');
-        $totalMugs = $this->mugclub_model->getAllMugsCount();
+        $totalMugs = $this->mugclub_model->getAllMugsCount($locArray);
         $avgChecks = $this->dashboard_model->getAvgCheckins($startDate,$endDate,$locArray);
         $Regulars = $this->dashboard_model->getRegulars($startDate,$endDate,$locArray);
         $Irregulars = $this->dashboard_model->getIrregulars($startDate,$endDate,$locArray);

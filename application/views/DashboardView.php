@@ -1384,15 +1384,25 @@
             }
         }
 
+        for($i=0;$i<count($locations);$i++)
+        {
+            ?>
+            graph_avg[<?php echo $i;?>]= [];
+            graph_regulars[<?php echo $i;?>] = [];
+            graph_irregulars[<?php echo $i;?>] = [];
+            graph_lapsers[<?php echo $i;?>] = [];
+            feed_locs[<?php echo $i;?>] = [];
+            <?php
+        }
         //Graph points
         if(isset($graph['avgChecks']))
         {
             ?>
-            graph_avg[0] = [];
+            /*graph_avg[0] = [];
             graph_avg[1] = [];
             graph_avg[2] = [];
             graph_avg[3] = [];
-            graph_avg[4] = [];
+            graph_avg[4] = [];*/
             <?php
             for($i = 0;$i<count($graph['avgChecks']); $i++)
             {
@@ -1411,11 +1421,11 @@
         if(isset($graph['regulars']))
         {
             ?>
-            graph_regulars[0] = [];
+            /*graph_regulars[0] = [];
             graph_regulars[1] = [];
             graph_regulars[2] = [];
             graph_regulars[3] = [];
-            graph_regulars[4] = [];
+            graph_regulars[4] = [];*/
             <?php
             for($i = 0;$i<count($graph['regulars']); $i++)
             {
@@ -1434,11 +1444,11 @@
         if(isset($graph['irregulars']))
         {
             ?>
-            graph_irregulars[0] = [];
+            /*graph_irregulars[0] = [];
             graph_irregulars[1] = [];
             graph_irregulars[2] = [];
             graph_irregulars[3] = [];
-            graph_irregulars[4] = [];
+            graph_irregulars[4] = [];*/
             <?php
             for($i = 0;$i<count($graph['irregulars']); $i++)
             {
@@ -1457,11 +1467,11 @@
         if(isset($graph['lapsers']))
         {
             ?>
-            graph_lapsers[0] = [];
+            /*graph_lapsers[0] = [];
             graph_lapsers[1] = [];
             graph_lapsers[2] = [];
             graph_lapsers[3] = [];
-            graph_lapsers[4] = [];
+            graph_lapsers[4] = [];*/
             <?php
             for($i = 0;$i<count($graph['lapsers']); $i++)
             {
@@ -1489,11 +1499,11 @@
         if(isset($weeklyFeed) && myIsMultiArray($weeklyFeed))
         {
             ?>
-            feed_locs[0] = [];
+            /*feed_locs[0] = [];
             feed_locs[1] = [];
             feed_locs[2] = [];
             feed_locs[3] = [];
-            feed_locs[4] = [];
+            feed_locs[4] = [];*/
             <?php
             foreach($weeklyFeed as $key => $row)
             {

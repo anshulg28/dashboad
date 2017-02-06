@@ -269,17 +269,16 @@ class Dashboard_Model extends CI_Model
         $query = "SELECT DISTINCT (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
                  WHERE feedbackLoc != 0) as 'total_overall',
                  (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
-                 WHERE feedbackLoc = 1) as 'total_bandra',
+                 WHERE feedbackLoc != 0 AND overallRating >= 9) as 'promo_overall',
+                 (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                 WHERE feedbackLoc != 0 AND overallRating < 7) as 'de_overall'";
+                 /*,
                  (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
                  WHERE feedbackLoc = 2) as 'total_andheri',
                  (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
                  WHERE feedbackLoc = 3) as 'total_kemps-corner',
                  (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
-                 WHERE feedbackLoc = 4) as 'total_colaba',
-                 (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
-                 WHERE feedbackLoc != 0 AND overallRating >= 9) as 'promo_overall',
-                 (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
-                 WHERE feedbackLoc != 0 AND overallRating < 7) as 'de_overall'";
+                 WHERE feedbackLoc = 4) as 'total_colaba'";*/
         if(isset($locations))
         {
             $length = count($locations)-1;
@@ -293,6 +292,8 @@ class Dashboard_Model extends CI_Model
                     {
                         $query .= ",";
                     }
+                    $query .= "(SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                              WHERE feedbackLoc = ".$row['id'].") as 'total_".$row['locUniqueLink']."',";
                     $query .= "(SELECT COUNT(overallRating) FROM usersfeedbackmaster 
                               WHERE feedbackLoc = ".$row['id']." AND overallRating >= 9) as 'promo_".$row['locUniqueLink']."',";
                     $query .= "(SELECT COUNT(overallRating) FROM usersfeedbackmaster 
