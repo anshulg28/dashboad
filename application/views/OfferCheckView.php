@@ -20,19 +20,25 @@
                             <div class="input-group">
                                 <span class="input-group-addon">DO-</span>
                                 <input type="number" name="offerCode" id="offerCode"
-                                       class="form-control" placeholder="11111">
+                                       class="form-control offer-input" placeholder="11111">
                             </div>
                             <h4 class="text-center">OR</h4>
                             <div class="input-group">
                                 <span class="input-group-addon">BR-</span>
                                 <input type="number" name="breakOfferCode" id="breakOfferCode"
-                                       class="form-control" placeholder="11111">
+                                       class="form-control offer-input" placeholder="11111">
+                            </div>
+                            <h4 class="text-center">OR</h4>
+                            <div class="input-group">
+                                <span class="input-group-addon">EV-</span>
+                                <input type="number" name="eventOfferCode" id="eventOfferCode"
+                                       class="form-control offer-input" placeholder="11111">
                             </div>
                             <h4 class="text-center">OR</h4>
                             <div class="input-group">
                                 <span class="input-group-addon">TW-</span>
                                 <input type="number" name="oldOfferCode" id="oldOfferCode"
-                                       class="form-control" placeholder="11111">
+                                       class="form-control offer-input" placeholder="11111">
                             </div>
                         </div>
                         <div class="col-sm-1 col-xs-0"></div>
@@ -59,28 +65,26 @@
         var newOffer = $('#offerCode').val();
         var oldOffer = $('#oldOfferCode').val();
         var breakOffer = $('#breakOfferCode').val();
+        var eventOffer = $('#eventOfferCode').val();
         var offerUrl,offerPrifix,finalCode;
-        if(newOffer != '' && oldOffer != '')
+        var filledFields = 0;
+        $('.offer-input').each(function(i,val){
+            if($(val).val() != '')
+            {
+                filledFields++;
+            }
+        });
+        if(filledFields > 1)
         {
             bootbox.alert('Enter Only 1 Code!');
             return false;
         }
-        if(oldOffer != '' && breakOffer != '')
-        {
-            bootbox.alert('Enter Only 1 Code!');
-            return false;
-        }
-        if(breakOffer != '' && newOffer != '')
-        {
-            bootbox.alert('Enter Only 1 Code!');
-            return false;
-        }
-
-        if(newOffer == '' && oldOffer == '' && breakOffer == '')
+        else if(filledFields == 0)
         {
             bootbox.alert('Please Provide Offer Code!');
             return false;
         }
+
         if(newOffer != '')
         {
             finalCode = newOffer;
@@ -92,6 +96,12 @@
             finalCode = breakOffer;
             offerUrl = base_url+'offers/offerCheck/'+breakOffer;
             offerPrifix = 'BR';
+        }
+        else if(eventOffer != '')
+        {
+            finalCode = eventOffer;
+            offerUrl = base_url+'offers/offerCheck/'+eventOffer;
+            offerPrifix = 'EV';
         }
         else if(oldOffer != '')
         {
@@ -126,6 +136,13 @@
                     else if(data.offerType == 'Breakfast')
                     {
                         bootbox.alert('<label class="my-success-text">Valid for One Breakfast and One Beer. </label>', function(){
+                            redeemOffer(offerPrifix, finalCode, offerUrl);
+                        });
+                    }
+                    else if(data.offerType == 'Workshop')
+                    {
+                        bootbox.alert('<label class="my-success-text">Valid for One Beer<span class="my-danger-text"> OR </span>' +
+                            'Drink & Garlic Bread<span class="my-danger-text"> OR </span>House Fries. </label>', function(){
                             redeemOffer(offerPrifix, finalCode, offerUrl);
                         });
                     }
@@ -177,6 +194,11 @@
                             else if(data.offerType == 'Breakfast')
                             {
                                 bootbox.alert('<label class="my-success-text">Congrats, you get a Breakfast. This includes one pint. </label>');
+                            }
+                            else if(data.offerType == 'Workshop')
+                            {
+                                bootbox.alert('<label class="my-success-text">Congrats, you are eligible for 330ml Beer! Mug Club members get 500ml' +
+                                    '<span class="my-danger-text"> OR </span>Drink & Garlic Bread<span class="my-danger-text"> OR </span>House Fires </label>');
                             }
                             else
                             {

@@ -725,6 +725,9 @@
                                                         case 2:
                                                             echo 'Paid : Rs '.$row['eventData']['eventPrice'];
                                                             break;
+                                                        case 3:
+                                                            echo 'Paid(without pint) : Rs '.$row['eventData']['eventPrice'];
+                                                            break;
                                                     }
                                                     ?>
                                                 </td>
@@ -736,7 +739,8 @@
                                                     if($row['eventData']['ifApproved'] == EVENT_WAITING)
                                                     {
                                                         ?>
-                                                        <a data-toggle="tooltip" title="Approve" class="even-tracker" href="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
+                                                        <a data-toggle="tooltip" title="Approve" data-costType="<?php echo $row['eventData']['costType'];?>"
+                                                           class="even-tracker approveThis-event" href="#" data-url="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-check my-success-text"></i></a>
                                                         <a data-toggle="tooltip" title="Decline" href="<?php echo base_url().'dashboard/decline/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-times my-error-text"></i></a>
@@ -759,7 +763,8 @@
                                                     elseif($row['eventData']['ifApproved'] == EVENT_DECLINED)
                                                     {
                                                         ?>
-                                                        <a data-toggle="tooltip" title="Declined" class="even-tracker" href="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
+                                                        <a data-toggle="tooltip" title="Declined" data-costType="<?php echo $row['eventData']['costType'];?>"
+                                                           class="even-tracker approveThis-event" href="#" data-url="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-ban my-error-text"></i></a>
                                                         <?php
                                                     }
@@ -797,6 +802,18 @@
                                                                href="<?php echo base_url().'dashboard/closeReg/'.$row['eventData']['eventId'];?>">
                                                                 <i class="fa fa-15x fa-times-circle-o"></i></a>&nbsp;
                                                             <?php
+                                                        }
+                                                    ?>
+                                                    <?php
+                                                        if($row['eventData']['costType'] != '1')
+                                                        {
+                                                            ?>
+                                                            <a data-toggle="tooltip" class="eventCostChange-icon even-tracker"
+                                                               data-costType="<?php echo $row['eventData']['costType'];?>" data-url="<?php echo base_url().'dashboard/changeCostType/'.$row['eventData']['eventId'];?>"
+                                                               title="Change Cost Option" href="#">
+                                                                <i class="fa fa-inr fa-15x"></i></a>&nbsp;
+                                                            <?php
+
                                                         }
                                                     ?>
                                                     <a data-toggle="tooltip" class="eventSignups-icon even-tracker" data-eventName="<?php echo $row['eventData']['eventName'];?>" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Signup List" href="#">
@@ -880,16 +897,21 @@
                                             <input type="radio" id="paidType" class="mdl-radio__button" name="costType" value="2">
                                             <span class="mdl-radio__label">Paid</span>
                                         </label>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid2Type">
+                                            <input type="radio" id="paid2Type" class="mdl-radio__button" name="costType" value="3">
+                                            <span class="mdl-radio__label">Paid (without pint)</span>
+                                        </label>
+
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label event-price hide">
                                             <input class="mdl-textfield__input" type="text" name="eventPrice" pattern="-?[0-9]*(\.[0-9]+)?" id="eventPrice">
                                             <label class="mdl-textfield__label" for="eventPrice">Price</label>
                                             <span class="mdl-textfield__error">Input is not a number!</span>
                                         </div>
-                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label special-offer hide">
+                                        <input type="hidden" name="priceFreeStuff" value=""/>
+                                        <!--<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label special-offer hide">
                                             <input class="mdl-textfield__input" type="text" name="priceFreeStuff" id="priceFreeStuff" placeholder="">
                                             <label class="mdl-textfield__label" for="priceFreeStuff">Special Offer With Price?</label>
-                                        </div>
+                                        </div>-->
                                     </div>
                                     <br>
                                     <div class="text-left">
@@ -1269,6 +1291,37 @@
 
         </div>
     </div>
+    <div id="eventPrice-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Event Cost Type</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <label>Select Event Cost Type: </label>
+                    <div class="cost-type">
+                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect hide" for="freeType_modal">
+                            <input type="radio" id="freeType_modal" class="mdl-radio__button" name="costType" value="1">
+                            <span class="mdl-radio__label">Free</span>
+                        </label>
+                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paidType_modal">
+                            <input type="radio" id="paidType_modal" class="mdl-radio__button" name="costType" value="2">
+                            <span class="mdl-radio__label">Paid</span>
+                        </label>
+                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid2Type_modal">
+                            <input type="radio" id="paid2Type_modal" class="mdl-radio__button" name="costType" value="3">
+                            <span class="mdl-radio__label">Paid (without pint)</span>
+                        </label>
+                    </div><br>
+                    <button type="button" class="btn btn-primary save-event-price">Save</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
     <?php echo $footerView; ?>
 
 </body>
@@ -1636,6 +1689,10 @@
                 <?php
             }
         ?>
+        if(window.location.href.indexOf('events') != -1)
+        {
+            $('.nav-pills a[href="#eventpanel"]').tab('show');
+        }
     });
     function joinObjectArray(AssocArray)
     {
@@ -1680,6 +1737,7 @@
         lapsersBar.animate(lapsers[selectedLoc]);
         refreshGraphs();
     }
+    var evenTable,fnbTable;
     $(document).ready(function(){
         var thArray = ['overall-th','bandra-th','andheri-th'];
         var tdArray = ['overall-td','bandra-td','andheri-td'];
@@ -1695,6 +1753,36 @@
         });
         drawGraphs();
         drawFeedGraph();
+        if(localStorageUtil.getLocal('tabEventPage') != null)
+        {
+            $('.nav-pills a[href="#eventpanel"]').tab('show');
+            evenTable =  $('#main-event-table').DataTable({
+                "displayStart": localStorageUtil.getLocal('tabEventPage') * 10,
+                "ordering": false
+            });
+            //localStorageUtil.delLocal('tabEventPage');
+        }
+        else
+        {
+            evenTable =  $('#main-event-table').DataTable({
+                "ordering": false
+            });
+        }
+        if(localStorageUtil.getLocal('tabFnbPage') != null)
+        {
+            $('.nav-pills a[href="#fnbpanel"]').tab('show');
+            fnbTable =  $('#main-fnb-table').DataTable({
+                "displayStart": localStorageUtil.getLocal('tabFnbPage') * 10,
+                "ordering": false
+            });
+            //localStorageUtil.delLocal('tabFnbPage');
+        }
+        else
+        {
+            fnbTable =  $('#main-fnb-table').DataTable({
+                "ordering": false
+            });
+        }
     });
 
     $(document).on('submit', '#customDateForm', function(e){
@@ -2404,8 +2492,8 @@
         }
     });
 
-    $(document).on('change','input[name="costType"]', function(){
-        if($(this).val() == "2")
+    $(document).on('change','#eventAdd input[name="costType"]', function(){
+        if($(this).val() == "2" || $(this).val() == "3")
         {
             $('.event-price').removeClass('hide');
             $('.special-offer').removeClass('hide');
@@ -2477,38 +2565,6 @@
     $('#main-comp-event-table').DataTable({
         "ordering": false
     });
-    var evenTable,fnbTable;
-
-    if(localStorageUtil.getLocal('tabEventPage') != null)
-    {
-        $('.nav-pills a[href="#eventpanel"]').tab('show');
-        evenTable =  $('#main-event-table').DataTable({
-            "displayStart": localStorageUtil.getLocal('tabEventPage') * 10,
-            "ordering": false
-        });
-        localStorageUtil.delLocal('tabEventPage');
-    }
-    else
-    {
-        evenTable =  $('#main-event-table').DataTable({
-            "ordering": false
-        });
-    }
-    if(localStorageUtil.getLocal('tabFnbPage') != null)
-    {
-        $('.nav-pills a[href="#fnbpanel"]').tab('show');
-        fnbTable =  $('#main-fnb-table').DataTable({
-            "displayStart": localStorageUtil.getLocal('tabFnbPage') * 10,
-            "ordering": false
-        });
-        localStorageUtil.delLocal('tabFnbPage');
-    }
-    else
-    {
-        fnbTable =  $('#main-fnb-table').DataTable({
-            "ordering": false
-        });
-    }
 
     $('[data-toggle="tooltip"]').tooltip();
     $(document).on('click','.view-photos', function(){
@@ -2756,6 +2812,97 @@
                 bootbox.alert('Some Error Occurred!');
             }
         });
+    });
+</script>
+
+<script>
+    var eveApprovType, eveApprovUrl;
+    $(document).on('click','#eventView .approveThis-event', function(){
+        eveApprovType = $(this).attr('data-costType');
+        eveApprovUrl = $(this).attr('data-url');
+        if(eveApprovType != '1')
+        {
+            $('#eventPrice-modal input[name="costType"]').each(function(i,val){
+                var inp = '#'+$(val).attr('id');
+                if($(val).val() != eveApprovType)
+                {
+                    document.querySelector(inp).parentNode.MaterialRadio.uncheck();
+                }
+                else
+                {
+                    document.querySelector(inp).parentNode.MaterialRadio.check();
+                }
+            });
+
+            $('#eventPrice-modal').modal('show');
+        }
+        else
+        {
+            showCustomLoader();
+            $.ajax({
+                type:'GET',
+                dataType:'json',
+                url: eveApprovUrl,
+                success: function(data){
+                    hideCustomLoader();
+                    if(data.status == true)
+                    {
+                        window.location.reload();
+                    }
+                },
+                error: function(){
+                    hideCustomLoader();
+                    bootbox.alert('Some Error Occurred!');
+                }
+            });
+        }
+    });
+
+    $(document).on('click','#eventPrice-modal .save-event-price', function(){
+
+        showCustomLoader();
+        $.ajax({
+            type:'POST',
+            dataType:'json',
+            url: eveApprovUrl,
+            data:{costType: $('#eventPrice-modal input[name="costType"]:checked').val()},
+            success: function(data){
+                hideCustomLoader();
+                if(data.status == true)
+                {
+                    window.location.reload();
+                }
+                else
+                {
+                    bootbox.alert(data.errorMsg, function(){
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
+
+    });
+    $(document).on('click','#eventView .eventCostChange-icon', function(){
+        eveApprovType = $(this).attr('data-costType');
+        eveApprovUrl = $(this).attr('data-url');
+        $('#eventPrice-modal input[name="costType"]').each(function(i,val){
+            var inp = '#'+$(val).attr('id');
+            if($(val).val() != eveApprovType)
+            {
+                document.querySelector(inp).parentNode.MaterialRadio.uncheck();
+            }
+            else
+            {
+                document.querySelector(inp).parentNode.MaterialRadio.check();
+            }
+        });
+
+        $('#eventPrice-modal').modal('show');
+
     });
 </script>
 

@@ -30,6 +30,13 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="control-label col-sm-2" for="eventNums">Number of Event Codes :</label>
+                        <div class="col-sm-10">
+                            <input type="number" name="eventNums" class="form-control"
+                                   id="eventNums" placeholder="Eg. 50"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <div class="col-sm-2"></div>
                         <div class="col-sm-10">
                             <label for="is_custom">
@@ -104,13 +111,19 @@
                                         <td><?php echo date('d/m/Y');?></td>
                                         <td>
                                             <?php
-                                            if($row['offerType'] == 'Breakfast2')
+                                            switch($row['offerType'])
                                             {
-                                                echo 'BR-'.$row['offerCode'];
-                                            }
-                                            else
-                                            {
-                                                echo 'DO-'.$row['offerCode'];
+                                                case 'Breakfast2':
+                                                    echo 'BR-'.$row['offerCode'];
+                                                    break;
+                                                case 'Beer':
+                                                    echo 'DO-'.$row['offerCode'];
+                                                    break;
+                                                case 'Workshop':
+                                                    echo 'EV-'.$row['offerCode'];
+                                                    break;
+                                                default:
+                                                    echo 'DO-'.$row['offerCode'];
                                             }
                                             ?>
                                         </td>
@@ -175,13 +188,19 @@
                                                 <td><?php echo date('d/m/Y');?></td>
                                                 <td>
                                                     <?php
-                                                    if($row['offerType'] == 'Breakfast2')
+                                                    switch($row['offerType'])
                                                     {
-                                                        echo 'BR-'.$row['offerCode'];
-                                                    }
-                                                    else
-                                                    {
-                                                        echo 'DO-'.$row['offerCode'];
+                                                        case 'Breakfast2':
+                                                            echo 'BR-'.$row['offerCode'];
+                                                            break;
+                                                        case 'Beer':
+                                                            echo 'DO-'.$row['offerCode'];
+                                                            break;
+                                                        case 'Workshop':
+                                                            echo 'EV-'.$row['offerCode'];
+                                                            break;
+                                                        default:
+                                                            echo 'DO-'.$row['offerCode'];
                                                     }
                                                     ?>
                                                 </td>
@@ -254,6 +273,10 @@
                         {
                             myCodesHtml += 'BR-'+data[num].code+'&#13;&#10;';
                         }
+                        else if(data[num].type == 'Workshop')
+                        {
+                            myCodesHtml += 'EV-'+data[num].code+'&#13;&#10;';
+                        }
                         else
                         {
                             myCodesHtml += 'DO-'+data[num].code+'&#13;&#10;';
@@ -262,6 +285,10 @@
                         if(data[num].type == 'Breakfast2')
                         {
                             tableCodes += 'BR-'+data[num].code;
+                        }
+                        else if(data[num].type == 'Workshop')
+                        {
+                            tableCodes += 'EV-'+data[num].code;
                         }
                         else
                         {

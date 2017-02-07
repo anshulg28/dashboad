@@ -97,13 +97,19 @@
                                         <th scope="row"><?php echo $row['id'];?></th>
                                         <td>
                                             <?php
-                                            if($row['offerType'] == 'Breakfast2')
+                                            switch($row['offerType'])
                                             {
-                                                echo 'BR-'.$row['offerCode'];
-                                            }
-                                            else
-                                            {
-                                                echo 'DO-'.$row['offerCode'];
+                                                case 'Breakfast2':
+                                                    echo 'BR-'.$row['offerCode'];
+                                                    break;
+                                                case 'Beer':
+                                                    echo 'DO-'.$row['offerCode'];
+                                                    break;
+                                                case 'Workshop':
+                                                    echo 'EV-'.$row['offerCode'];
+                                                    break;
+                                                default:
+                                                    echo 'DO-'.$row['offerCode'];
                                             }
                                             ?>
                                         </td>

@@ -150,6 +150,31 @@ class Offers extends MY_Controller {
 
                 }
             }
+            if(isset($post['eventNums']) && $post['eventNums'] != 0)
+            {
+                for($i=0;$i<$post['eventNums'];$i++)
+                {
+                    $newCode = mt_rand(1000,99999);
+                    while(myInArray($newCode,$usedCodes))
+                    {
+                        $newCode = mt_rand(1000,99999);
+                    }
+                    $unUsedCodes[] = array(
+                        'code' => $newCode,
+                        'type' => 'Workshop'
+                    );
+                    $toBeInserted[] = array(
+                        'offerCode' => $newCode,
+                        'offerType' => 'Workshop',
+                        'offerLoc' => null,
+                        'isRedeemed' => 0,
+                        'ifActive' => 1,
+                        'createDateTime' => date('Y-m-d H:i:s'),
+                        'useDateTime' => null
+                    );
+
+                }
+            }
             if(isset($post['customCode']) && $post['customNums'] != 0)
             {
                 for($i=0;$i<$post['customNums'];$i++)

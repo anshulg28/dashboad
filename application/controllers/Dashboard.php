@@ -943,7 +943,7 @@ class Dashboard extends MY_Controller {
         $data['msg'] = 'Event Declined!';
         $this->load->view('PageThankYouView',$data);
     }
-    function eventApproved($eventId)
+    /*function eventApproved($eventId)
     {
         $this->eventApprove($eventId);
         redirect(base_url().'dashboard');
@@ -952,12 +952,53 @@ class Dashboard extends MY_Controller {
     {
         $this->eventDecline($eventId);
         redirect(base_url().'dashboard');
-    }
-
-    function eventApprove($eventId)
+    }*/
+    function changeCostType($eventId)
     {
+        $post = $this->input->post();
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status']= false;
+            $data['errorMsg'] = 'Session Timed Out, Please Re-login!';
+            echo json_encode($data);
+            return false;
+        }
+        if(isset($post['costType']) && $post['costType'] != '')
+        {
+            $postData = array(
+                'costType' => $post['costType']
+            );
+            $this->dashboard_model->updateEventRecord($postData,$eventId);
+            $data['status']= true;
+        }
+        else
+        {
+            $data['status']= false;
+            $data['errorMsg'] = 'No Cost Option Selected!';
+        }
+        echo json_encode($data);
+    }
+    function eventApproved($eventId)
+    {
+        $post = $this->input->post();
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status']= false;
+            $data['errorMsg'] = 'Session Timed Out, Please Re-login!';
+            echo json_encode($data);
+            return false;
+        }
         $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
 
+        if(isset($post['costType']) && $post['costType'] != '')
+        {
+            $postData = array(
+                'costType' => $post['costType']
+            );
+            $this->dashboard_model->updateEventRecord($postData,$eventId);
+        }
         if(isset($eventDetail[0]['eventPaymentLink']) && isStringSet($eventDetail[0]['eventPaymentLink']))
         {
             $this->dashboard_model->ApproveEvent($eventId);
@@ -1043,10 +1084,12 @@ class Dashboard extends MY_Controller {
                 $this->dashboard_model->updateEventRecord($details, $eventDetail[0]['eventId']);
             }
         }
-
+        $data['status'] = true;
+        echo json_encode($data);
     }
-    function eventDecline($eventId)
+    function eventDeclined($eventId)
     {
+        $data = array();
         $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
         $this->dashboard_model->DeclineEvent($eventId);
         $senderName = 'Doolally';
@@ -1059,6 +1102,8 @@ class Dashboard extends MY_Controller {
         $eventDetail['senderName'] = $senderName;
         $eventDetail['senderEmail'] = $senderEmail;
         $this->sendemail_library->eventDeclineMail($eventDetail);
+        $data['status'] = true;
+        echo json_encode($data);
     }
     function setEventDeActive($eventId)
     {

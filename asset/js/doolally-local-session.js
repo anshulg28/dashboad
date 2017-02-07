@@ -16,7 +16,7 @@ localStorageUtil =
             {
                 return null;
             }
-            if(new Date().getTime() < record.timestamp && JSON.parse(record.value))
+            if(new Date().getTime() < record.timestamp && JSON.parse(record.value) != null)
             {
                 return JSON.parse(record.value);
             }

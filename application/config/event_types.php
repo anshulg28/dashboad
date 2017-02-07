@@ -17,6 +17,7 @@ $config['insta_locationMap'] = array(
     '1741740822733140' => 'Kemps Taproom'
 );
 $config['phons'] = array(
+    'Anshul' => '8879103942',
     'Tresha' => '9820570311',
     'Priyanka' => '9920087855',
     'Daksha' => '9892110655',
