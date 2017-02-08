@@ -964,19 +964,25 @@ class Dashboard extends MY_Controller {
             echo json_encode($data);
             return false;
         }
-        if(isset($post['costType']) && $post['costType'] != '')
+        // Check if free option selected
+        if($post['costType'] == '1')
         {
             $postData = array(
-                'costType' => $post['costType']
+                'costType' => $post['costType'],
+                'eventPrice' => '0'
             );
-            $this->dashboard_model->updateEventRecord($postData,$eventId);
-            $data['status']= true;
         }
         else
         {
-            $data['status']= false;
-            $data['errorMsg'] = 'No Cost Option Selected!';
+            $postData = array(
+                'costType' => $post['costType'],
+                'eventPrice' => $post['costPrice']
+            );
         }
+
+        $this->dashboard_model->updateEventRecord($postData,$eventId);
+        $data['status']= true;
+
         echo json_encode($data);
     }
     function eventApproved($eventId)
@@ -994,9 +1000,20 @@ class Dashboard extends MY_Controller {
 
         if(isset($post['costType']) && $post['costType'] != '')
         {
-            $postData = array(
-                'costType' => $post['costType']
-            );
+            if($post['costType'] == '1')
+            {
+                $postData = array(
+                    'costType' => $post['costType'],
+                    'eventPrice' => '0'
+                );
+            }
+            else
+            {
+                $postData = array(
+                    'costType' => $post['costType'],
+                    'eventPrice' => $post['costPrice']
+                );
+            }
             $this->dashboard_model->updateEventRecord($postData,$eventId);
         }
         if(isset($eventDetail[0]['eventPaymentLink']) && isStringSet($eventDetail[0]['eventPaymentLink']))
@@ -1040,17 +1057,34 @@ class Dashboard extends MY_Controller {
 
             if(!myIsMultiArray($donePost))
             {
-                $postData = array(
-                    'title' => $eventDetail[0]['eventName'],
-                    'description' => $eventDetail[0]['eventDescription'],
-                    'currency' => 'INR',
-                    'base_price' => $eventDetail[0]['eventPrice'],
-                    'start_date' => $eventDetail[0]['eventDate'].' '.date("H:i", strtotime($eventDetail[0]['startTime'])),
-                    'end_date' => $eventDetail[0]['eventDate'].' '.date("H:i", strtotime($eventDetail[0]['endTime'])),
-                    'venue' => $eventDetail[0]['locName'].', Doolally Taproom',
-                    'redirect_url' => MOBILE_URL.'?event='.$eventDetail[0]['eventId'].'&hash='.encrypt_data('EV-'.$eventDetail[0]['eventId']),
-                    'timezone' => 'Asia/Kolkata'
-                );
+                if($eventDetail[0]['costType'] == EVENT_FREE)
+                {
+                    $postData = array(
+                        'title' => $eventDetail[0]['eventName'],
+                        'description' => $eventDetail[0]['eventDescription'],
+                        'currency' => 'INR',
+                        'base_price' => '0',
+                        'start_date' => $eventDetail[0]['eventDate'].' '.date("H:i", strtotime($eventDetail[0]['startTime'])),
+                        'end_date' => $eventDetail[0]['eventDate'].' '.date("H:i", strtotime($eventDetail[0]['endTime'])),
+                        'venue' => $eventDetail[0]['locName'].', Doolally Taproom',
+                        'redirect_url' => MOBILE_URL.'?event='.$eventDetail[0]['eventId'].'&hash='.encrypt_data('EV-'.$eventDetail[0]['eventId']),
+                        'timezone' => 'Asia/Kolkata'
+                    );
+                }
+                else
+                {
+                    $postData = array(
+                        'title' => $eventDetail[0]['eventName'],
+                        'description' => $eventDetail[0]['eventDescription'],
+                        'currency' => 'INR',
+                        'base_price' => $eventDetail[0]['eventPrice'],
+                        'start_date' => $eventDetail[0]['eventDate'].' '.date("H:i", strtotime($eventDetail[0]['startTime'])),
+                        'end_date' => $eventDetail[0]['eventDate'].' '.date("H:i", strtotime($eventDetail[0]['endTime'])),
+                        'venue' => $eventDetail[0]['locName'].', Doolally Taproom',
+                        'redirect_url' => MOBILE_URL.'?event='.$eventDetail[0]['eventId'].'&hash='.encrypt_data('EV-'.$eventDetail[0]['eventId']),
+                        'timezone' => 'Asia/Kolkata'
+                    );
+                }
                 $donePost = $this->curl_library->createInstaLink($postData);
             }
             $this->dashboard_model->ApproveEvent($eventId);

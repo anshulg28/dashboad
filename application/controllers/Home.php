@@ -178,7 +178,7 @@ class Home extends MY_Controller {
                     );
                     $this->login_model->updateUserRecord($userCheck['userId'],$details);*/
 
-                    $newOtp = mt_rand(10000,999999);
+                    $newOtp = mt_rand(1000,99999);
 
                     $details = array(
                         'userOtp'=> $newOtp
@@ -421,7 +421,7 @@ class Home extends MY_Controller {
         if(isset($post['mob']))
         {
             $walletBal = $this->dashboard_model->getBalanceByMob($post['mob']);
-            $newOtp = mt_rand(10000,999999);
+            $newOtp = mt_rand(1000,99999);
 
             $details = array(
                 'userOtp'=> $newOtp

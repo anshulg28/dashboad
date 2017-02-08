@@ -53,6 +53,10 @@
 {
     margin:0;
 }
+.my-centerAlign
+{
+    margin:0 auto;
+}
 .my-fullWidth
 {
     width:100%;

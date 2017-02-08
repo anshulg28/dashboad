@@ -740,6 +740,7 @@
                                                     {
                                                         ?>
                                                         <a data-toggle="tooltip" title="Approve" data-costType="<?php echo $row['eventData']['costType'];?>"
+                                                           data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
                                                            class="even-tracker approveThis-event" href="#" data-url="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-check my-success-text"></i></a>
                                                         <a data-toggle="tooltip" title="Decline" href="<?php echo base_url().'dashboard/decline/'.$row['eventData']['eventId'];?>">
@@ -764,6 +765,7 @@
                                                     {
                                                         ?>
                                                         <a data-toggle="tooltip" title="Declined" data-costType="<?php echo $row['eventData']['costType'];?>"
+                                                           data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
                                                            class="even-tracker approveThis-event" href="#" data-url="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-ban my-error-text"></i></a>
                                                         <?php
@@ -804,18 +806,14 @@
                                                             <?php
                                                         }
                                                     ?>
-                                                    <?php
-                                                        if($row['eventData']['costType'] != '1')
-                                                        {
-                                                            ?>
-                                                            <a data-toggle="tooltip" class="eventCostChange-icon even-tracker"
-                                                               data-costType="<?php echo $row['eventData']['costType'];?>" data-url="<?php echo base_url().'dashboard/changeCostType/'.$row['eventData']['eventId'];?>"
-                                                               title="Change Cost Option" href="#">
-                                                                <i class="fa fa-inr fa-15x"></i></a>&nbsp;
-                                                            <?php
 
-                                                        }
-                                                    ?>
+                                                    <a data-toggle="tooltip" class="eventCostChange-icon even-tracker"
+                                                       data-costType="<?php echo $row['eventData']['costType'];?>"
+                                                       data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
+                                                       data-url="<?php echo base_url().'dashboard/changeCostType/'.$row['eventData']['eventId'];?>"
+                                                       title="Change Cost Option" href="#">
+                                                        <i class="fa fa-inr fa-15x"></i></a>&nbsp;
+
                                                     <a data-toggle="tooltip" class="eventSignups-icon even-tracker" data-eventName="<?php echo $row['eventData']['eventName'];?>" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Signup List" href="#">
                                                         <i class="fa fa-users fa-15x"></i></a>&nbsp;
                                                 </td>
@@ -1303,18 +1301,36 @@
                 <div class="modal-body text-center">
                     <label>Select Event Cost Type: </label>
                     <div class="cost-type">
-                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect hide" for="freeType_modal">
-                            <input type="radio" id="freeType_modal" class="mdl-radio__button" name="costType" value="1">
-                            <span class="mdl-radio__label">Free</span>
-                        </label>
-                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paidType_modal">
-                            <input type="radio" id="paidType_modal" class="mdl-radio__button" name="costType" value="2">
-                            <span class="mdl-radio__label">Paid</span>
-                        </label>
-                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid2Type_modal">
-                            <input type="radio" id="paid2Type_modal" class="mdl-radio__button" name="costType" value="3">
-                            <span class="mdl-radio__label">Paid (without pint)</span>
-                        </label>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <ul class="list-inline">
+                                    <li>
+                                        <div class="radio">
+                                            <label><input type="radio" name="costType" value="1">Free</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="radio">
+                                            <label><input type="radio" name="costType" value="2">Paid</label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="radio">
+                                            <label><input type="radio" name="costType" value="3">Paid (Without Pint)</label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-6">
+                                <div class="input-group hide">
+                                    <span class="input-group-addon">Rs. </span>
+                                    <input class="form-control" type="number" name="costPrice" id="costPrice" placeholder="Event Cost"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-3"></div>
+
+                        </div>
                     </div><br>
                     <button type="button" class="btn btn-primary save-event-price">Save</button>
                 </div>
@@ -1760,7 +1776,7 @@
                 "displayStart": localStorageUtil.getLocal('tabEventPage') * 10,
                 "ordering": false
             });
-            //localStorageUtil.delLocal('tabEventPage');
+            localStorageUtil.delLocal('tabEventPage');
         }
         else
         {
@@ -1775,7 +1791,7 @@
                 "displayStart": localStorageUtil.getLocal('tabFnbPage') * 10,
                 "ordering": false
             });
-            //localStorageUtil.delLocal('tabFnbPage');
+            localStorageUtil.delLocal('tabFnbPage');
         }
         else
         {
@@ -2491,19 +2507,6 @@
             $('.other-event input').attr('name','eventType');
         }
     });
-
-    $(document).on('change','#eventAdd input[name="costType"]', function(){
-        if($(this).val() == "2" || $(this).val() == "3")
-        {
-            $('.event-price').removeClass('hide');
-            $('.special-offer').removeClass('hide');
-        }
-        else
-        {
-            $('.event-price').addClass('hide');
-            $('.special-offer').addClass('hide');
-        }
-    });
     
     var filesEventsArr = [];
     function eventUploadChange(ele)
@@ -2816,56 +2819,68 @@
 </script>
 
 <script>
-    var eveApprovType, eveApprovUrl;
+    var eveApprovUrl, costPrice, paid1Price, paid2Price;
     $(document).on('click','#eventView .approveThis-event', function(){
-        eveApprovType = $(this).attr('data-costType');
+        var eveApprovType = $(this).attr('data-costType');
         eveApprovUrl = $(this).attr('data-url');
-        if(eveApprovType != '1')
-        {
-            $('#eventPrice-modal input[name="costType"]').each(function(i,val){
-                var inp = '#'+$(val).attr('id');
-                if($(val).val() != eveApprovType)
+        costPrice = $(this).attr('data-costPrice');
+        $('#eventPrice-modal input[name="costType"]').each(function(i,val){
+
+            if($(val).val() != eveApprovType)
+            {
+                $(val).prop('checked', false);
+                if(eveApprovType != '1')
                 {
-                    document.querySelector(inp).parentNode.MaterialRadio.uncheck();
+                    $('#eventPrice-modal #costPrice').parent().removeClass('hide');
                 }
                 else
                 {
-                    document.querySelector(inp).parentNode.MaterialRadio.check();
+                    $('#eventPrice-modal #costPrice').parent().addClass('hide');
                 }
-            });
-
-            $('#eventPrice-modal').modal('show');
+            }
+            else
+            {
+                $(val).prop('checked',true);
+            }
+        });
+        $('#eventPrice-modal #costPrice').val(costPrice);
+        if(eveApprovType == '2')
+        {
+            paid1Price = Number(costPrice);
+            paid2Price = Number(costPrice) - 250;
+        }
+        else if(eveApprovType == '3')
+        {
+            paid1Price = Number(costPrice) + 250;
+            paid2Price = Number(costPrice);
         }
         else
         {
-            showCustomLoader();
-            $.ajax({
-                type:'GET',
-                dataType:'json',
-                url: eveApprovUrl,
-                success: function(data){
-                    hideCustomLoader();
-                    if(data.status == true)
-                    {
-                        window.location.reload();
-                    }
-                },
-                error: function(){
-                    hideCustomLoader();
-                    bootbox.alert('Some Error Occurred!');
-                }
-            });
+            paid1Price = costPrice;
+            paid2Price = costPrice;
         }
+        $('#eventPrice-modal').modal('show');
     });
 
     $(document).on('click','#eventPrice-modal .save-event-price', function(){
+        var selectedType = $('#eventPrice-modal input[name="costType"]:checked').val();
+        var costEntered = $('#eventPrice-modal #costPrice').val();
+        if(selectedType != '1')
+        {
+            if(costEntered == '' || costEntered == 0)
+            {
+                bootbox.alert('<label class="my-danger-text">Please Provide the Event Price!</label>');
+                return false;
+            }
+        }
 
         showCustomLoader();
         $.ajax({
             type:'POST',
             dataType:'json',
             url: eveApprovUrl,
-            data:{costType: $('#eventPrice-modal input[name="costType"]:checked').val()},
+            data:{costType: $('#eventPrice-modal input[name="costType"]:checked').val(),
+                    costPrice: costEntered},
             success: function(data){
                 hideCustomLoader();
                 if(data.status == true)
@@ -2887,22 +2902,123 @@
 
     });
     $(document).on('click','#eventView .eventCostChange-icon', function(){
-        eveApprovType = $(this).attr('data-costType');
+       var eveApprovType = $(this).attr('data-costType');
         eveApprovUrl = $(this).attr('data-url');
+        costPrice = $(this).attr('data-costPrice');
         $('#eventPrice-modal input[name="costType"]').each(function(i,val){
-            var inp = '#'+$(val).attr('id');
+
             if($(val).val() != eveApprovType)
             {
-                document.querySelector(inp).parentNode.MaterialRadio.uncheck();
+                $(val).prop('checked', false);
+                if(eveApprovType != '1')
+                {
+                    $('#eventPrice-modal #costPrice').parent().removeClass('hide');
+                }
+                else
+                {
+                    $('#eventPrice-modal #costPrice').parent().addClass('hide');
+                }
             }
             else
             {
-                document.querySelector(inp).parentNode.MaterialRadio.check();
+                $(val).prop('checked',true);
             }
         });
-
+        $('#eventPrice-modal #costPrice').val(costPrice);
+        if(eveApprovType == '2')
+        {
+            paid1Price = Number(costPrice);
+            paid2Price = Number(costPrice) - 250;
+        }
+        else if(eveApprovType == '3')
+        {
+            paid1Price = Number(costPrice) + 250;
+            paid2Price = Number(costPrice);
+        }
+        else
+        {
+            paid1Price = costPrice;
+            paid2Price = costPrice;
+        }
         $('#eventPrice-modal').modal('show');
 
+    });
+    $(document).on('change','#eventPrice-modal input[name="costType"]', function(){
+        if($(this).val() == '1')
+        {
+            $('#eventPrice-modal #costPrice').parent().addClass('hide');
+        }
+        else if($(this).val() == '2')
+        {
+            $('#eventPrice-modal #costPrice').val(paid1Price).parent().removeClass('hide');
+        }
+        else
+        {
+            if($('#eventPrice-modal #costPrice').val() != 0)
+            {
+                $('#eventPrice-modal #costPrice').val(paid2Price);
+            }
+            $('#eventPrice-modal #costPrice').parent().removeClass('hide');
+        }
+    });
+
+    //focus out event on price input
+    $(document).on('focusout','#eventPrice-modal #costPrice', function(){
+        if($(this).val() != 0)
+        {
+            var basicPrice = Number($(this).val());
+            if($('#eventPrice-modal input[name="costType"]:checked').val() == '2')
+            {
+                paid1Price = basicPrice+250;
+                paid2Price = basicPrice;
+                $(this).val(paid1Price);
+            }
+            else
+            {
+                paid2Price = basicPrice;
+                paid1Price = basicPrice+250;
+                $(this).val(paid2Price);
+            }
+        }
+    });
+
+    var addPaid1 = 0;
+    var addPaid2 = 0;
+    $(document).on('change','#eventAdd input[name="costType"]', function(){
+        if($(this).val() == "2")
+        {
+            $('.event-price input[name="eventPrice"]').val(addPaid1).parent().removeClass('hide');
+        }
+        else if($(this).val() == "3")
+        {
+            if($('.event-price input[name="eventPrice"]').val() != 0)
+            {
+                $('.event-price input[name="eventPrice"]').val(addPaid2);
+            }
+            $('.event-price input[name="eventPrice"]').parent().removeClass('hide');
+        }
+        else
+        {
+            $('.event-price').addClass('hide');
+        }
+    });
+    $(document).on('focusout','#eventAdd .event-price input[name="eventPrice"]', function(){
+        if($(this).val() != 0)
+        {
+            var basicPrice = Number($(this).val());
+            if($('#eventAdd input[name="costType"]:checked').val() == '2')
+            {
+                addPaid1 = basicPrice+250;
+                addPaid2 = basicPrice;
+                $(this).val(addPaid1);
+            }
+            else
+            {
+                addPaid2 = basicPrice;
+                addPaid1 = basicPrice+250;
+                $(this).val(addPaid2);
+            }
+        }
     });
 </script>
 

@@ -85,6 +85,7 @@
                                     </ul>
                                     <div class="text-left">
                                         <label>Event Cost :</label>
+                                        <input type="hidden" name="priceFreeStuff" value=""/>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="freeType">
                                             <input type="radio" id="freeType" class="mdl-radio__button" name="costType"
                                                    value="1" <?php if($row['eventData']['costType'] == "1"){echo 'checked';}?>>
@@ -95,18 +96,23 @@
                                                    value="2" <?php if($row['eventData']['costType'] == "2"){echo 'checked';}?>>
                                             <span class="mdl-radio__label">Paid</span>
                                         </label>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid2Type">
+                                            <input type="radio" id="paid2Type" class="mdl-radio__button" name="costType"
+                                                   value="3" <?php if($row['eventData']['costType'] == "3"){echo 'checked';}?>>
+                                            <span class="mdl-radio__label">Paid (without pint)</span>
+                                        </label>
+
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label event-price hide">
                                             <input class="mdl-textfield__input" type="text" name="eventPrice" pattern="-?[0-9]*(\.[0-9]+)?"
                                                    id="eventPrice" value="<?php echo $row['eventData']['eventPrice'];?>">
                                             <label class="mdl-textfield__label" for="eventPrice">Price</label>
                                             <span class="mdl-textfield__error">Input is not a number!</span>
                                         </div>
-                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label special-offer hide">
+                                        <!--<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label special-offer hide">
                                             <input class="mdl-textfield__input" type="text" name="priceFreeStuff" id="priceFreeStuff"
-                                                   placeholder="" value="<?php echo $row['eventData']['priceFreeStuff'];?>">
+                                                   placeholder="" value="<?php /*echo $row['eventData']['priceFreeStuff'];*/?>">
                                             <label class="mdl-textfield__label" for="priceFreeStuff">Special Offer With Price?</label>
-                                        </div>
+                                        </div>-->
                                     </div>
                                     <br>
                                     <div class="text-left">
@@ -351,19 +357,62 @@
     {
         if($('input[name="costType"]:checked').val() == "2")
         {
-            $('.event-price').removeClass('hide');
-            $('.special-offer').removeClass('hide');
+            $('.event-price input[name="eventPrice"]').val(addPaid1).parent().removeClass('hide');
+        }
+        else if($('input[name="costType"]:checked').val() == "3")
+        {
+            if($('.event-price input[name="eventPrice"]').val() != 0)
+            {
+                $('.event-price input[name="eventPrice"]').val(addPaid2);
+            }
+            $('.event-price input[name="eventPrice"]').parent().removeClass('hide');
         }
         else
         {
             $('.event-price').addClass('hide');
-            $('.special-offer').addClass('hide');
         }
     }
     $(window).load(function(){
         costToggle();
     });
-
+    var addPaid1,addPaid2;
+    $(document).ready(function(){
+        var eveApprovType = $('input[name="costType"]:checked').val();
+        var costPrice = $('#eventPrice').val();
+        if(eveApprovType == '2')
+        {
+            addPaid1 = Number(costPrice);
+            addPaid2 = Number(costPrice) - 250;
+        }
+        else if(eveApprovType == '3')
+        {
+            addPaid1 = Number(costPrice) + 250;
+            addPaid2 = Number(costPrice);
+        }
+        else
+        {
+            addPaid1 = costPrice;
+            addPaid2 = costPrice;
+        }
+    });
+    $(document).on('focusout','.event-price input[name="eventPrice"]', function(){
+        if($(this).val() != 0)
+        {
+            var basicPrice = Number($(this).val());
+            if($('input[name="costType"]:checked').val() == '2')
+            {
+                addPaid1 = basicPrice+250;
+                addPaid2 = basicPrice;
+                $(this).val(addPaid1);
+            }
+            else
+            {
+                addPaid2 = basicPrice;
+                addPaid1 = basicPrice+250;
+                $(this).val(addPaid2);
+            }
+        }
+    });
     $(document).on('submit','#event-dash-edit', function(e){
         var ele = $(this);
         e.preventDefault();

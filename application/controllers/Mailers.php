@@ -353,7 +353,7 @@ class Mailers extends MY_Controller {
         {
             $pressInfo = $this->mailers_model->getPressInfoByMail($key);
             $newBody = $this->replacePressName($mainBody,$pressInfo);
-            $cc        = 'priyanka@doolally.in,tresha@doolally.in,daksha@doolally.in,shweta@doolally.in,richa@doolally.in';
+            $cc        = 'tresha@doolally.in';
             $fromName  = 'Doolally';
             if(isset($this->userFirstName))
             {

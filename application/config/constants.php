@@ -144,3 +144,8 @@ defined('EVENT_PATH_THUMB') OR define('EVENT_PATH_THUMB','uploads/events/thumb/'
 defined('ITEM_FOOD') OR define('ITEM_FOOD','1');
 defined('ITEM_BEVERAGE') OR define('ITEM_BEVERAGE','2');
 defined('MOBILE_URL') OR define('MOBILE_URL','https://doolally.in/');
+
+/* Event Cost Types */
+defined('EVENT_FREE') OR define('EVENT_FREE','1');
+defined('EVENT_PAID') OR define('EVENT_PAID','2');
+defined('EVENT_PAID_NO_PINT') OR define('EVENT_PAID_NO_PINT','3');
