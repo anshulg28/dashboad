@@ -558,7 +558,7 @@ class Dashboard_Model extends CI_Model
     }
     public function getJoinersInfo($eventId)
     {
-        $query = "SELECT um.firstName, um.lastName, erm.quantity, erm.createdDT
+        $query = "SELECT um.firstName, um.lastName, um.emailId, erm.paymentId, erm.quantity, erm.createdDT
                   FROM eventregistermaster erm
                   LEFT JOIN doolally_usersmaster um ON um.userId = erm.bookerUserId
                   WHERE erm.isUserCancel != 1 AND erm.eventId = $eventId ORDER BY erm.createdDT DESC";

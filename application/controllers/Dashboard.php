@@ -893,18 +893,50 @@ class Dashboard extends MY_Controller {
 
     public function cancelEvent($eventId)
     {
+        $data = array();
         if(isSessionVariableSet($this->isUserSession) === false)
         {
-            redirect(base_url());
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout! Please login Again';
+            echo json_encode($data);
+            return false;
         }
-        $data = array();
+
         $events = $this->dashboard_model->getEventById($eventId);
         $details = array(
             'ifActive' => '0'
         );
         $this->dashboard_model->updateEventRecord($details,$eventId);
-        $this->sendemail_library->eventCancelMail($events);
         $this->sendemail_library->eventCancelUserMail($events);
+
+        $allAttendees = $this->dashboard_model->getJoinersInfo($eventId);
+        if(isset($allAttendees) && myIsArray($allAttendees))
+        {
+            foreach($allAttendees as $key => $row)
+            {
+                $row['eventPlace'] = $events[0]['eventPlace'];
+                $row['eventName'] = $events[0]['eventName'];
+                if($events[0]['costType'] != EVENT_FREE && $events[0]['eventPrice'] != '0')
+                {
+                    $details = array(
+                        'payment_id'=> $row['paymentId'],
+                        'type'=> 'TAN',
+                        'body'=> 'Not Attending Event'
+                    );
+                    $refundStats = $this->curl_library->refundInstaPayment($details);
+                }
+
+                if(isset($refundStats) && myIsArray($refundStats))
+                {
+                    if($refundStats['success'] === true && isset($refundStats['refund']))
+                    {
+                        $cancelInfo['refundId'] = $refundStats['refund']['id'];
+                    }
+                }
+                $this->sendemail_library->attendeeCancelMail($row);
+            }
+        }
+        //$this->sendemail_library->eventCancelMail($events);
         $data['status'] = true;
         echo json_encode($data);
 

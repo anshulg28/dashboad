@@ -121,6 +121,16 @@ class curl_library
         return $this->getDataByGet($url,0, $header);
     }
 
+    public function refundInstaPayment($details)
+    {
+        $url = 'https://www.instamojo.com/api/1.1/refunds/';
+        $header = array(
+            'X-Api-Key:'.INSTA_API_KEY,
+            'X-Auth-Token:'.INSTA_AUTH_TOKEN
+        );
+        return $this->getDataByPost($url,$details,0, $header);
+    }
+
     public function getJukeboxTaprooms()
     {
         $url = 'http://api.bcjukebox.in/api/restaurants/';

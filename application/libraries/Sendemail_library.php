@@ -158,6 +158,38 @@ class Sendemail_library
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
     }
 
+    public function attendeeCancelMail($userData)
+    {
+        $phons = $this->CI->config->item('phons');
+        $mailRecord = $this->CI->users_model->searchUserByLoc($userData['eventPlace']);
+        $senderName = 'Doolally';
+        $senderEmail = 'events@doolally.in';
+        $senderPhone = $phons['Tresha'];
+
+        if($mailRecord['status'] === true)
+        {
+            $senderName = $mailRecord['userData']['firstName'];
+            $senderEmail = $mailRecord['userData']['emailId'];
+            $senderPhone = $phons[$senderName];
+        }
+        $userData['senderName'] = $senderName;
+        $userData['senderEmail'] = $senderEmail;
+        $userData['senderPhone'] = $senderPhone;
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/attendeeCancelMailView', $data, true);
+
+        $fromEmail = $senderEmail;
+
+        $cc        = 'events@doolally.in';
+        $fromName  = $senderName;
+
+        $subject = 'You have withdrawn from '.$userData['eventName'];
+        $toEmail = $userData['emailId'];
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
+    }
+
     public function eventApproveMail($userData)
     {
         $phons = $this->CI->config->item('phons');

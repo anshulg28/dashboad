@@ -761,6 +761,8 @@
                                                         ?>
                                                         <a data-toggle="tooltip" title="Active" class="even-tracker" href="<?php echo base_url().'dashboard/setEventDeActive/'.$row['eventData']['eventId'];?>">
                                                             <i class="fa fa-15x fa-lightbulb-o my-success-text"></i></a>
+                                                        <a class="even-tracker cancel-this-event" data-toggle="tooltip" title="Cancel Event" href="#" data-eventId="<?php echo $row['eventData']['eventId'];?>" >
+                                                            <i class="fa fa-15x fa-times"></i></a>
                                                         <?php
                                                     }
                                                     elseif($row['eventData']['ifApproved'] == EVENT_APPROVED && $row['eventData']['ifActive'] == NOT_ACTIVE)
@@ -3028,6 +3030,36 @@
                 $(this).val(addPaid2);
             }
         }
+    });
+
+    $(document).on('click','#eventView .cancel-this-event', function(){
+        var eveId = $(this).attr('data-eventId');
+        bootbox.confirm("Are you sure you want to Cancel Event?", function(result) {
+            if(result === true)
+            {
+                showCustomLoader();
+                $.ajax({
+                    type:'GET',
+                    dataType:'json',
+                    url:base_url+'dashboard/cancelEvent/'+eveId,
+                    success: function(data){
+                        hideCustomLoader();
+                        if(data.status == true)
+                        {
+                            window.location.reload();
+                        }
+                        else
+                        {
+                            bootbox.alert('<label class="my-danger-text">'+data.errorMsg+'</label>');
+                        }
+                    },
+                    error: function(){
+                        hideCustomLoader();
+                        bootbox.alert('Some Error Occurred!');
+                    }
+                });
+            }
+        });
     });
 </script>
 
