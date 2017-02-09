@@ -707,6 +707,7 @@
                                         <?php
                                         foreach($eventDetails as $key => $row)
                                         {
+                                            $eveLoc = $row['eventData']['eventPlace'];
                                             ?>
                                             <tr>
                                                 <th scope="row"><?php echo $row['eventData']['eventId'];?></th>
@@ -733,8 +734,16 @@
                                                 </td>
                                                 <td><?php echo $row['eventData']['locData'][0]['locName'];?></td>
                                                 <td><?php echo $row['eventData']['creatorName'];?></td>
-                                                <td><!--<a data-toggle="tooltip" title="Edit" href="<?php /*echo base_url().'mugclub/edit/'.$row['mugId'];*/?>">
+                                                <td class="my-keepRelative"><!--<a data-toggle="tooltip" title="Edit" href="<?php /*echo base_url().'mugclub/edit/'.$row['mugId'];*/?>">
                                                         <i class="glyphicon glyphicon-edit"></i></a>&nbsp;-->
+                                                    <?php
+                                                        if(isset($commLocs) && !in_array($eveLoc,$commLocs))
+                                                        {
+                                                            ?>
+                                                            <div class="my-td-overlay"></div>
+                                                            <?php
+                                                        }
+                                                    ?>
                                                 <?php
                                                     if($row['eventData']['ifApproved'] == EVENT_WAITING)
                                                     {

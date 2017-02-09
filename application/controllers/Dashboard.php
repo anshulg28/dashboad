@@ -46,6 +46,8 @@ class Dashboard extends MY_Controller {
             {
                 $data['userInfo'][$key] = $this->locations_model->getLocationDetailsById($key);
             }
+
+            $data['commLocs'] = $allLocs;
         }
         //Dashboard Data
         $startDate = date('Y-m-d', strtotime('-1 month'));
