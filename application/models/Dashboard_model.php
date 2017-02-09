@@ -561,7 +561,7 @@ class Dashboard_Model extends CI_Model
         $query = "SELECT um.firstName, um.lastName, erm.quantity, erm.createdDT
                   FROM eventregistermaster erm
                   LEFT JOIN doolally_usersmaster um ON um.userId = erm.bookerUserId
-                  WHERE erm.eventId = $eventId ORDER BY erm.createdDT DESC";
+                  WHERE erm.isUserCancel != 1 AND erm.eventId = $eventId ORDER BY erm.createdDT DESC";
 
         $result = $this->db->query($query)->result_array();
 
