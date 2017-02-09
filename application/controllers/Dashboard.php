@@ -916,6 +916,7 @@ class Dashboard extends MY_Controller {
             {
                 $row['eventPlace'] = $events[0]['eventPlace'];
                 $row['eventName'] = $events[0]['eventName'];
+                $row['creatorName'] = $events[0]['creatorName'];
                 if($events[0]['costType'] != EVENT_FREE && $events[0]['eventPrice'] != '0')
                 {
                     $details = array(

@@ -7,15 +7,16 @@
 
 <body>
     <p>
-        Dear <?php echo $mailData['firstName'].' '.$mailData['lastName']; ?>,<br><br>
+        Dear <?php echo $mailData['firstName']; ?><br><br>
 
-        You have withdrawn from <?php echo $mailData['eventName']; ?>.
-        We will inform the organiser that you will not be attending the event. For paid events, the money will be fully refunded to you.<br><br>
+        The organiser <?php echo $mailData['creatorName']; ?> has cancelled the event <?php echo $mailData['eventName']; ?>.
+         For paid events, the money will be fully refunded to you.<br><br>
 
         <?php
             if(isset($mailData['refundId']))
             {
                 ?>
+                Here are the refund details: <br>
                 Refund Id: <?php echo $mailData['refundId'];?><br>
                 <b>
                     <a href="https://www.instamojo.com/resolutioncenter/cases/<?php echo $mailData['refundId'];?>/?from=email"
