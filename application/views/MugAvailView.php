@@ -79,15 +79,17 @@
                     if(typeof data.availMugs != 'undefined')
                     {
                         var mugHtml = '';
+                        var i = 1;
                         for(var index in data.availMugs)
                         {
-                            if(index == 5)
+                            if(i == 5)
                             {
                                 $('.avail-header').removeClass('hide');
                                 $('.available-mugs-list').html(mugHtml);
                                 return false;
                             }
                             mugHtml += '<li><span class="label label-primary avail-mugs">'+data.availMugs[index]+'</span></li>';
+                            i++;
                         }
                         $('.avail-header').removeClass('hide');
                         $('.available-mugs-list').html(mugHtml);

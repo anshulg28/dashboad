@@ -402,50 +402,22 @@ class Mugclub extends MY_Controller {
         $data = array();
         if(isSessionVariableSet($this->isUserSession))
         {
-            $op = 'plus';
+            //Setting operation
+            $op = 'minus';
+            //Initial search Capping limit
             $searchCap = 50;
             $opFlag = 1;
             if(isset($mugid))
             {
-                $result = $this->mugclub_model->getMugDataById($mugid);
-                if($result['status'] === true)
+                if(!in_array($mugid,range(0,100)))
                 {
-                    $holdMugs = $this->mugclub_model->getAllMugHolds();
-                    $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, $holdMugs);
-                    if(count($mugResult) < 1)
+                    //Getting mug number data if exists
+                    $result = $this->mugclub_model->getMugDataById($mugid);
+                    // Mug Data exists
+                    if($result['status'] === true)
                     {
-                        while(count($mugResult) < 1 && $searchCap != 500)
-                        {
-                            if($opFlag == 1)
-                            {
-                                $opFlag = 2;
-                                $op = 'minus';
-                            }
-                            else
-                            {
-                                $opFlag = 1;
-                                $op = 'plus';
-                                $searchCap += 50;
-                            }
-
-                            $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap,$holdMugs);
-                        }
-                        $data['availMugs'] = $mugResult;
-                    }
-                    else
-                    {
-                        $data['availMugs'] = $mugResult;
-                    }
-
-                    $data['status'] = false;
-                    $data['errorMsg'] = 'Mug Number Already Exists';
-                }
-                else
-                {
-                    $holdMug = $this->mugclub_model->getMugHoldById($mugid);
-                    if($holdMug['status'] === true)
-                    {
-                        $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                        $holdMugs = $this->mugclub_model->getAllMugHolds();
+                        $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, $holdMugs);
                         if(count($mugResult) < 1)
                         {
                             while(count($mugResult) < 1 && $searchCap != 500)
@@ -462,7 +434,7 @@ class Mugclub extends MY_Controller {
                                     $searchCap += 50;
                                 }
 
-                                $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                                $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap,$holdMugs);
                             }
                             $data['availMugs'] = $mugResult;
                         }
@@ -474,10 +446,51 @@ class Mugclub extends MY_Controller {
                         $data['status'] = false;
                         $data['errorMsg'] = 'Mug Number Already Exists';
                     }
-                    else
+                    else // Mug Data not found
                     {
-                        $data['status'] = true;
+                        //Check if mug number is not on hold
+                        $holdMug = $this->mugclub_model->getMugHoldById($mugid);
+                        if($holdMug['status'] === true) //Mug Number on hold search new
+                        {
+                            $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                            if(count($mugResult) < 1)
+                            {
+                                while(count($mugResult) < 1 && $searchCap != 500)
+                                {
+                                    if($opFlag == 1)
+                                    {
+                                        $opFlag = 2;
+                                        $op = 'minus';
+                                    }
+                                    else
+                                    {
+                                        $opFlag = 1;
+                                        $op = 'plus';
+                                        $searchCap += 50;
+                                    }
+
+                                    $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                                }
+                                $data['availMugs'] = $mugResult;
+                            }
+                            else
+                            {
+                                $data['availMugs'] = $mugResult;
+                            }
+
+                            $data['status'] = false;
+                            $data['errorMsg'] = 'Mug Number Already Exists';
+                        }
+                        else // Mug Not on hold and available
+                        {
+                            $data['status'] = true;
+                        }
                     }
+                }
+                else
+                {
+                    $data['status'] = false;
+                    $data['errorMsg'] = 'Mug Number Not Available';
                 }
             }
         }
@@ -551,12 +564,15 @@ class Mugclub extends MY_Controller {
         }
 
         $availMugs = array_values($availMugs);
+        $blockedNums = range(0,100);
+        $availMugs = array_diff($availMugs,$blockedNums);
         if(myIsMultiArray($holdMugs))
         {
-            foreach($holdMugs as $key => $row)
+            //$holdMugs['mugList'] = array_merge($holdMugs['mugList'],$blockedNums);
+            foreach($holdMugs['mugList'] as $key => $row)
             {
-                $aKey = array_search($row,$availMugs);
-                if(isset($aKey))
+                $aKey = array_search($row['mugId'],$availMugs);
+                if($aKey)
                 {
                     unset($availMugs[$aKey]);
                 }
