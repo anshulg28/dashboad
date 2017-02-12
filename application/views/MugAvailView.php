@@ -61,7 +61,7 @@
         $.ajax({
             type:"GET",
             dataType:"json",
-            url:base_url+'mugclub/MugAvailability/json/'+mugNum,
+            url:base_url+'mugclub/MugAvailability/json/0/'+mugNum,
             success: function(data)
             {
                 hideCustomLoader();

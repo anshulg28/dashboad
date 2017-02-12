@@ -36,8 +36,10 @@ class Mailers_Model extends CI_Model
     }
     public function getAllPressEmails()
     {
-        $query = "SELECT * "
-            ."FROM pressmailmaster ";
+        $query = "SELECT pmm.id, pmm.publication, pmm.pressName, pmm.pressEmail, pmm.pressMailType,"
+                ." ptm.catName"
+                ." FROM pressmailmaster pmm"
+                ." LEFT JOIN presstypemaster ptm ON ptm.id = pmm.pressMailType";
 
         $result = $this->db->query($query)->result_array();
 
@@ -52,6 +54,33 @@ class Mailers_Model extends CI_Model
         }
 
         return $data;
+    }
+    function fetchPressCats()
+    {
+        $query = "SELECT GROUP_CONCAT(pmm.pressEmail) as 'emails', ptm.catName
+                    FROM pressmailmaster pmm
+                    LEFT JOIN presstypemaster ptm ON ptm.id = pmm.pressMailType
+                    GROUP BY ptm.id";
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function getPressMailTypes()
+    {
+        $query = "SELECT * FROM presstypemaster";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function getPressMailById($pressId)
+    {
+        $query = "SELECT * FROM pressmailmaster 
+                  WHERE id = ".$pressId;
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
     }
     public function getPressInfoByMail($email)
     {
@@ -89,4 +118,26 @@ class Mailers_Model extends CI_Model
         return true;
     }
 
+    public function saveMailType($post)
+    {
+        $this->db->insert('pressTypemaster', $post);
+        return true;
+    }
+    public function savePressEmail($post)
+    {
+        $this->db->insert('pressmailmaster', $post);
+        return true;
+    }
+    public function deletePressEmail($pressId)
+    {
+        $this->db->where('id', $pressId);
+        $this->db->delete('pressmailmaster');
+        return true;
+    }
+    public function updatePressEmail($details,$pressId)
+    {
+        $this->db->where('id', $pressId);
+        $this->db->update('pressmailmaster',$details);
+        return true;
+    }
 }

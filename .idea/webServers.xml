@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="41664771-0323-4da3-8bc5-7cf88e8fbf22" name="dashboard" url="http://doolally.io">
+        <fileTransfer host="doolally.io" port="22" privateKey="C:\Users\anshul\Downloads\doolallydev.ppk" rootFolder="/var/www/html/dashboad" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

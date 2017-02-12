@@ -10,162 +10,215 @@
     <main class="mailPage">
         <div class="container-fluid">
             <div class="row">
-                <h2 class="text-center">Send Mail</h2>
-                <br>
+                <!--<h2 class="text-center">Send Mail</h2>-->
+                <!--<br>-->
                 <div class="col-sm-1 col-xs-0"></div>
                 <div class="col-sm-10 col-xs-12 mail-content text-center">
-                    <div class="row">
-                        <?php
-                        $mailTypes = array();
-                        if(!isset($pressMails))
-                        {
-                            echo 'No Press Mails Found!';
-                        }
-                        else
-                        {
-                            ?>
-                            <nav class="col-sm-4">
-                                <ul class="nav nav-pills nav-stacked text-left custom-mugs-list">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#sendMail">Send Mail</a></li>
+                        <li><a data-toggle="tab" href="#viewIds">View Press</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="sendMail" class="tab-pane fade in active">
+                            <br>
+                            <div class="row">
+                                <?php
+                                $mailTypes = array();
+                                if(!isset($pressMails))
+                                {
+                                    echo 'No Press Mails Found!';
+                                }
+                                else
+                                {
+                                    ?>
+                                    <nav class="col-sm-4">
+                                        <ul class="nav nav-pills nav-stacked text-left custom-mugs-list">
+                                            <?php
+                                            if(isset($mailCats) && myIsArray($mailCats))
+                                            {
+                                                foreach($mailCats as $key => $row)
+                                                {
+                                                    ?>
+                                                    <li>
+                                                        <label class="my-pointer-item" for="<?php echo $row['catName'];?>_press">
+                                                            <input type="checkbox" id="<?php echo $row['catName'];?>_press" class="mugCheckList"
+                                                                   data-pressEmail="<?php echo $row['emails'];?>" />
+                                                            <?php echo ucfirst($row['catName']);?>
+                                                        </label>
+                                                    </li>
+                                                    <?php
+                                                }
+                                            }
+                                            else
+                                            {
+                                                echo 'No Mails Found!';
+                                            }
+                                            foreach($pressMails as $key => $row)
+                                            {
+
+                                                switch ($row['pressMailType'])
+                                                {
+                                                    case 0:
+                                                        ?>
+                                                        <li>
+                                                            <label class="my-pointer-item" for="<?php echo $row['id'];?>_press">
+                                                                <input type="checkbox" id="<?php echo $row['id'];?>_press" class="mugCheckList"
+                                                                       data-pressEmail="<?php echo $row['pressEmail'];?>" />
+                                                                <?php
+                                                                if(isset($row['publication']) && $row['publication'] != '')
+                                                                {
+                                                                    echo $row['publication'].'-'.$row['pressEmail'];
+                                                                }
+                                                                elseif(isset($row['pressName']) && $row['pressName'] != '')
+                                                                {
+                                                                    echo $row['pressName'].'-'.$row['pressEmail'];
+                                                                }
+                                                                else
+                                                                {
+                                                                    echo $row['pressEmail'];
+                                                                }
+                                                                ?>
+                                                            </label>
+                                                        </li>
+                                                        <?php
+                                                        break;
+                                                    case 1:
+                                                        $mailTypes['food'][] = $row['pressEmail'];
+                                                        break;
+                                                    case 2:
+                                                        $mailTypes['games'][] = $row['pressEmail'];
+                                                        break;
+                                                    case 3:
+                                                        $mailTypes['craft'][] = $row['pressEmail'];
+                                                        break;
+                                                    case 4:
+                                                        $mailTypes['events'][] = $row['pressEmail'];
+                                                        break;
+                                                    case 5:
+                                                        $mailTypes['reviews'][] = $row['pressEmail'];
+                                                        break;
+                                                    case 6:
+                                                        $mailTypes['tech'][] = $row['pressEmail'];
+                                                        break;
+                                                    case 7:
+                                                        $mailTypes['workshops'][] = $row['pressEmail'];
+                                                        break;
+                                                    case 8:
+                                                        $mailTypes['office'][] = $row['pressEmail'];
+                                                        break;
+                                                }
+                                            }
+                                            ?>
+                                        </ul>
+                                    </nav>
+                                    <div class="col-sm-8">
+                                        <form action="<?php echo base_url();?>mailers/sendPressMails/json" id="mainMailerForm" method="post" class="form-horizontal" role="form">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-2" for="toList">To:</label>
+                                                <div class="col-sm-10">
+                                                    <div class="row">
+                                                        <div class="col-xs-11">
+                                                            <textarea class="form-control" name="pressEmails" id="toList" placeholder="Email Id(s) (comma separated)"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <!--<button type="button" class="btn btn-danger col-sm-2 my-marginDown" data-toggle="modal" data-target="#subjectModal" >Select Subject</button>-->
+                                                <div class="col-sm-2"></div>
+                                                <div class="col-sm-10">
+                                                    <input type="text" name="mailSubject" class="form-control" onfocus="whichHasFocus= 1" id="mailSubject" placeholder="Subject">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <!--<button type="button" class="btn btn-danger col-sm-2 my-marginDown" data-toggle="modal" data-target="#bodyModal" >Select Body</button>-->
+                                                <div class="col-sm-2"></div>
+                                                <div class="col-sm-10">
+                                                    <textarea name="mailBody" rows="10" class="form-control" onfocus="whichHasFocus= 2" id="mailBody" placeholder="Body"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <!--<button type="button" class="btn btn-danger col-sm-2 my-marginDown" data-toggle="modal" data-target="#bodyModal" >Select Body</button>-->
+                                                <label class="control-label col-sm-2" for="attchment">Attachment:</label>
+                                                <div class="col-sm-10">
+                                                    <label class="radio-inline"><input type="radio" name="attachmentType" value="1" checked>Upload</label>
+                                                    <label class="radio-inline"><input type="radio" name="attachmentType" value="2">URL(Comma separated)</label>
+                                                    <input type="file" name="attachment" multiple class="form-control" id="attchment" />
+                                                    <textarea name="attachmentUrls" class="form-control hide" rows="5"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-2 col-sm-10">
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <div class="progress hide">
+                                            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p>Available Tags:</p>
+                                            <div class="col-sm-2"></div>
+                                            <ul class="col-sm-10 list-inline mugtags-list">
+                                                <li class="my-pointer-item"><span class="label label-success">[name]</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                        </div>
+                        <div id="viewIds" class="tab-pane fade text-left">
+                            <a class="btn btn-primary press-add-btn" href="<?php echo base_url().'mailers/add';?>">
+                                <i class="fa fa-plus"></i>
+                                Add New Press Mail
+                            </a>
+                            <table id="press-emails-table" class="table table-hover table-bordered table-striped paginated my-fullWidth">
+                                <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Press Name</th>
+                                    <th>Press Email</th>
+                                    <th>Press Category</th>
+                                    <th>Publication</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <?php
+                                if(isset($pressMails) && myIsArray($pressMails))
+                                {
+                                    ?>
+                                    <tbody>
                                     <?php
                                     foreach($pressMails as $key => $row)
                                     {
-                                        switch ($row['pressMailType'])
-                                        {
-                                            case 0:
-                                                ?>
-                                                <li>
-                                                    <label class="my-pointer-item" for="<?php echo $row['id'];?>_press">
-                                                        <input type="checkbox" id="<?php echo $row['id'];?>_press" class="mugCheckList"
-                                                               data-pressEmail="<?php echo $row['pressEmail'];?>" />
-                                                        <?php
-                                                        if(isset($row['publication']) && $row['publication'] != '')
-                                                        {
-                                                            echo $row['publication'].'-'.$row['pressEmail'];
-                                                        }
-                                                        elseif(isset($row['pressName']) && $row['pressName'] != '')
-                                                        {
-                                                            echo $row['pressName'].'-'.$row['pressEmail'];
-                                                        }
-                                                        else
-                                                        {
-                                                            echo $row['pressEmail'];
-                                                        }
-                                                        ?>
-                                                    </label>
-                                                </li>
-                                                <?php
-                                                break;
-                                            case 1:
-                                                $mailTypes['food'][] = $row['pressEmail'];
-                                                break;
-                                            case 2:
-                                                $mailTypes['games'][] = $row['pressEmail'];
-                                                break;
-                                            case 3:
-                                                $mailTypes['craft'][] = $row['pressEmail'];
-                                                break;
-                                            case 4:
-                                                $mailTypes['events'][] = $row['pressEmail'];
-                                                break;
-                                            case 5:
-                                                $mailTypes['reviews'][] = $row['pressEmail'];
-                                                break;
-                                            case 6:
-                                                $mailTypes['tech'][] = $row['pressEmail'];
-                                                break;
-                                            case 7:
-                                                $mailTypes['workshops'][] = $row['pressEmail'];
-                                                break;
-                                            case 8:
-                                                $mailTypes['office'][] = $row['pressEmail'];
-                                                break;
-                                        }
+                                        ?>
+                                        <tr>
+                                            <th scope="row"><?php echo $row['id'];?></th>
+                                            <td><?php echo $row['pressName'];?></td>
+                                            <td><?php echo $row['pressEmail'];?></td>
+                                            <td><?php echo $row['catName'];?></td>
+                                            <td><?php echo $row['publication'];?></td>
+                                            <td>
+                                                <a data-toggle="tooltip" title="Edit" href="<?php echo base_url().'mailers/edit/'.$row['id'];?>">
+                                                    <i class="glyphicon glyphicon-edit"></i></a>&nbsp;
+                                                <a data-toggle="tooltip" class="pressDelete-icon" title="Delete" data-pressId = "<?php echo $row['id'];?>">
+                                                    <i class="fa fa-trash-o"></i></a>&nbsp;
+                                            </td>
+                                        </tr>
+                                        <?php
                                     }
                                     ?>
-                                </ul>
-                                <br>
-                                <ul class="nav nav-pills nav-stacked text-left custom-mugs-list">
+                                    </tbody>
                                     <?php
-                                    foreach($mailTypes as $key => $row)
-                                    {
-                                        if(myIsArray($row))
-                                        {
-                                            $combinedEmails = implode(',',$row);
-                                            ?>
-                                            <li>
-                                                <label class="my-pointer-item" for="<?php echo $key;?>_press">
-                                                    <input type="checkbox" id="<?php echo $key;?>_press" class="mugCheckList"
-                                                           data-pressEmail="<?php echo $combinedEmails;?>" />
-                                                    <?php
-                                                    echo ucfirst($key);
-                                                    ?>
-                                                </label>
-                                            </li>
-                                            <?php
-                                        }
-                                    }
-                                    ?>
-                                </ul>
-                            </nav>
-                            <div class="col-sm-8">
-                                <form action="<?php echo base_url();?>mailers/sendPressMails/json" id="mainMailerForm" method="post" class="form-horizontal" role="form">
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-2" for="toList">To:</label>
-                                        <div class="col-sm-10">
-                                            <div class="row">
-                                                <div class="col-xs-11">
-                                                    <textarea class="form-control" name="pressEmails" id="toList" placeholder="Email Id(s) (comma separated)"></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <!--<button type="button" class="btn btn-danger col-sm-2 my-marginDown" data-toggle="modal" data-target="#subjectModal" >Select Subject</button>-->
-                                        <div class="col-sm-2"></div>
-                                        <div class="col-sm-10">
-                                            <input type="text" name="mailSubject" class="form-control" onfocus="whichHasFocus= 1" id="mailSubject" placeholder="Subject">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <!--<button type="button" class="btn btn-danger col-sm-2 my-marginDown" data-toggle="modal" data-target="#bodyModal" >Select Body</button>-->
-                                        <div class="col-sm-2"></div>
-                                        <div class="col-sm-10">
-                                            <textarea name="mailBody" rows="10" class="form-control" onfocus="whichHasFocus= 2" id="mailBody" placeholder="Body"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <!--<button type="button" class="btn btn-danger col-sm-2 my-marginDown" data-toggle="modal" data-target="#bodyModal" >Select Body</button>-->
-                                        <label class="control-label col-sm-2" for="attchment">Attachment:</label>
-                                        <div class="col-sm-10">
-                                            <label class="radio-inline"><input type="radio" name="attachmentType" value="1" checked>Upload</label>
-                                            <label class="radio-inline"><input type="radio" name="attachmentType" value="2">URL(Comma separated)</label>
-                                            <input type="file" name="attachment" multiple class="form-control" id="attchment" />
-                                            <textarea name="attachmentUrls" class="form-control hide" rows="5"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-sm-offset-2 col-sm-10">
-                                            <button type="submit" class="btn btn-primary">Submit</button>
-                                        </div>
-                                    </div>
-                                </form>
-
-                                <div class="progress hide">
-                                    <div class="progress-bar progress-bar-striped active" role="progressbar"
-                                         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                </div>
-                                <div>
-                                    <p>Available Tags:</p>
-                                    <div class="col-sm-2"></div>
-                                    <ul class="col-sm-10 list-inline mugtags-list">
-                                        <li class="my-pointer-item"><span class="label label-success">[name]</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <?php
-                        }
-                        ?>
+                                }
+                                ?>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-1 col-xs-0"></div>
@@ -333,6 +386,14 @@
         $('.mailPage #toList').empty().append(emails);
     });
 
+    CKEDITOR.on('instanceReady', function(evt) {
+        var editor = evt.editor;
+
+        editor.on('focus', function(e) {
+            whichHasFocus = 2;
+        });
+    });
+
     $(document).on('click','.mugtags-list li', function(){
         var mugTag = $(this).find('span').html();
 
@@ -342,10 +403,28 @@
         }
         else if(whichHasFocus == 2)
         {
-            $('textarea[name="mailBody"]').append(mugTag);
+            CKEDITOR.instances.mailBody.insertHtml(mugTag);
         }
 
     });
+
+    $(document).ready(function(){
+
+        $('[data-toggle="tooltip"]').tooltip();
+        $('#press-emails-table').DataTable({
+            ordering: false
+        });
+    });
+
+    $(document).on('click','.pressDelete-icon', function(){
+        var pressId = $(this).attr('data-pressId');
+        bootbox.confirm("Are you sure you want to delete Press Email #"+pressId+" ?", function(result) {
+            if(result === true)
+            {
+                window.location.href='<?php echo base_url();?>mailers/delete/'+pressId;
+            }
+        });
+    });
 </script>
 
-</html>l
+</html>

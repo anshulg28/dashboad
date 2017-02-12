@@ -156,7 +156,7 @@
             $.ajax({
                 type:'get',
                 dataType:'json',
-                url:'<?php echo base_url();?>mugclub/MugAvailability/json/'+mugNo,
+                url:'<?php echo base_url();?>mugclub/MugAvailability/json/1/'+mugNo,
                 success: function(data){
                     if(data.status === true)
                     {

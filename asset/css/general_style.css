@@ -63,7 +63,7 @@
 }
 .my-fullWidth
 {
-    width:100%;
+    width:100% !important;
 }
 .fa-15x
 {
@@ -247,6 +247,10 @@ input::-webkit-inner-spin-button {
 .homePage .my-mainMenuList li, .mailPage .my-mainMenuList li
 {
     position:relative;
+}
+.mailPage .press-add-btn
+{
+    margin:20px;
 }
 .homePage .my-mainMenuList li a, .mugCheckIn .my-mainMenuList li a,
 .mailPage .my-mainMenuList li a, .offerPage .my-mainMenuList li a

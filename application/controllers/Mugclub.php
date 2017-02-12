@@ -397,7 +397,7 @@ class Mugclub extends MY_Controller {
         redirect(base_url().'mugclub');
     }
 
-    public function MugAvailability($responseType = RESPONSE_JSON, $mugid)
+    public function MugAvailability($responseType = RESPONSE_JSON, $isAdding = 1, $mugid)
     {
         $data = array();
         if(isSessionVariableSet($this->isUserSession))
@@ -409,11 +409,12 @@ class Mugclub extends MY_Controller {
             $opFlag = 1;
             if(isset($mugid))
             {
-                if(!in_array($mugid,range(0,100)))
+                if($isAdding == 1)
                 {
                     //Getting mug number data if exists
                     $result = $this->mugclub_model->getMugDataById($mugid);
                     // Mug Data exists
+
                     if($result['status'] === true)
                     {
                         $holdMugs = $this->mugclub_model->getAllMugHolds();
@@ -489,8 +490,89 @@ class Mugclub extends MY_Controller {
                 }
                 else
                 {
-                    $data['status'] = false;
-                    $data['errorMsg'] = 'Mug Number Not Available';
+                    if(!in_array($mugid,range(0,100)))
+                    {
+                        //Getting mug number data if exists
+                        $result = $this->mugclub_model->getMugDataById($mugid);
+                        // Mug Data exists
+                        if($result['status'] === true)
+                        {
+                            $holdMugs = $this->mugclub_model->getAllMugHolds();
+                            $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, $holdMugs);
+                            if(count($mugResult) < 1)
+                            {
+                                while(count($mugResult) < 1 && $searchCap != 500)
+                                {
+                                    if($opFlag == 1)
+                                    {
+                                        $opFlag = 2;
+                                        $op = 'minus';
+                                    }
+                                    else
+                                    {
+                                        $opFlag = 1;
+                                        $op = 'plus';
+                                        $searchCap += 50;
+                                    }
+
+                                    $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap,$holdMugs);
+                                }
+                                $data['availMugs'] = $mugResult;
+                            }
+                            else
+                            {
+                                $data['availMugs'] = $mugResult;
+                            }
+
+                            $data['status'] = false;
+                            $data['errorMsg'] = 'Mug Number Already Exists';
+                        }
+                        else // Mug Data not found
+                        {
+                            //Check if mug number is not on hold
+                            $holdMug = $this->mugclub_model->getMugHoldById($mugid);
+                            if($holdMug['status'] === true) //Mug Number on hold search new
+                            {
+                                $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                                if(count($mugResult) < 1)
+                                {
+                                    while(count($mugResult) < 1 && $searchCap != 500)
+                                    {
+                                        if($opFlag == 1)
+                                        {
+                                            $opFlag = 2;
+                                            $op = 'minus';
+                                        }
+                                        else
+                                        {
+                                            $opFlag = 1;
+                                            $op = 'plus';
+                                            $searchCap += 50;
+                                        }
+
+                                        $mugResult = $this->getAllUnusedMugs($mugid, $op, $searchCap, array($mugid));
+                                    }
+                                    $data['availMugs'] = $mugResult;
+                                }
+                                else
+                                {
+                                    $data['availMugs'] = $mugResult;
+                                }
+
+                                $data['status'] = false;
+                                $data['errorMsg'] = 'Mug Number Already Exists';
+                            }
+                            else // Mug Not on hold and available
+                            {
+                                $data['status'] = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Mug Number Not Available';
+                    }
                 }
             }
         }

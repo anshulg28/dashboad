@@ -69,7 +69,78 @@ class Mailers extends MY_Controller {
         $this->load->view('MailAddView',$data);
 
     }
+    public function showPressMailAdd()
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
 
+        $data['pressTypes'] = $this->mailers_model->getPressMailTypes();
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('PressMailAddView',$data);
+
+    }
+
+    public function showPressMailEdit($pressId)
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+
+        $data['mailInfo'] = $this->mailers_model->getPressMailById($pressId);
+        $data['pressTypes'] = $this->mailers_model->getPressMailTypes();
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('PressMailEditView',$data);
+
+    }
+
+    public function savePressCategory()
+    {
+        $data = array();
+        $post = $this->input->post();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout! Login Again!';
+            echo json_encode($data);
+            return false;
+        }
+
+        $post['insertedDT'] = date('Y-m-d H:i:s');
+        $this->mailers_model->saveMailType($post);
+        $data['status'] = true;
+
+        echo json_encode($data);
+    }
+
+    public function refreshMailTypes()
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout! Login Again!';
+            echo json_encode($data);
+            return false;
+        }
+        $data['status'] = true;
+        $data['mailTypes'] = $this->mailers_model->getPressMailTypes();
+        echo json_encode($data);
+    }
     public function saveMail()
     {
 
@@ -77,6 +148,44 @@ class Mailers extends MY_Controller {
 
         $this->mailers_model->saveMailTemplate($post);
 
+    }
+    public function savePressMail()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+
+        $this->mailers_model->savePressEmail($post);
+
+        redirect(base_url().'mailers/pressSend');
+
+    }
+
+    public function removePressEmail($pressId)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $this->mailers_model->deletePressEmail($pressId);
+        redirect(base_url().'mailers/pressSend');
+    }
+    public function updatePressMail()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+        if(isset($post) && myIsArray($post))
+        {
+            $PressId = $post['id'];
+            unset($post['id']);
+            $this->mailers_model->updatePressEmail($post,$PressId);
+            redirect(base_url().'mailers/pressSend');
+        }
     }
     public function sendMail($mailType)
     {
@@ -288,6 +397,7 @@ class Mailers extends MY_Controller {
         {
             $data['pressMails'] = $mailResult['mailData'];
         }
+        $data['mailCats'] = $this->mailers_model->fetchPressCats();
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
         $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
