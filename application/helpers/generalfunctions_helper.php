@@ -264,6 +264,9 @@ if(!function_exists('slugify'))
         // lowercase
         $text = strtolower($text);
 
+        $random = substr( md5(rand()), 0, 7);
+        $text = $text.'-'.$random;
+
         if (empty($text)) {
             return 'n-a';
         }

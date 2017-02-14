@@ -435,13 +435,30 @@ class Sendemail_library
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
     }
 
+    public function instamojoFailMail($userData)
+    {
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/mugEditMailView', $data, true);
+
+        $fromEmail = 'admin@doolally.in';
+
+        $cc = '';
+        $fromName  = 'Doolally';
+
+        $subject = 'Unknown Mug Renewed via Instamojo';
+        $toEmail = 'tresha@doolally.in';
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromName, $subject, $content);
+    }
+
     public function sendEmail($to, $cc = '', $from, $fromName, $subject, $content, $attachment = array())
     {
         //Create the Transport
         /*$CI =& get_instance();
         $CI->load->library('swift_mailer/swift_required.php');*/
 
-        require_once APPPATH.'libraries/swift_mailer/swift_required.php';
+        /*require_once APPPATH.'libraries/swift_mailer/swift_required.php';
 
         $transport = Swift_SmtpTransport::newInstance ('smtp.gmail.com', 465, 'ssl')
             ->setUsername('admin@brewcraftsindia.com')
@@ -475,8 +492,8 @@ class Sendemail_library
         //Send the message
         $result = $mailer->send($message);
 
-        return $result;
-        /*$CI =& get_instance();
+        return $result;*/
+        $CI =& get_instance();
         $CI->load->library('email');
         $config['mailtype'] = 'html';
         $CI->email->clear(true);
@@ -496,7 +513,7 @@ class Sendemail_library
 
         $CI->email->subject($subject);
         $CI->email->message($content);
-        return $CI->email->send();*/
+        return $CI->email->send();
     }
 
     public function generateBreakfastTwoCode($mugId)

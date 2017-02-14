@@ -195,6 +195,7 @@ class Dashboard extends MY_Controller {
     public function instaMojoRecord()
     {
         $post = $this->input->post();
+
         // Get the MAC from the POST data
         if(isset($post['mac']))
         {
@@ -221,6 +222,20 @@ class Dashboard extends MY_Controller {
                         $mugNum = $row['value'];
                     }
 
+                    $mugStatus = $this->mugclub_model->getMugDataById($mugNum);
+
+                    if($mugStatus['status'] === false)
+                    {
+                        $details = array(
+                            'buyer_name' => $post['buyer_name'],
+                            'payment_id' => $post['payment_id'],
+                            'quantity' => $post['quantity'],
+                            'buyer_email' =>  $post['buyer'],
+                            'buyer_phone' => $post['buyer_phone'],
+                            'mugNo' => $mugNum
+                        );
+                        $this->sendemail_library->instamojoFailMail($details);
+                    }
                     $details = array(
                         "mugId" => $mugNum,
                         "buyerName" => $post['buyer_name'],

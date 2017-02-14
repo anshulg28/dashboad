@@ -126,9 +126,9 @@
                                 <thead>
                                 <tr>
                                     <th>Id</th>
-                                    <th>Press Name</th>
-                                    <th>Press Email</th>
-                                    <th>Press Category</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Category</th>
                                     <th>Publication</th>
                                     <th>Actions</th>
                                 </tr>
