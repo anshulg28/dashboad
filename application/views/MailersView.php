@@ -98,7 +98,7 @@
                                 <div class="menuWrap">
                                     <i class="fa fa-television fa-2x"></i>
                                     <br>
-                                    <span>Press Mail</span>
+                                    <span>Workshop Mail</span>
                                 </div>
                             </a>
                         </li>

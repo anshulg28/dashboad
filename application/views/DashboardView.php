@@ -672,7 +672,7 @@
                     <li><a data-toggle="tab" href="#eventAdd">Add Event</a></li>
                     <li><a data-toggle="tab" href="#compEvents">Completed</a></li>
                     <?php
-                        if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
+                        if($this->userType != SERVER_USER)
                         {
                             ?>
                             <li><a data-toggle="tab" href="#metaTab">Event Sharing</a></li>
@@ -1078,7 +1078,7 @@
                         ?>
                     </div>
                     <?php
-                    if($this->userType == ADMIN_USER || $this->userType == ROOT_USER)
+                    if($this->userType != SERVER_USER)
                     {
                         ?>
                         <div id="metaTab" class="tab-pane fade">

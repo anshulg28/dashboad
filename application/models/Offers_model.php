@@ -123,7 +123,7 @@ class Offers_Model extends CI_Model
     {
         $query = "SELECT offerType, isRedeemed"
                 ." FROM offersmaster "
-                ."WHERE offerCode = ".$offerCode;
+                ."WHERE ifActive = 1 AND offerCode = ".$offerCode;
 
         $result = $this->db->query($query)->row_array();
 

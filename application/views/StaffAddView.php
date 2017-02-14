@@ -69,7 +69,7 @@
                             <input type="radio" id="isRecYes" class="mdl-radio__button" name="isRecurring" value="1" checked>
                             <span class="mdl-radio__label">Yes</span>
                         </label>
-                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="isRecYes">
+                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="isRecNo">
                             <input type="radio" id="isRecNo" class="mdl-radio__button" name="isRecurring" value="2">
                             <span class="mdl-radio__label">No</span>
                         </label>
@@ -87,7 +87,7 @@
                             <input type="radio" id="isCapYes" class="mdl-radio__button" name="isCapping" value="1" checked>
                             <span class="mdl-radio__label">Yes</span>
                         </label>
-                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="isCapYes">
+                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="isCapNo">
                             <input type="radio" id="isCapNo" class="mdl-radio__button" name="isCapping" value="2">
                             <span class="mdl-radio__label">No</span>
                         </label>

@@ -437,7 +437,46 @@ class Sendemail_library
 
     public function sendEmail($to, $cc = '', $from, $fromName, $subject, $content, $attachment = array())
     {
-        $CI =& get_instance();
+        //Create the Transport
+        /*$CI =& get_instance();
+        $CI->load->library('swift_mailer/swift_required.php');*/
+
+        require_once APPPATH.'libraries/swift_mailer/swift_required.php';
+
+        $transport = Swift_SmtpTransport::newInstance ('smtp.gmail.com', 465, 'ssl')
+            ->setUsername('admin@brewcraftsindia.com')
+            ->setPassword('ngks2009');
+        //$transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -bs');
+
+        $mailer = Swift_Mailer::newInstance($transport);
+
+        //Create a message
+        $message = Swift_Message::newInstance($subject)
+            ->setSubject($subject)
+            //->setCc($cc)
+            ->setFrom(array($from => $fromName))
+            ->setTo($to) ->setBody($content, 'text/html');
+
+        if($cc != '')
+        {
+            $message->setBcc($cc);
+        }
+        if(isset($attachment) && myIsMultiArray($attachment))
+        {
+            foreach($attachment as $key)
+            {
+                if($key != '')
+                {
+                    $message->attach(Swift_Attachment::fromPath($key));
+                }
+            }
+        }
+        //$message->attach($attachment);
+        //Send the message
+        $result = $mailer->send($message);
+
+        return $result;
+        /*$CI =& get_instance();
         $CI->load->library('email');
         $config['mailtype'] = 'html';
         $CI->email->clear(true);
@@ -454,12 +493,10 @@ class Sendemail_library
                 $CI->email->attach($key);
             }
         }
-        /*if($attachment != ""){
-            $CI->email->attach($attachment);
-        }*/
+
         $CI->email->subject($subject);
         $CI->email->message($content);
-        return $CI->email->send();
+        return $CI->email->send();*/
     }
 
     public function generateBreakfastTwoCode($mugId)

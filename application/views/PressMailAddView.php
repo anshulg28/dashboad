@@ -9,7 +9,7 @@
     <?php echo $headerView; ?>
     <main class="mailPage">
         <div class="container-fluid">
-            <h1 class="text-center">Press Email Add</h1>
+            <h1 class="text-center">Email Add</h1>
             <hr>
             <div class="row">
                 <div class="col-sm-2"></div>
@@ -21,13 +21,13 @@
             <br>
             <form action="<?php echo base_url();?>mailers/savePressMail" method="post" class="form-horizontal" role="form">
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="pressName">Press Name:</label>
+                    <label class="control-label col-sm-2" for="pressName">Name:</label>
                     <div class="col-sm-10">
                         <input type="text" name="pressName" class="form-control" id="pressName" placeholder="Enter Name" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="pressEmail">Press Name:</label>
+                    <label class="control-label col-sm-2" for="pressEmail">Email:</label>
                     <div class="col-sm-10">
                         <input type="email" name="pressEmail" class="form-control" id="pressEmail" placeholder="Enter Email" required>
                     </div>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="pressMailType">Email Category:</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-8">
                         <select id="pressMailType" name="pressMailType" class="form-control" required>
                             <?php
                                 if(isset($pressTypes) && myIsArray($pressTypes))
@@ -56,6 +56,8 @@
                                 }
                             ?>
                         </select>
+                    </div>
+                    <div class="col-sm-2">
                         <a href="#" class="my-black-text press-type-refresh"
                            data-toggle="tooltip" title="Refresh List">
                             <i class="fa fa-refresh"></i>

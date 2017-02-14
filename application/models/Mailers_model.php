@@ -120,7 +120,7 @@ class Mailers_Model extends CI_Model
 
     public function saveMailType($post)
     {
-        $this->db->insert('pressTypemaster', $post);
+        $this->db->insert('presstypemaster', $post);
         return true;
     }
     public function savePressEmail($post)

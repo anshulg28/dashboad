@@ -16,7 +16,7 @@
                 <div class="col-sm-10 col-xs-12 mail-content text-center">
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#sendMail">Send Mail</a></li>
-                        <li><a data-toggle="tab" href="#viewIds">View Press</a></li>
+                        <li><a data-toggle="tab" href="#viewIds">Address Book</a></li>
                     </ul>
                     <div class="tab-content">
                         <div id="sendMail" class="tab-pane fade in active">
@@ -53,61 +53,6 @@
                                             {
                                                 echo 'No Mails Found!';
                                             }
-                                            foreach($pressMails as $key => $row)
-                                            {
-
-                                                switch ($row['pressMailType'])
-                                                {
-                                                    case 0:
-                                                        ?>
-                                                        <li>
-                                                            <label class="my-pointer-item" for="<?php echo $row['id'];?>_press">
-                                                                <input type="checkbox" id="<?php echo $row['id'];?>_press" class="mugCheckList"
-                                                                       data-pressEmail="<?php echo $row['pressEmail'];?>" />
-                                                                <?php
-                                                                if(isset($row['publication']) && $row['publication'] != '')
-                                                                {
-                                                                    echo $row['publication'].'-'.$row['pressEmail'];
-                                                                }
-                                                                elseif(isset($row['pressName']) && $row['pressName'] != '')
-                                                                {
-                                                                    echo $row['pressName'].'-'.$row['pressEmail'];
-                                                                }
-                                                                else
-                                                                {
-                                                                    echo $row['pressEmail'];
-                                                                }
-                                                                ?>
-                                                            </label>
-                                                        </li>
-                                                        <?php
-                                                        break;
-                                                    case 1:
-                                                        $mailTypes['food'][] = $row['pressEmail'];
-                                                        break;
-                                                    case 2:
-                                                        $mailTypes['games'][] = $row['pressEmail'];
-                                                        break;
-                                                    case 3:
-                                                        $mailTypes['craft'][] = $row['pressEmail'];
-                                                        break;
-                                                    case 4:
-                                                        $mailTypes['events'][] = $row['pressEmail'];
-                                                        break;
-                                                    case 5:
-                                                        $mailTypes['reviews'][] = $row['pressEmail'];
-                                                        break;
-                                                    case 6:
-                                                        $mailTypes['tech'][] = $row['pressEmail'];
-                                                        break;
-                                                    case 7:
-                                                        $mailTypes['workshops'][] = $row['pressEmail'];
-                                                        break;
-                                                    case 8:
-                                                        $mailTypes['office'][] = $row['pressEmail'];
-                                                        break;
-                                                }
-                                            }
                                             ?>
                                         </ul>
                                     </nav>
@@ -134,7 +79,7 @@
                                                 <!--<button type="button" class="btn btn-danger col-sm-2 my-marginDown" data-toggle="modal" data-target="#bodyModal" >Select Body</button>-->
                                                 <div class="col-sm-2"></div>
                                                 <div class="col-sm-10">
-                                                    <textarea name="mailBody" rows="10" class="form-control" onfocus="whichHasFocus= 2" id="mailBody" placeholder="Body"></textarea>
+                                                    <textarea name="mailBody" rows="10" class="form-control" id="mailBody" placeholder="Body"></textarea>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -175,7 +120,7 @@
                         <div id="viewIds" class="tab-pane fade text-left">
                             <a class="btn btn-primary press-add-btn" href="<?php echo base_url().'mailers/add';?>">
                                 <i class="fa fa-plus"></i>
-                                Add New Press Mail
+                                Add New Address
                             </a>
                             <table id="press-emails-table" class="table table-hover table-bordered table-striped paginated my-fullWidth">
                                 <thead>

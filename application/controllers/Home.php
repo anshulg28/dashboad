@@ -587,7 +587,7 @@ class Home extends MY_Controller {
         );
         $this->dashboard_model->updateWalletLog($walletRecord);
 
-        redirect(base_url());
+        redirect(base_url().'empDetails');
     }
     function updateStaff()
     {
