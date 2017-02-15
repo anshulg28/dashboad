@@ -705,8 +705,10 @@
                                         </thead>
                                         <tbody>
                                         <?php
+
                                         foreach($eventDetails as $key => $row)
                                         {
+                                            // TODO Check if location all or individual.
                                             $eveLoc = $row['eventData']['eventPlace'];
                                             ?>
                                             <tr>
@@ -732,7 +734,18 @@
                                                     }
                                                     ?>
                                                 </td>
-                                                <td><?php echo $row['eventData']['locData'][0]['locName'];?></td>
+                                                <td>
+                                                    <?php
+                                                        if($row['eventData']['isEventEverywhere'] == '1')
+                                                        {
+                                                            echo 'All Taprooms';
+                                                        }
+                                                        else
+                                                        {
+                                                            echo $row['eventData']['locData'][0]['locName'];
+                                                        }
+                                                    ?>
+                                                </td>
                                                 <td><?php echo $row['eventData']['creatorName'];?></td>
                                                 <td class="my-keepRelative"><!--<a data-toggle="tooltip" title="Edit" href="<?php /*echo base_url().'mugclub/edit/'.$row['mugId'];*/?>">
                                                         <i class="glyphicon glyphicon-edit"></i></a>&nbsp;-->
@@ -884,6 +897,12 @@
                                             </div>
                                         </li>
                                         <li>
+                                            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="showEventDate">
+                                                <input type="checkbox" name="showEventDate" value="2" id="showEventDate" class="mdl-checkbox__input">
+                                                <span class="mdl-checkbox__label">Hide Event Date?</span>
+                                            </label>
+                                        </li>
+                                        <li>
                                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                                 <input class="mdl-textfield__input" type="text" name="startTime" id="startTime" placeholder="">
                                                 <label class="mdl-textfield__label" for="startTime">Start Time</label>
@@ -895,7 +914,20 @@
                                                 <label class="mdl-textfield__label" for="endTime">End Time</label>
                                             </div>
                                         </li>
+                                        <li>
+                                            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="showEventTime">
+                                                <input type="checkbox" name="showEventTime" value="2" id="showEventTime" class="mdl-checkbox__input">
+                                                <span class="mdl-checkbox__label">Hide Event Time?</span>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="showEventPrice">
+                                                <input type="checkbox" name="showEventPrice" value="2" id="showEventPrice" class="mdl-checkbox__input">
+                                                <span class="mdl-checkbox__label">Hide Event Price?</span>
+                                            </label>
+                                        </li>
                                     </ul>
+                                    <br>
                                     <div class="text-left">
                                         <label>Event Cost :</label>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="freeType">
@@ -924,23 +956,33 @@
                                     </div>
                                     <br>
                                     <div class="text-left">
-                                        <label>Event Place: </label>
-                                        <select id="eventPlace" name="eventPlace" class="form-control">
-                                            <?php
-                                            if(isset($locations))
-                                            {
-                                                foreach($locations as $key => $row)
-                                                {
-                                                    if(isset($row['id']))
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <label>Event Place: </label>
+                                                <select id="eventPlace" name="eventPlace" class="form-control">
+                                                    <?php
+                                                    if(isset($locations))
                                                     {
-                                                        ?>
-                                                        <option value="<?php echo $row['id'];?>"><?php echo $row['locName'];?></option>
-                                                        <?php
+                                                        foreach($locations as $key => $row)
+                                                        {
+                                                            if(isset($row['id']))
+                                                            {
+                                                                ?>
+                                                                <option value="<?php echo $row['id'];?>"><?php echo $row['locName'];?></option>
+                                                                <?php
+                                                            }
+                                                        }
                                                     }
-                                                }
-                                            }
-                                            ?>
-                                        </select>
+                                                    ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-6 all-loc-block">
+                                                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="isEventEverywhere">
+                                                    <input type="checkbox" name="isEventEverywhere" value="1" id="isEventEverywhere" class="mdl-checkbox__input">
+                                                    <span class="mdl-checkbox__label">Available At All Locations?</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                     <br>
                                     <div class="text-left">
@@ -3064,6 +3106,21 @@
                 });
             }
         });
+    });
+
+    $(document).on('change','#eventAdd input[name="isEventEverywhere"]', function(){
+        if($(this).is(':checked'))
+        {
+            $('#eventAdd #eventPlace').attr('disabled','disabled');
+           var placeHtml = '<input id="newPlaceInput" type="hidden" name="eventPlace" value="'+$('#eventAdd #eventPlace').val()+'"/>';
+            $('#eventAdd #dashboardEventAdd').append(placeHtml);
+        }
+        else
+        {
+            $('#eventAdd #eventPlace').removeAttr('disabled');
+            if(typeof $('#eventAdd #newPlaceInput').val() !='undefined')
+                $('#eventAdd #dashboardEventAdd').find($('#newPlaceInput')).remove();
+        }
     });
 </script>
 

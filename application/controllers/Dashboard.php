@@ -1009,6 +1009,10 @@ class Dashboard extends MY_Controller {
         }
         $post['startTime'] = date('H:i', strtotime($post['startTime']));
         $post['endTime'] = date('H:i', strtotime($post['endTime']));
+        if(!isset($post['isEventEverywhere']))
+        {
+            $post['isEventEverywhere'] = '2';
+        }
         $this->dashboard_model->updateEventRecord($post,$eventId);
 
         if(isset($attachement) && $attachement != '')

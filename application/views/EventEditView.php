@@ -15,6 +15,7 @@
                     if(isset($eventInfo) && myIsArray($eventInfo))
                     {
                         $eventDate = '';
+                        $isAllLocs = false;
                         foreach($eventInfo as $key => $row)
                         {
                             if(isset($row['eventData']['eventId']))
@@ -83,6 +84,48 @@
                                             </div>
                                         </li>
                                     </ul>
+                                    <ul class="list-inline text-left">
+                                        <li class="my-singleBorder">
+                                            <label>Hide Event Date?</label>
+                                            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="yesDate">
+                                                <input type="radio" id="yesDate" class="mdl-radio__button" name="showEventDate"
+                                                       value="2" <?php if($row['eventData']['showEventDate'] == "2"){echo 'checked';}?>>
+                                                <span class="mdl-radio__label">Yes</span>
+                                            </label>
+                                            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="noDate">
+                                                <input type="radio" id="noDate" class="mdl-radio__button" name="showEventDate"
+                                                       value="1" <?php if($row['eventData']['showEventDate'] == "1"){echo 'checked';}?>>
+                                                <span class="mdl-radio__label">No</span>
+                                            </label>
+                                        </li>
+                                        <li class="my-singleBorder">
+                                            <label>Hide Event Time?</label>
+                                            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="yesTime">
+                                                <input type="radio" id="yesTime" class="mdl-radio__button" name="showEventTime"
+                                                       value="2" <?php if($row['eventData']['showEventTime'] == "2"){echo 'checked';}?>>
+                                                <span class="mdl-radio__label">Yes</span>
+                                            </label>
+                                            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="noTime">
+                                                <input type="radio" id="noTime" class="mdl-radio__button" name="showEventTime"
+                                                       value="1" <?php if($row['eventData']['showEventTime'] == "1"){echo 'checked';}?>>
+                                                <span class="mdl-radio__label">No</span>
+                                            </label>
+                                        </li>
+                                        <li class="my-singleBorder">
+                                            <label>Hide Event Price?</label>
+                                            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="yesPrice">
+                                                <input type="radio" id="yesPrice" class="mdl-radio__button" name="showEventPrice"
+                                                       value="2" <?php if($row['eventData']['showEventPrice'] == "2"){echo 'checked';}?>>
+                                                <span class="mdl-radio__label">Yes</span>
+                                            </label>
+                                            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="noPrice">
+                                                <input type="radio" id="noPrice" class="mdl-radio__button" name="showEventPrice"
+                                                       value="1" <?php if($row['eventData']['showEventPrice'] == "1"){echo 'checked';}?>>
+                                                <span class="mdl-radio__label">No</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                    <br>
                                     <div class="text-left">
                                         <label>Event Cost :</label>
                                         <input type="hidden" name="priceFreeStuff" value=""/>
@@ -116,24 +159,45 @@
                                     </div>
                                     <br>
                                     <div class="text-left">
-                                        <label>Event Place: </label>
-                                        <select id="eventPlace" name="eventPlace" class="form-control">
-                                            <?php
-                                            if(isset($locations))
-                                            {
-                                                foreach($locations as $lockey => $locrow)
-                                                {
-                                                    if(isset($locrow['id']))
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <?php
+                                                    if($row['eventData']['isEventEverywhere'] == '1')
                                                     {
                                                         ?>
-                                                        <option value="<?php echo $locrow['id'];?>"
-                                                        <?php if($locrow['id'] == $row['eventData']['eventPlace']){echo 'selected';}?>><?php echo $locrow['locName'];?></option>
+                                                        <input id="newPlaceInput" type="hidden" name="eventPlace"
+                                                               value="<?php echo $row['eventData']['eventPlace'];?>"/>
                                                         <?php
                                                     }
-                                                }
-                                            }
-                                            ?>
-                                        </select>
+                                                ?>
+                                                <label>Event Place: </label>
+                                                <select id="eventPlace" name="eventPlace" class="form-control"
+                                                    <?php if($row['eventData']['isEventEverywhere'] == '1'){echo 'disabled="disabled"';} ?>>
+                                                    <?php
+                                                    if(isset($locations))
+                                                    {
+                                                        foreach($locations as $lockey => $locrow)
+                                                        {
+                                                            if(isset($locrow['id']))
+                                                            {
+                                                                ?>
+                                                                <option value="<?php echo $locrow['id'];?>"
+                                                                    <?php if($locrow['id'] == $row['eventData']['eventPlace']){echo 'selected';}?>><?php echo $locrow['locName'];?></option>
+                                                                <?php
+                                                            }
+                                                        }
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-6 all-loc-block">
+                                                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="isEventEverywhere">
+                                                    <input type="checkbox" name="isEventEverywhere" value="1" id="isEventEverywhere" class="mdl-checkbox__input"
+                                                        <?php if($row['eventData']['isEventEverywhere'] == '1'){echo 'checked';} ?>>
+                                                    <span class="mdl-checkbox__label">Available At All Locations?</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                     <br>
                                     <div class="text-left">
@@ -415,6 +479,7 @@
             }
         }
     });
+    var placeHtml='';
     $(document).on('submit','#event-dash-edit', function(e){
         var ele = $(this);
         e.preventDefault();
@@ -506,6 +571,20 @@
                     bootbox.alert('Some Error Occurred!');
                 }
             });
+        }
+    });
+    $(document).on('change','input[name="isEventEverywhere"]', function(){
+        if($(this).is(':checked'))
+        {
+            $('#eventPlace').attr('disabled','disabled');
+            placeHtml = '<input id="newPlaceInput" type="hidden" name="eventPlace" value="'+$('#eventPlace').val()+'"/>';
+            $('#event-dash-edit').append(placeHtml);
+        }
+        else
+        {
+            $('#eventPlace').removeAttr('disabled');
+            if(typeof $('#newPlaceInput').val() !='undefined')
+            $('#event-dash-edit').find($('#newPlaceInput')).remove();
         }
     });
 </script>

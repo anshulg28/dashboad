@@ -539,6 +539,10 @@ input::-webkit-inner-spin-button {
     margin-bottom: 10px;
     padding-bottom: 20px;
 }
+.dashboard .all-loc-block, .eventEdit .all-loc-block
+{
+    padding-top:30px;
+}
 .eventEdit .img-remove-icon, .fnbEdit .img-remove-icon
 {
     position: absolute;
