@@ -216,8 +216,8 @@
                 ?>
             </div>
         </div>
+        <?php echo $footerView; ?>
     </main>
-    <?php echo $footerView; ?>
 </body>
 <?php echo $globalJs; ?>
 

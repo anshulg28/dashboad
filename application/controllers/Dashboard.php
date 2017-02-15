@@ -947,7 +947,7 @@ class Dashboard extends MY_Controller {
                         $donePost = $this->curl_library->createInstaLink($postData);
                     }
                 }
-                else //Creating event without image
+                if(!myIsMultiArray($donePost)) //Creating event without image
                 {
                     if($post['costType'] == EVENT_FREE)
                     {
@@ -997,9 +997,16 @@ class Dashboard extends MY_Controller {
         }
         if(myInArray('eventName', $changeCheck))
         {
-            $post['eventSlug'] = slugify($post['eventName']);
+            $eveSlug = slugify($post['eventName']);
+            $post['eventSlug'] = $eveSlug;
+            $post['eventShareLink'] = MOBILE_URL.'?page/events/'.$eveSlug;
+            $post['shortUrl'] = null;
+            $shortDWName = $this->googleurlapi->shorten(MOBILE_URL.'?page/events/'.$eveSlug);
+            if($shortDWName !== false)
+            {
+                $post['shortUrl'] = $shortDWName;
+            }
         }
-
         $post['startTime'] = date('H:i', strtotime($post['startTime']));
         $post['endTime'] = date('H:i', strtotime($post['endTime']));
         $this->dashboard_model->updateEventRecord($post,$eventId);
