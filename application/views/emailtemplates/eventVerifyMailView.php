@@ -9,7 +9,7 @@
     <p>Event Detail:</p>
     <p>
         Event Image:
-        <img src="<?php echo base_url().EVENT_PATH_THUMB.$mailData[0]['attachment'];?>"/><br>
+        <img src="<?php echo MOBILE_URL.EVENT_PATH_THUMB.$mailData[0]['attachment'];?>"/><br>
         Event Name: <?php echo $mailData[0]['eventName'];?><br>
         Event description: <?php echo $mailData[0]['eventDescription'];?><br>
         Event Type: <?php echo $mailData[0]['eventType'];?><br>

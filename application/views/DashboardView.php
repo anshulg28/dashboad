@@ -724,10 +724,10 @@
                                                             echo 'Free';
                                                             break;
                                                         case 2:
-                                                            echo 'Paid : Rs '.$row['eventData']['eventPrice'];
+                                                            echo 'Paid (with pint) : Rs '.$row['eventData']['eventPrice'];
                                                             break;
                                                         case 3:
-                                                            echo 'Paid(without pint) : Rs '.$row['eventData']['eventPrice'];
+                                                            echo 'Paid: Rs '.$row['eventData']['eventPrice'];
                                                             break;
                                                     }
                                                     ?>
@@ -904,11 +904,11 @@
                                         </label>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paidType">
                                             <input type="radio" id="paidType" class="mdl-radio__button" name="costType" value="2">
-                                            <span class="mdl-radio__label">Paid</span>
+                                            <span class="mdl-radio__label">Paid (with pint)</span>
                                         </label>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid2Type">
                                             <input type="radio" id="paid2Type" class="mdl-radio__button" name="costType" value="3">
-                                            <span class="mdl-radio__label">Paid (without pint)</span>
+                                            <span class="mdl-radio__label">Paid</span>
                                         </label>
 
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label event-price hide">
@@ -1036,7 +1036,10 @@
                                                         echo 'Free';
                                                         break;
                                                     case 2:
-                                                        echo 'Paid : Rs '.$row['eventPrice'];
+                                                        echo 'Paid (with pint): Rs '.$row['eventPrice'];
+                                                        break;
+                                                    case 3:
+                                                        echo 'Paid: Rs '.$row['eventPrice'];
                                                         break;
                                                 }
                                                 ?>
@@ -1048,7 +1051,7 @@
                                                 <?php
                                                 if(isset($row['filename']))
                                                 {
-                                                    $imgs[] = base_url().EVENT_PATH_THUMB.$row['filename'];
+                                                    $imgs[] = MOBILE_URL.EVENT_PATH_THUMB.$row['filename'];
                                                     ?>
                                                     <a class="view-photos" data-toggle="tooltip" title="View Photos" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
                                                         <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
@@ -3010,6 +3013,7 @@
         }
         else
         {
+            $('.event-price input[name="eventPrice"]').val('0');
             $('.event-price').addClass('hide');
         }
     });

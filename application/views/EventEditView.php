@@ -94,12 +94,12 @@
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paidType">
                                             <input type="radio" id="paidType" class="mdl-radio__button" name="costType"
                                                    value="2" <?php if($row['eventData']['costType'] == "2"){echo 'checked';}?>>
-                                            <span class="mdl-radio__label">Paid</span>
+                                            <span class="mdl-radio__label">Paid (with pint)</span>
                                         </label>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid2Type">
                                             <input type="radio" id="paid2Type" class="mdl-radio__button" name="costType"
                                                    value="3" <?php if($row['eventData']['costType'] == "3"){echo 'checked';}?>>
-                                            <span class="mdl-radio__label">Paid (without pint)</span>
+                                            <span class="mdl-radio__label">Paid</span>
                                         </label>
 
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label event-price hide">
@@ -217,6 +217,7 @@
             </div>
         </div>
     </main>
+    <?php echo $footerView; ?>
 </body>
 <?php echo $globalJs; ?>
 
@@ -369,6 +370,7 @@
         }
         else
         {
+            $('.event-price input[name="eventPrice"]').val('0');
             $('.event-price').addClass('hide');
         }
     }

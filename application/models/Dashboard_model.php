@@ -716,7 +716,7 @@ class Dashboard_Model extends CI_Model
         $query = "SELECT em.eventId, em.eventName, em.eventDescription, em.eventType, em.eventDate, em.startTime, em.endTime, em.costType, 
                   em.eventPrice, em.priceFreeStuff, em.eventPlace, em.eventCapacity, em.ifMicRequired, em.ifProjectorRequired, 
                   em.creatorName, em.creatorPhone, em.creatorEmail, em.aboutCreator, em.userId, em.eventShareLink, em.eventSlug,
-                  em.eventPaymentLink, em.ifActive, em.ifApproved, ea.filename, l.locName, l.mapLink
+                  em.instaSlug, em.eventPaymentLink, em.ifActive, em.ifApproved, ea.filename, l.locName, l.mapLink
                   FROM `eventmaster` em
                   LEFT JOIN eventattachment ea ON ea.eventId = em.eventId
                   LEFT JOIN locationmaster l ON eventPlace = l.id
@@ -1098,7 +1098,7 @@ class Dashboard_Model extends CI_Model
     {
         $query = "SELECT *"
             ." FROM custommetatags"
-            ." ORDER BY id DESC LIMIT 5";
+            ." ORDER BY id DESC";
 
         $result = $this->db->query($query)->result_array();
 
