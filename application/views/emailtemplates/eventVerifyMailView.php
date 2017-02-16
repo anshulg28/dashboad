@@ -12,7 +12,7 @@
         <img src="<?php echo MOBILE_URL.EVENT_PATH_THUMB.$mailData[0]['attachment'];?>"/><br>
         Event Name: <?php echo $mailData[0]['eventName'];?><br>
         Event description: <?php echo $mailData[0]['eventDescription'];?><br>
-        Event Type: <?php echo $mailData[0]['eventType'];?><br>
+        <!--Event Type: <?php /*echo $mailData[0]['eventType'];*/?><br>-->
         Event Date: <?php echo $mailData[0]['eventDate'];?><br>
         Event Time: <?php echo $mailData[0]['startTime'] .' - '.$mailData[0]['endTime'];?><br>
         Event Price:

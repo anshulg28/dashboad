@@ -32,27 +32,27 @@
                                         <label class="mdl-textfield__label" for="eventName">Event Name</label>
                                     </div>
                                     <br>
-                                    <div class="text-left">
+                                    <!--<div class="text-left">
                                         <label for="eventType">Event Type :</label>
                                         <select name="eventType" id="eventType" class="form-control">
                                             <?php
-                                            $foundType = false;
+/*                                            $foundType = false;
                                             foreach($this->config->item('eventTypes') as $evekey => $everow)
                                             {
-                                                ?>
-                                                <option value="<?php echo $everow;?>"
-                                                <?php if($row['eventData']['eventType'] == $everow){$foundType = true;echo 'selected';};?>><?php echo $everow;?></option>
+                                                */?>
+                                                <option value="<?php /*echo $everow;*/?>"
+                                                <?php /*if($row['eventData']['eventType'] == $everow){$foundType = true;echo 'selected';};*/?>><?php /*echo $everow;*/?></option>
                                                 <?php
-                                            }
-                                            ?>
+/*                                            }
+                                            */?>
                                         </select>
                                         <div class="mdl-textfield mdl-js-textfield other-event hide">
                                             <input class="mdl-textfield__input" type="text"
-                                                   id="otherType" <?php if($foundType == false){echo 'value="'.$row['eventData']['eventType'].'"';}?>>
+                                                   id="otherType" <?php /*if($foundType == false){echo 'value="'.$row['eventData']['eventType'].'"';}*/?>>
                                             <label class="mdl-textfield__label" for="otherType">Other</label>
                                         </div>
                                     </div>
-                                    <br>
+                                    <br>-->
                                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth text-left">
                                         <label for="eventDescription">Event Description: </label>
                                         <textarea class="mdl-textfield__input my-singleBorder" type="text" name="eventDescription" rows="5"

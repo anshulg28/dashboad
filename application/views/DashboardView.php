@@ -694,7 +694,7 @@
                                             <th>Event Id</th>
                                             <th>Name</th>
                                             <th>Description</th>
-                                            <th>Type</th>
+                                            <!--<th>Type</th>-->
                                             <th>Date</th>
                                             <th>Timing</th>
                                             <th>Cost</th>
@@ -708,14 +708,14 @@
 
                                         foreach($eventDetails as $key => $row)
                                         {
-                                            // TODO Check if location all or individual.
+
                                             $eveLoc = $row['eventData']['eventPlace'];
                                             ?>
                                             <tr>
                                                 <th scope="row"><?php echo $row['eventData']['eventId'];?></th>
                                                 <td><?php echo $row['eventData']['eventName'];?></td>
                                                 <td><?php echo strip_tags($row['eventData']['eventDescription']);?></td>
-                                                <td><?php echo $row['eventData']['eventType'];?></td>
+                                                <!--<td><?php /*echo $row['eventData']['eventType'];*/?></td>-->
                                                 <td><?php $d = date_create($row['eventData']['eventDate']); echo date_format($d,DATE_FORMAT_UI);?></td>
                                                 <td><?php echo $row['eventData']['startTime'] .' - '.$row['eventData']['endTime'];?></td>
                                                 <td>
@@ -867,24 +867,24 @@
                                         <label class="mdl-textfield__label" for="eventName">Event Name</label>
                                     </div>
                                     <br>
-                                    <div class="text-left">
+                                    <!--<div class="text-left">
                                         <label for="eventType">Event Type :</label>
                                         <select name="eventType" id="eventType" class="form-control">
                                             <?php
-                                                foreach($this->config->item('eventTypes') as $key => $row)
+/*                                                foreach($this->config->item('eventTypes') as $key => $row)
                                                 {
-                                                    ?>
-                                                    <option value="<?php echo $row;?>"><?php echo $row;?></option>
+                                                    */?>
+                                                    <option value="<?php /*echo $row;*/?>"><?php /*echo $row;*/?></option>
                                                     <?php
-                                                }
-                                            ?>
+/*                                                }
+                                            */?>
                                         </select>
                                         <div class="mdl-textfield mdl-js-textfield other-event hide">
                                             <input class="mdl-textfield__input" type="text" id="otherType">
                                             <label class="mdl-textfield__label" for="otherType">Other</label>
                                         </div>
                                     </div>
-                                    <br>
+                                    <br>-->
                                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth text-left">
                                         <label for="eventDescription">Event Description: </label>
                                         <textarea class="mdl-textfield__input my-singleBorder" type="text" name="eventDescription" rows="5" id="eventDescription"></textarea>
@@ -1049,7 +1049,7 @@
                                         <th>Event Id</th>
                                         <th>Name</th>
                                         <th>Description</th>
-                                        <th>Type</th>
+                                        <!--<th>Type</th>-->
                                         <th>Date</th>
                                         <th>Timing</th>
                                         <th>Cost</th>
@@ -1067,7 +1067,7 @@
                                             <th scope="row"><?php echo $row['eventId'];?></th>
                                             <td><?php echo $row['eventName'];?></td>
                                             <td><?php echo strip_tags($row['eventDescription']);?></td>
-                                            <td><?php echo $row['eventType'];?></td>
+                                            <!--<td><?php /*echo $row['eventType'];*/?></td>-->
                                             <td><?php $d = date_create($row['eventDate']); echo date_format($d,DATE_FORMAT_UI);?></td>
                                             <td><?php echo $row['startTime'] .' - '.$row['endTime'];?></td>
                                             <td>
