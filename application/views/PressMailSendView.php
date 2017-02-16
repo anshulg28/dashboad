@@ -4,6 +4,12 @@
 	<meta charset="utf-8">
 	<title>Press Mail :: Doolally</title>
 	<?php echo $globalStyle; ?>
+    <style>
+        .cke_editable
+        {
+            line-height:0.8 !important;
+        }
+    </style>
 </head>
 <body>
     <?php echo $headerView; ?>
@@ -176,6 +182,8 @@
 
 <script>
     CKEDITOR.replace( 'mailBody' );
+    CKEDITOR.config.enterMode = CKEDITOR.ENTER_BR;
+    CKEDITOR.config.shiftEnterMode = CKEDITOR.ENTER_P;
     var whichHasFocus = 0;
     $(document).on('change','input[name="attachmentType"]',function(){
         if($(this).val() == '1')

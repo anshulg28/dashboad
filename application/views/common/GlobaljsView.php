@@ -7,7 +7,7 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/bootbox.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/getmdl-select.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/Chart.min.js"></script>
-<script src="http://cdn.ckeditor.com/4.5.10/basic/ckeditor.js"></script>
+<script src="http://cdn.ckeditor.com/4.6.2/basic/ckeditor.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/progressbar.min.js"></script>
 <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBu7Do2fKtcQYdGyoC5glTzRLxs6FKxy4Y&libraries=places"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/mobile/js/jquery.swipebox.min.js"></script>
