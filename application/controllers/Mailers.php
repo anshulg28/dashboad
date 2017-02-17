@@ -490,6 +490,83 @@ class Mailers extends MY_Controller {
 
     }
 
+    public function templates()
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+
+        $data['templates'] = $this->mailers_model->getAllTemplates();
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('TemplatesView',$data);
+
+    }
+
+    public function templateAdd()
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('TemplateAddView',$data);
+    }
+    public function templateEdit($tempId)
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+
+        $data['tempEdit'] = $this->mailers_model->getTemplateById($tempId);
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('TemplateAddView',$data);
+    }
+    public function tempUpdate()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+
+        if(isset($post['id']))
+        {
+            $this->mailers_model->updateTemplate($post,$post['id']);
+        }
+        redirect(base_url().'mailers/templates');
+    }
+
+    public function tempSave()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+
+        $this->mailers_model->saveTemplate($post);
+        redirect(base_url().'mailers/templates');
+    }
     public function generateBreakfastTwoCode($mugId)
     {
         $allCodes = $this->offers_model->getAllCodes();

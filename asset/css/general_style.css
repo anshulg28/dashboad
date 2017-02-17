@@ -637,6 +637,10 @@ display:block;
 {
     font-size:20px;
 }
+.templates .mugtags-list span
+{
+    font-size:85%;
+}
 @media screen and (max-width: 1024px)
 {
     .mailPage .mail-content

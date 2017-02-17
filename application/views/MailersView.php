@@ -102,6 +102,15 @@
                                 </div>
                             </a>
                         </li>
+                        <li>
+                            <a href="<?php echo base_url().'mailers/templates';?>">
+                                <div class="menuWrap">
+                                    <i class="fa fa-book fa-2x"></i>
+                                    <br>
+                                    <span>Template View</span>
+                                </div>
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="col-sm-2 col-xs-0"></div>

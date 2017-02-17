@@ -82,6 +82,23 @@ class Mailers_Model extends CI_Model
 
         return $result;
     }
+    public function getAllTemplates()
+    {
+        $query = "SELECT * FROM mailtemplates";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function getTemplateById($tempId)
+    {
+        $query = "SELECT * FROM mailtemplates 
+                  WHERE id = ".$tempId;
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
     public function getPressInfoByMail($email)
     {
         $query = "SELECT pressName "
@@ -138,6 +155,17 @@ class Mailers_Model extends CI_Model
     {
         $this->db->where('id', $pressId);
         $this->db->update('pressmailmaster',$details);
+        return true;
+    }
+    public function updateTemplate($details,$tempId)
+    {
+        $this->db->where('id', $tempId);
+        $this->db->update('mailtemplates',$details);
+        return true;
+    }
+    public function saveTemplate($post)
+    {
+        $this->db->insert('mailtemplates', $post);
         return true;
     }
 }
