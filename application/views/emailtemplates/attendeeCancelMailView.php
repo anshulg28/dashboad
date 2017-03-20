@@ -9,7 +9,7 @@
     <p>
         Dear <?php echo $mailData['firstName']; ?><br><br>
 
-        The organiser <?php echo $mailData['creatorName']; ?> has cancelled the event <?php echo $mailData['eventName']; ?>.
+        The organiser <?php echo str_replace('.','',$mailData['creatorName']); ?> has cancelled the event <?php echo trim($mailData['eventName']); ?>.
          For paid events, the money will be fully refunded to you.<br><br>
 
         <?php

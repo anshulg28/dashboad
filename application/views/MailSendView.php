@@ -49,7 +49,14 @@
                                                                                    echo 'disabled';
                                                                                }
                                                                            ?>>
-                                                                    <?php echo $row['mugId'].': '.ucfirst($row['firstName']);?>
+                                                                    <?php
+                                                                        echo $row['mugId'].': '.ucfirst($row['firstName']);
+                                                                        if(isset($row['birthDate']))
+                                                                        {
+                                                                            $bDate = date_create($row['birthDate']);
+                                                                            echo ' - '.date_format($bDate,'jS M');
+                                                                        }
+                                                                    ?>
                                                                 </label>
                                                             </li>
                                                             <?php

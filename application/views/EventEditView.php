@@ -127,23 +127,33 @@
                                     </ul>
                                     <br>
                                     <div class="text-left">
-                                        <label>Event Cost :</label>
+                                        <label>Event Cost (<a href="#" data-toggle="modal" data-target="#costModal">?</a>):</label><br>
                                         <input type="hidden" name="priceFreeStuff" value=""/>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="freeType">
                                             <input type="radio" id="freeType" class="mdl-radio__button" name="costType"
                                                    value="1" <?php if($row['eventData']['costType'] == "1"){echo 'checked';}?>>
                                             <span class="mdl-radio__label">Free</span>
-                                        </label>
+                                        </label><br>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paidType">
                                             <input type="radio" id="paidType" class="mdl-radio__button" name="costType"
                                                    value="2" <?php if($row['eventData']['costType'] == "2"){echo 'checked';}?>>
-                                            <span class="mdl-radio__label">Paid (with pint)</span>
+                                            <span class="mdl-radio__label">Event Fee + Doolally Fee</span>
                                         </label>
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label custom-price">
+                                            <input class="mdl-textfield__input" type="text" name="doolallyFee" value="<?php echo $row['eventData']['doolallyFee'];?>" pattern="-?[0-9]*(\.[0-9]+)?" id="customPrice">
+                                            <label class="mdl-textfield__label" for="customPrice">Custom Price</label>
+                                            <span class="mdl-textfield__error">Input is not a number!</span>
+                                        </div><br>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid2Type">
                                             <input type="radio" id="paid2Type" class="mdl-radio__button" name="costType"
                                                    value="3" <?php if($row['eventData']['costType'] == "3"){echo 'checked';}?>>
-                                            <span class="mdl-radio__label">Paid</span>
-                                        </label>
+                                            <span class="mdl-radio__label">Event Fee</span>
+                                        </label><br>
+                                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid3Type">
+                                            <input type="radio" id="paid3Type" class="mdl-radio__button" name="costType"
+                                                   value="4" <?php if($row['eventData']['costType'] == "4"){echo 'checked';}?>>
+                                            <span class="mdl-radio__label">Doolally Fee</span>
+                                        </label><br>
 
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label event-price hide">
                                             <input class="mdl-textfield__input" type="text" name="eventPrice" pattern="-?[0-9]*(\.[0-9]+)?"
@@ -280,6 +290,28 @@
                 ?>
             </div>
         </div>
+        <div id="costModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Cost Information</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Free (NO organiser fee, NO doolally fee, NO coupon code)<br>
+                            Event Fee (organiser fee, NO doolally fee, NO coupon code)<br>
+                            Event Fee + Doolally Fee (organiser fee, doolally fee, coupon code)<br>
+                            Doolally Fee (NO organiser fee, doolally fee, coupon code)</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <?php echo $footerView; ?>
     </main>
 </body>
@@ -414,6 +446,8 @@
         }
     });
 
+    var fixDoolallyFee = Number($('#customPrice').val());
+
     $(document).on('change','input[name="costType"]', function(){
         costToggle();
     });
@@ -424,7 +458,7 @@
         {
             $('.event-price input[name="eventPrice"]').val(addPaid1).parent().removeClass('hide');
         }
-        else if($('input[name="costType"]:checked').val() == "3")
+        else if($('input[name="costType"]:checked').val() == "3" || $('input[name="costType"]:checked').val() == "4")
         {
             if($('.event-price input[name="eventPrice"]').val() != 0)
             {
@@ -448,11 +482,11 @@
         if(eveApprovType == '2')
         {
             addPaid1 = Number(costPrice);
-            addPaid2 = Number(costPrice) - 250;
+            addPaid2 = Number(costPrice) - fixDoolallyFee;
         }
-        else if(eveApprovType == '3')
+        else if(eveApprovType == '3' || eveApprovType == '4')
         {
-            addPaid1 = Number(costPrice) + 250;
+            addPaid1 = Number(costPrice) + fixDoolallyFee;
             addPaid2 = Number(costPrice);
         }
         else
@@ -467,16 +501,38 @@
             var basicPrice = Number($(this).val());
             if($('input[name="costType"]:checked').val() == '2')
             {
-                addPaid1 = basicPrice+250;
+                addPaid1 = basicPrice+fixDoolallyFee;
                 addPaid2 = basicPrice;
                 $(this).val(addPaid1);
             }
             else
             {
                 addPaid2 = basicPrice;
-                addPaid1 = basicPrice+250;
+                addPaid1 = basicPrice+fixDoolallyFee;
                 $(this).val(addPaid2);
             }
+        }
+    });
+    $(document).on("keyup","#customPrice", function(){
+        var oldFee = fixDoolallyFee;
+        if(Number($(this).val()) >= 250)
+        {
+            fixDoolallyFee = Number($(this).val());
+        }
+        else
+        {
+            fixDoolallyFee = 250;
+        }
+        var basicPrice = Number($('.event-price input[name="eventPrice"]').val());
+
+        if($('input[name="costType"]:checked').val() == '2')
+        {
+            addPaid1 = basicPrice + (fixDoolallyFee - oldFee);
+            $('.event-price input[name="eventPrice"]').val(addPaid1);
+        }
+        else
+        {
+            addPaid1 = addPaid1 + (fixDoolallyFee - oldFee);
         }
     });
     var placeHtml='';

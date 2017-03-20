@@ -16,9 +16,10 @@ class Checkin_Model extends CI_Model
 
     public function getAllTodayCheckInList()
     {
-        $query = "SELECT m.id,mugId,l.locName,checkinDateTime "
+        $query = "SELECT m.id,m.mugId,mm.firstName, mm.lastName,l.locName,checkinDateTime "
             ."FROM mugcheckinmaster m "
             ."LEFT JOIN locationmaster l ON l.id = m.location "
+            ."LEFT JOIN mugmaster mm ON m.mugId = mm.mugId "
             ."WHERE DATE(checkinDateTime) = CURRENT_DATE() ORDER BY id DESC";
 
         $result = $this->db->query($query)->result_array();
@@ -37,9 +38,10 @@ class Checkin_Model extends CI_Model
     }
     public function getAllCheckInList()
     {
-        $query = "SELECT m.id,mugId,l.locName,checkinDateTime "
+        $query = "SELECT m.id,m.mugId,mm.firstName, mm.lastName,l.locName,checkinDateTime "
             ."FROM mugcheckinmaster m "
             ."LEFT JOIN locationmaster l ON l.id = m.location "
+            ."LEFT JOIN mugmaster mm ON m.mugId = mm.mugId "
             ."ORDER BY m.id DESC";
 
         $result = $this->db->query($query)->result_array();

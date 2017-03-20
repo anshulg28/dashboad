@@ -520,16 +520,17 @@ class Mugclub_Model extends CI_Model
 
     public function getBirthdayMugsList($locSort = false, $locArray = '')
     {
-        $query = "SELECT mugId, firstName, emailId "
+        $query = "SELECT mugId, firstName, emailId, birthDate "
             ." FROM mugmaster "
             ."WHERE birthDate IS NOT NULL AND birthDate != '0000-00-00' AND membershipEnd >= CURRENT_DATE() "
-            ."AND DATE_FORMAT(birthDate,'%m-%d') = DATE_FORMAT(NOW(),'%m-%d') AND birthdayMailStatus = 0";
+            ."AND DATE_FORMAT(birthDate,'%m-%d') BETWEEN DATE_FORMAT( (CURRENT_DATE() - INTERVAL 1 WEEK ) , '%m-%d')"
+            ." AND DATE_FORMAT( CURRENT_DATE() , '%m-%d' ) AND birthdayMailStatus = 0 ";
 
         if($locSort === true)
         {
             $query .= ' AND homeBase IN('.$locArray.')';
         }
-
+        $query .= " ORDER BY DATE_FORMAT( birthDate, '%m-%d' ) DESC ";
         $result = $this->db->query($query)->result_array();
 
         $data['expiryMugList'] = $result;
@@ -561,6 +562,21 @@ class Mugclub_Model extends CI_Model
         $result  = $this->db->query($query)->row_array();
 
         return $result;
+    }
+
+    public function getInstaMugById($id)
+    {
+        $query = "SELECT * FROM instamojomugmaster WHERE id= ".$id;
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+
+    public function updateInstaMug($details,$id)
+    {
+        $this->db->where('id', $id);
+        $this->db->update('instamojomugmaster', $details);
+        return true;
     }
 
 }

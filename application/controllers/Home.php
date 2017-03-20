@@ -569,25 +569,36 @@ class Home extends MY_Controller {
     }
     function saveStaff()
     {
+        $data = array();
         if(isSessionVariableSet($this->isUserSession) === false)
         {
             redirect(base_url());
         }
         $post = $this->input->post();
 
-        $id = $this->dashboard_model->saveStaffRecord($post);
+        $empCheck = $this->dashboard_model->checkStaffById($post['empId']);
+        if($empCheck['status'] == true)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = "Employee Already Exists!";
+        }
+        else
+        {
+            $id = $this->dashboard_model->saveStaffRecord($post);
 
-        $walletRecord = array(
-            'staffId' => $id,
-            'amount' => '1500',
-            'amtAction' => '2',
-            'notes' => 'New Staff Added',
-            'loggedDT' => date('Y-m-d H:i:s'),
-            'updatedBy' => $this->userName
-        );
-        $this->dashboard_model->updateWalletLog($walletRecord);
+            $walletRecord = array(
+                'staffId' => $id,
+                'amount' => '1500',
+                'amtAction' => '2',
+                'notes' => 'New Staff Added',
+                'loggedDT' => date('Y-m-d H:i:s'),
+                'updatedBy' => $this->userName
+            );
+            $this->dashboard_model->updateWalletLog($walletRecord);
+            $data['status'] = true;
+        }
 
-        redirect(base_url().'empDetails');
+        echo json_encode($data);
     }
     function updateStaff()
     {
@@ -640,6 +651,7 @@ class Home extends MY_Controller {
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
         $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
 
         $this->load->view('StaffAddView', $data);
 
@@ -701,11 +713,11 @@ class Home extends MY_Controller {
             $staffCheck = $this->dashboard_model->checkStaffById($post['empId']);
             if($staffCheck['status'] == true)
             {
-                $data['status'] = true;
+                $data['status'] = false;
             }
             else
-                {
-
+            {
+                $data['status'] = true;
             }
         }
         else
@@ -713,6 +725,8 @@ class Home extends MY_Controller {
             $data['status'] = false;
             $data['errorMsg'] = 'No Employee Id Provided!';
         }
+        
+        echo json_encode($data);
     }
     function empDetails()
     {
@@ -835,58 +849,67 @@ class Home extends MY_Controller {
                     {
                         $postBillNum = $post['billNum'];
                         $postBillAmt = $post['billAmount'];
-                        //$this->dashboard_model->setCouponUsed($coupon['id']);
-                        $billLog = array(
-                            'billNum' => $postBillNum,
-                            'offerId' => null,
-                            'staffId' => $staffDetails['id'],
-                            'billAmount' => $postBillAmt,
-                            'insertedDT' => date('Y-m-d H:i:s')
-                        );
-                        $this->dashboard_model->saveBillLog($billLog);
-                        //$this->dashboard_model->clearCheckinLog($post['checkInId']);
 
                         //Wallet Balance Calculation
                         $oldBalance = $staffDetails['walletBalance']; // $post['walletBalance'];
-                        $usedAmt = $postBillAmt;
-                        $finalBal = $oldBalance - $usedAmt;
-                        $walletRecord = array(
-                            'staffId' => $staffDetails['id'],
-                            'amount' => $usedAmt,
-                            'amtAction' => '1',
-                            'notes' => 'Wallet Balance Used',
-                            'loggedDT' => date('Y-m-d H:i:s'),
-                            'updatedBy' => 'system'
-                        );
-                        //Log Insertion in the wallet
-                        $this->dashboard_model->updateWalletLog($walletRecord);
-
-                        $details = array(
-                            'walletBalance' => $finalBal
-                        );
-                        $this->dashboard_model->updateStaffRecord($staffDetails['id'],$details);
-
-                        $numbers = array('91'.$staffDetails['mobNum']);
-
-                        $postDetails = array(
-                            'apiKey' => TEXTLOCAL_API,
-                            'numbers' => implode(',', $numbers),
-                            'sender'=> urlencode('DOLALY'),
-                            'message' => rawurlencode('Available Wallet Balance: '.$finalBal)
-                        );
-                        $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
-                        if($smsStatus['status'] == 'failure')
+                        if((int)$oldBalance < (int)$postBillAmt)
                         {
-                            if(isset($smsStatus['warnings']))
-                            {
-                                $data['smsError'] = $smsStatus['warnings'][0]['message'];
-                            }
-                            else
-                            {
-                                $data['smsError'] = $smsStatus['errors'][0]['message'];
-                            }
+                            $data['status'] = FALSE;
+                            $data['errorMsg'] = "Insufficient Wallet Balance!";
                         }
-                        $data['status'] = true;
+                        else
+                        {
+                            $usedAmt = $postBillAmt;
+                            $finalBal = $oldBalance - $usedAmt;
+                            //$this->dashboard_model->setCouponUsed($coupon['id']);
+                            $billLog = array(
+                                'billNum' => $postBillNum,
+                                'offerId' => null,
+                                'staffId' => $staffDetails['id'],
+                                'billAmount' => $postBillAmt,
+                                'insertedDT' => date('Y-m-d H:i:s')
+                            );
+                            $this->dashboard_model->saveBillLog($billLog);
+                            //$this->dashboard_model->clearCheckinLog($post['checkInId']);
+
+                            $walletRecord = array(
+                                'staffId' => $staffDetails['id'],
+                                'amount' => $usedAmt,
+                                'amtAction' => '1',
+                                'notes' => 'Wallet Balance Used',
+                                'loggedDT' => date('Y-m-d H:i:s'),
+                                'updatedBy' => 'system'
+                            );
+                            //Log Insertion in the wallet
+                            $this->dashboard_model->updateWalletLog($walletRecord);
+
+                            $details = array(
+                                'walletBalance' => $finalBal
+                            );
+                            $this->dashboard_model->updateStaffRecord($staffDetails['id'],$details);
+
+                            $numbers = array('91'.$staffDetails['mobNum']);
+
+                            $postDetails = array(
+                                'apiKey' => TEXTLOCAL_API,
+                                'numbers' => implode(',', $numbers),
+                                'sender'=> urlencode('DOLALY'),
+                                'message' => rawurlencode('Available Wallet Balance: '.$finalBal)
+                            );
+                            $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                            if($smsStatus['status'] == 'failure')
+                            {
+                                if(isset($smsStatus['warnings']))
+                                {
+                                    $data['smsError'] = $smsStatus['warnings'][0]['message'];
+                                }
+                                else
+                                {
+                                    $data['smsError'] = $smsStatus['errors'][0]['message'];
+                                }
+                            }
+                            $data['status'] = true;
+                        }
                     }
                     else
                     {

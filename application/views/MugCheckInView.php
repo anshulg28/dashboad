@@ -30,6 +30,7 @@
                 <thead>
                 <tr>
                     <th>Id</th>
+                    <th>Name</th>
                     <th>Mug #</th>
                     <th>Location</th>
                     <th>Date & Time</th>
@@ -61,6 +62,9 @@
                                     ?>
                                     <tr>
                                         <th scope="row"><?php echo $row['id'];?></th>
+                                        <td>
+                                            <?php echo $row['firstName'].' '.$row['lastName'];?>
+                                        </td>
                                         <td><?php echo $row['mugId'];?></td>
                                         <td><?php echo $row['locName'];?></td>
                                         <td><?php $d = date_create($row['checkinDateTime']); echo date_format($d,DATE_TIME_FORMAT_UI);?></td>

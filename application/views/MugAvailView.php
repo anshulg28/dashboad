@@ -52,7 +52,7 @@
 <script>
 
     $(document).on('click','.mugCheck-btn',function(){
-
+    $('#mobNumCheck').val(Number($('#mobNumCheck').val()));
     var mugNum = $('#mobNumCheck').val();
     if(mugNum != '')
     {
@@ -129,6 +129,7 @@ $(document).on('keyup','#mobNumCheck', function(event){
         finalVal = 9999 /*- (Number($(this).val()) - 9999)*/;
         $(this).val(finalVal);
     }
+
     else if(keycode == '13'){
         $('.mugCheck-btn').trigger('click');
     }

@@ -924,4 +924,84 @@ class Mugclub extends MY_Controller {
         }
         return $returnTxt;
     }
+
+    function addInstaMug()
+    {
+        $data = array();
+        $post = $this->input->post();
+
+        if(isSessionVariableSet($this->isUserSession))
+        {
+            if(isset($post['memId']))
+            {
+                $instaRecord = $this->mugclub_model->getInstaMugById($post['memId']);
+                if(isset($instaRecord) && myIsArray($instaRecord))
+                {
+                    $mugExists = $this->mugclub_model->getMugDataById($instaRecord['mugId']);
+                    {
+                        if($mugExists['status'] === false)
+                        {
+                            $mugTag = '';
+                            if(isset($instaRecord['mugTag']))
+                            {
+                                $mugTag = $instaRecord['mugTag'];
+                            }
+                            $memStart = date('Y-m-d');
+                            $details = array(
+                                'mugId' => $instaRecord['mugId'],
+                                'mugTag' => $mugTag,
+                                'homeBase' => $instaRecord['homeBase'],
+                                'firstName' => $instaRecord['firstName'],
+                                'lastName' => $instaRecord['lastName'],
+                                'mobileNo' => $instaRecord['mobileNo'],
+                                'emailId' => $instaRecord['emailId'],
+                                'birthDate' => $instaRecord['birthDate'],
+                                'invoiceDate' => $instaRecord['invoiceDate'],
+                                'invoiceNo' => $instaRecord['invoiceNo'],
+                                'invoiceAmt' => $instaRecord['invoiceAmt'],
+                                'membershipStart' => $memStart,
+                                'membershipEnd' => date('Y-m-d', strtotime($memStart.' +12 month')),
+                                'oldHomeBase' => '0',
+                                'ifActive' => '1',
+                                'notes' => '',
+                                'mailStatus' => '0',
+                                'birthdayMailStatus' => '0',
+                                'mailDate' => null
+                            );
+
+                            $this->mugclub_model->saveMugRecord($details);
+
+                            if($post['ifMail'] == '1')
+                            {
+                                $this->sendemail_library->signUpWelcomeSendMail($details);
+                            }
+
+                            $instaMug = array(
+                                'isApproved' => '1'
+                            );
+                            $this->mugclub_model->updateInstaMug($instaMug,$post['memId']);
+                            $data['status'] = true;
+                        }
+                        else
+                        {
+                            $data['status'] = false;
+                            $data['errorMsg'] = 'Mug Number Already Exists!';
+                        }
+                    }
+                }
+            }
+            else
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'No Mug Details Provided!';
+            }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Unauthorized Access!';
+        }
+
+        echo json_encode($data);
+    }
 }

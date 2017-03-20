@@ -264,6 +264,27 @@ class Dashboard_Model extends CI_Model
 
         return $data;
     }
+
+    public function getAllInstamojoMugRecords()
+    {
+        $query = "SELECT imm.id,imm.mugId,imm.firstName,imm.lastName,imm.emailId,lm.locName "
+            ." FROM instamojomugmaster imm "
+            ."LEFT JOIN locationmaster lm ON imm.homeBase = lm.id"
+            ." WHERE status = 1 AND isApproved = 0";
+
+        $result = $this->db->query($query)->result_array();
+        $data['instaRecords'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
     public function getAllFeedbacks($locations)
     {
         $query = "SELECT DISTINCT (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
@@ -451,6 +472,15 @@ class Dashboard_Model extends CI_Model
         $this->db->update('eventmaster', $details);
         return true;
     }
+    public function cancelEventOffers($eventId)
+    {
+        $details = array(
+            'ifActive' => '0'
+        );
+        $this->db->where('offerEvent',$eventId);
+        $this->db->update('offersmaster', $details);
+        return true;
+    }
     public function saveEventAttachment($details)
     {
         $details['insertedDateTime'] = date('Y-m-d H:i:s');
@@ -467,7 +497,7 @@ class Dashboard_Model extends CI_Model
     public function getAllEvents()
     {
         $query = "SELECT *
-                  FROM eventmaster ORDER BY eventId DESC";
+                  FROM eventmaster ORDER BY eventDate ASC";
 
         $result = $this->db->query($query)->result_array();
 
@@ -673,12 +703,19 @@ class Dashboard_Model extends CI_Model
     }
     public function eventRegisDelete($eventId)
     {
+        $data['eventDone'] = '1';
         $this->db->where('eventId', $eventId);
-        $this->db->delete('eventregistermaster');
+        $this->db->update('eventregistermaster',$data);
         return true;
     }
     public function eventCompDelete($eventId)
     {
+        $query = "INSERT INTO eventdeletedmaster "
+            ."SELECT * FROM eventcompletedmaster "
+            ."where eventId = ".$eventId;
+
+        $this->db->query($query);
+
         $this->db->where('eventId', $eventId);
         $this->db->delete('eventcompletedmaster');
         return true;
@@ -693,6 +730,18 @@ class Dashboard_Model extends CI_Model
     {
         $this->db->where('id', $attId);
         $this->db->delete('eventattachment');
+        return true;
+    }
+    public function transferDeleteEvent($eventId)
+    {
+        $query = "INSERT INTO eventdeletedmaster "
+            ."SELECT * FROM eventmaster "
+            ."where eventId = ".$eventId;
+
+        $this->db->query($query);
+
+        $this->db->where('eventId', $eventId);
+        $this->db->delete('eventmaster');
         return true;
     }
     public function fnbAttDelete($attId)

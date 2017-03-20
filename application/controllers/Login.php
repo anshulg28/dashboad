@@ -458,6 +458,6 @@ class Login extends MY_Controller {
         $mainBody .= $body .'</body></html>';
         $newname= $post['attachment'];
 
-        $this->sendemail_library->sendEmail($post['toEmail'],'',$post['fromEmail'],$post['fromName'],$post['subEmail'],$mainBody,$newname);
+        $this->sendemail_library->sendEmail($post['toEmail'],'',DEFAULT_SENDER_EMAIL,DEFAULT_SENDER_PASS,$post['fromName'],$post['subEmail'],$mainBody,$newname);
     }
 }

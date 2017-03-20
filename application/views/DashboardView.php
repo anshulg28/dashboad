@@ -328,9 +328,42 @@
                                 <?php
                             }
                         }
+
+                    if(isset($instamojoMugs))
+                    {
+                        if($instamojoMugs['status'] === true)
+                        {
+                            foreach($instamojoMugs['instaRecords'] as $key => $row)
+                            {
+                                ?>
+                                <div class="mdl-cell mdl-cell--4-col my-instaMugCard" data-id="<?php echo $row['id'];?>">
+                                    <div class="demo-card-square mdl-card mdl-shadow--2dp">
+                                        <div class="mdl-card__title mdl-card--expand" style="background-color:#A2C760;">
+                                            <h2 class="mdl-card__title-text">
+                                                <i class="fa fa-beer fa-2x"></i>
+                                                <span class="mugTitle">New Mug #<?php echo $row['mugId'];?></span>
+                                            </h2>
+                                        </div>
+                                        <div class="mdl-card__supporting-text">
+                                            <h4 class="my-NoMargin"><?php echo $row['firstName'].' '.$row['lastName'];?></h4>
+                                            <?php echo $row['emailId'];?><br>
+                                            HomeBase: <?php echo $row['locName'];?>
+                                        </div>
+                                        <div class="mdl-card__actions mdl-card--border">
+                                            <a class="mug_confirm-btn mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect my-noUnderline"
+                                               onclick="changeMugCurrent(this)" data-id="<?php echo $row['id'];?>">
+                                                Confirm
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                        }
+                    }
                     ?>
                 </div>
-                <dialog class="mdl-dialog">
+                <dialog class="mdl-dialog renew-mug">
                     <input type="hidden" id="selectedMug"/>
                     <input type="hidden" id="mugPaymentId"/>
                     <input type="hidden" id="mugNum"/>
@@ -343,6 +376,23 @@
                     </div>
                     <div class="mdl-dialog__actions">
                         <button type="button" class="mdl-button agree_btn">Agree</button>
+                        <button type="button" class="mdl-button close">Cancel</button>
+                    </div>
+                </dialog>
+                <dialog class="mdl-dialog newMug-dialog">
+                    <input type="hidden" id="selectedId"/>
+                    <h4 class="mdl-dialog__title">Confirm Membership?</h4>
+                    <div class="mdl-dialog__content">
+                        <p>
+                            Register New Mug Membership
+                        </p>
+                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="confirmMail">
+                            <input type="checkbox" id="confirmMail" name="ifMail" value="1" class="mdl-checkbox__input">
+                            <span class="mdl-checkbox__label">Send Confirmation Mail?</span>
+                        </label>
+                    </div>
+                    <div class="mdl-dialog__actions">
+                        <button type="button" class="mdl-button mug_agree_btn">Agree</button>
                         <button type="button" class="mdl-button close">Cancel</button>
                     </div>
                 </dialog>
@@ -462,22 +512,23 @@
             </section>
             <section class="tab-pane fade" id="fnbpanel">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" href="#fnbView">Fnb Records</a></li>
+                    <li class="active"><a data-toggle="tab" href="#beverageView">Beverages</a></li>
+                    <li><a data-toggle="tab" href="#foodView">Food</a></li>
                     <li><a data-toggle="tab" href="#fnbAdd">Add Fnb</a></li>
                 </ul>
 
                 <div class="tab-content">
-                    <div id="fnbView" class="tab-pane fade in active">
+                    <div id="beverageView" class="tab-pane fade in active">
                         <?php
                         if(isset($fnbData) && myIsMultiArray($fnbData))
                         {
                             ?>
                             <div class="mdl-grid table-responsive">
-                                <table id="main-fnb-table" class="table table-hover table-bordered table-striped">
+                                <table id="main-beverage-table" class="table table-hover table-bordered table-striped">
                                     <thead>
                                     <tr>
-                                        <th>Fnb Id</th>
-                                        <th>Item Type</th>
+                                        <th>Beverage Id</th>
+                                        <!--<th>Item Type</th>-->
                                         <th>Name</th>
                                         <th>Headline</th>
                                         <th>Description</th>
@@ -490,86 +541,169 @@
                                     <?php
                                     foreach($fnbData as $key => $row)
                                     {
-                                        ?>
-                                        <tr>
-                                            <th scope="row"><?php echo $row['fnb']['fnbId'];?></th>
-                                            <td>
-                                                <?php
-                                                switch($row['fnb']['itemType'])
-                                                {
-                                                    case "1":
-                                                        echo 'Food';
-                                                        break;
-                                                    case "2":
-                                                        echo 'Beverage';
-                                                        break;
-                                                }
-                                                ?>
-                                            </td>
-                                            <td><?php echo $row['fnb']['itemName'];?></td>
-                                            <td><?php echo $row['fnb']['itemHeadline'];?></td>
-                                            <td><?php echo strip_tags($row['fnb']['itemDescription']);?></td>
-                                            <td><?php echo $row['fnb']['priceFull'];?></td>
-                                            <td><?php echo $row['fnb']['priceHalf'];?></td>
-                                            <td>
-                                                <?php
-                                                if($row['fnb']['itemType'] == "2")
-                                                {
-                                                    ?>
+                                        if($row['fnb']['itemType'] == "2")
+                                        {
+                                            ?>
+                                            <tr>
+                                                <th scope="row"><?php echo $row['fnb']['fnbId'];?></th>
+                                                <!--<td><?php /*echo 'Beverage';*/?></td>-->
+                                                <td><?php echo $row['fnb']['itemName'];?></td>
+                                                <td><?php echo $row['fnb']['itemHeadline'];?></td>
+                                                <td><?php echo strip_tags($row['fnb']['itemDescription']);?></td>
+                                                <td><?php echo $row['fnb']['priceFull'];?></td>
+                                                <td><?php echo $row['fnb']['priceHalf'];?></td>
+                                                <td>
                                                     <a data-toggle="tooltip" class="beer-tags fnb-tracker" title="Tag Location" href="#" data-fnbId="<?php echo $row['fnb']['fnbId'];?>">
                                                         <i class="fa fa-15x fa-tags my-success-text"></i></a>
                                                     <?php
-                                                }
-                                                ?>
-                                                <?php
-                                                if($row['fnb']['ifActive'] == ACTIVE)
-                                                {
-                                                    ?>
-                                                    <a data-toggle="tooltip" class="fnb-tracker" title="Active" href="<?php echo base_url().'dashboard/setFnbDeActive/'.$row['fnb']['fnbId'];?>">
-                                                        <i class="fa fa-15x fa-lightbulb-o my-success-text"></i></a>
-                                                    <?php
-                                                }
-                                                else
-                                                {
-                                                    ?>
-                                                    <a data-toggle="tooltip" class="fnb-tracker" title="Not Active" href="<?php echo base_url().'dashboard/setFnbActive/'.$row['fnb']['fnbId'];?>">
-                                                        <i class="fa fa-15x fa-lightbulb-o my-error-text"></i></a>
-                                                    <?php
-                                                }
-
-                                                if(isset($row['fnbAtt']) && myIsMultiArray($row['fnbAtt']))
-                                                {
-                                                    $imgs = array();
-                                                    foreach($row['fnbAtt'] as $attkey => $attrow)
+                                                    if($row['fnb']['ifActive'] == ACTIVE)
                                                     {
-                                                        switch($attrow['attachmentType'])
-                                                        {
-                                                            case "1":
-                                                                $imgs[] = MOBILE_URL.FOOD_PATH_THUMB.$attrow['filename'];
-                                                                break;
-                                                            case "2":
-                                                                $imgs[] = MOBILE_URL.BEVERAGE_PATH_NORMAL.$attrow['filename'];
-                                                                break;
-                                                            default:
-                                                                $imgs[] = MOBILE_URL.BEVERAGE_PATH_NORMAL.$attrow['filename'];
-                                                                break;
+                                                        ?>
+                                                        <a data-toggle="tooltip" class="fnb-tracker" title="Active" href="<?php echo base_url().'dashboard/setFnbDeActive/'.$row['fnb']['fnbId'];?>">
+                                                            <i class="fa fa-15x fa-lightbulb-o my-success-text"></i></a>
+                                                        <?php
+                                                    }
+                                                    else
+                                                    {
+                                                        ?>
+                                                        <a data-toggle="tooltip" class="fnb-tracker" title="Not Active" href="<?php echo base_url().'dashboard/setFnbActive/'.$row['fnb']['fnbId'];?>">
+                                                            <i class="fa fa-15x fa-lightbulb-o my-error-text"></i></a>
+                                                        <?php
+                                                    }
 
+                                                    if(isset($row['fnbAtt']) && myIsMultiArray($row['fnbAtt']))
+                                                    {
+                                                        $imgs = array();
+                                                        foreach($row['fnbAtt'] as $attkey => $attrow)
+                                                        {
+                                                            switch($attrow['attachmentType'])
+                                                            {
+                                                                case "1":
+                                                                    $imgs[] = MOBILE_URL.FOOD_PATH_THUMB.$attrow['filename'];
+                                                                    break;
+                                                                case "2":
+                                                                    $imgs[] = MOBILE_URL.BEVERAGE_PATH_NORMAL.$attrow['filename'];
+                                                                    break;
+                                                                default:
+                                                                    $imgs[] = MOBILE_URL.BEVERAGE_PATH_NORMAL.$attrow['filename'];
+                                                                    break;
+
+                                                            }
                                                         }
+                                                        ?>
+                                                        <a class="view-photos" data-toggle="tooltip" title="View Photos" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
+                                                            <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
+                                                        <?php
                                                     }
                                                     ?>
-                                                    <a class="view-photos" data-toggle="tooltip" title="View Photos" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
-                                                        <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
+                                                    <a data-toggle="tooltip" title="Edit"
+                                                       href="<?php echo base_url().'dashboard/editFnb/'.$row['fnb']['fnbId']?>">
+                                                        <i class="fa fa-15x fa-pencil-square-o my-black-text"></i></a>
+                                                    <a data-toggle="tooltip" class="fnbDelete-icon" data-fnbId="<?php echo $row['fnb']['fnbId'];?>" title="Delete" href="#">
+                                                        <i class="fa fa-trash-o fa-15x"></i></a>&nbsp;
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
+                                    }
+                                    ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <?php
+
+                        }
+                        else
+                        {
+                            echo 'No Records Found!';
+                        }
+                        ?>
+                    </div>
+                    <div id="foodView" class="tab-pane fade">
+                        <?php
+                        if(isset($fnbData) && myIsMultiArray($fnbData))
+                        {
+                            ?>
+                            <div class="mdl-grid table-responsive">
+                                <table id="main-food-table" class="table table-hover table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Food Id</th>
+                                        <!--<th>Item Type</th>-->
+                                        <th>Name</th>
+                                        <th>Headline</th>
+                                        <th>Description</th>
+                                        <th>Price Full</th>
+                                        <th>Price Half</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php
+                                    foreach($fnbData as $key => $row)
+                                    {
+                                        if($row['fnb']['itemType'] == "1")
+                                        {
+                                            ?>
+                                            <tr>
+                                                <th scope="row"><?php echo $row['fnb']['fnbId'];?></th>
+                                                <!--<td><?php /*echo 'Beverage';*/?></td>-->
+                                                <td><?php echo $row['fnb']['itemName'];?></td>
+                                                <td><?php echo $row['fnb']['itemHeadline'];?></td>
+                                                <td><?php echo strip_tags($row['fnb']['itemDescription']);?></td>
+                                                <td><?php echo $row['fnb']['priceFull'];?></td>
+                                                <td><?php echo $row['fnb']['priceHalf'];?></td>
+                                                <td>
                                                     <?php
-                                                }
-                                                ?>
-                                                <a data-toggle="tooltip" title="Edit"
-                                                   href="<?php echo base_url().'dashboard/editFnb/'.$row['fnb']['fnbId']?>">
-                                                    <i class="fa fa-15x fa-pencil-square-o my-black-text"></i></a>
-                                                <a data-toggle="tooltip" class="fnbDelete-icon" data-fnbId="<?php echo $row['fnb']['fnbId'];?>" title="Delete" href="#">
-                                                    <i class="fa fa-trash-o fa-15x"></i></a>&nbsp;
-                                            </td>
-                                        </tr>
-                                        <?php
+                                                    if($row['fnb']['ifActive'] == ACTIVE)
+                                                    {
+                                                        ?>
+                                                        <a data-toggle="tooltip" class="fnb-tracker" title="Active" href="<?php echo base_url().'dashboard/setFnbDeActive/'.$row['fnb']['fnbId'];?>">
+                                                            <i class="fa fa-15x fa-lightbulb-o my-success-text"></i></a>
+                                                        <?php
+                                                    }
+                                                    else
+                                                    {
+                                                        ?>
+                                                        <a data-toggle="tooltip" class="fnb-tracker" title="Not Active" href="<?php echo base_url().'dashboard/setFnbActive/'.$row['fnb']['fnbId'];?>">
+                                                            <i class="fa fa-15x fa-lightbulb-o my-error-text"></i></a>
+                                                        <?php
+                                                    }
+
+                                                    if(isset($row['fnbAtt']) && myIsMultiArray($row['fnbAtt']))
+                                                    {
+                                                        $imgs = array();
+                                                        foreach($row['fnbAtt'] as $attkey => $attrow)
+                                                        {
+                                                            switch($attrow['attachmentType'])
+                                                            {
+                                                                case "1":
+                                                                    $imgs[] = MOBILE_URL.FOOD_PATH_THUMB.$attrow['filename'];
+                                                                    break;
+                                                                case "2":
+                                                                    $imgs[] = MOBILE_URL.BEVERAGE_PATH_NORMAL.$attrow['filename'];
+                                                                    break;
+                                                                default:
+                                                                    $imgs[] = MOBILE_URL.BEVERAGE_PATH_NORMAL.$attrow['filename'];
+                                                                    break;
+
+                                                            }
+                                                        }
+                                                        ?>
+                                                        <a class="view-photos" data-toggle="tooltip" title="View Photos" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
+                                                            <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                    <a data-toggle="tooltip" title="Edit"
+                                                       href="<?php echo base_url().'dashboard/editFnb/'.$row['fnb']['fnbId']?>">
+                                                        <i class="fa fa-15x fa-pencil-square-o my-black-text"></i></a>
+                                                    <a data-toggle="tooltip" class="fnbDelete-icon" data-fnbId="<?php echo $row['fnb']['fnbId'];?>" title="Delete" href="#">
+                                                        <i class="fa fa-trash-o fa-15x"></i></a>&nbsp;
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
                                     }
                                     ?>
                                     </tbody>
@@ -671,6 +805,7 @@
                     <li class="active"><a data-toggle="tab" href="#eventView">Event Records</a></li>
                     <li><a data-toggle="tab" href="#eventAdd">Add Event</a></li>
                     <li><a data-toggle="tab" href="#compEvents">Completed</a></li>
+                    <li><a data-toggle="tab" href="#canEvents">Cancelled</a></li>
                     <?php
                         if($this->userType != SERVER_USER)
                         {
@@ -708,34 +843,38 @@
 
                                         foreach($eventDetails as $key => $row)
                                         {
-
-                                            $eveLoc = $row['eventData']['eventPlace'];
-                                            ?>
-                                            <tr>
-                                                <th scope="row"><?php echo $row['eventData']['eventId'];?></th>
-                                                <td><?php echo $row['eventData']['eventName'];?></td>
-                                                <td><?php echo strip_tags($row['eventData']['eventDescription']);?></td>
-                                                <!--<td><?php /*echo $row['eventData']['eventType'];*/?></td>-->
-                                                <td><?php $d = date_create($row['eventData']['eventDate']); echo date_format($d,DATE_FORMAT_UI);?></td>
-                                                <td><?php echo $row['eventData']['startTime'] .' - '.$row['eventData']['endTime'];?></td>
-                                                <td>
-                                                    <?php
-                                                    switch($row['eventData']['costType'])
-                                                    {
-                                                        case 1:
-                                                            echo 'Free';
-                                                            break;
-                                                        case 2:
-                                                            echo 'Paid (with pint) : Rs '.$row['eventData']['eventPrice'];
-                                                            break;
-                                                        case 3:
-                                                            echo 'Paid: Rs '.$row['eventData']['eventPrice'];
-                                                            break;
-                                                    }
-                                                    ?>
-                                                </td>
-                                                <td>
-                                                    <?php
+                                            if($row['eventData']['isEventCancel'] == '0')
+                                            {
+                                                $eveLoc = $row['eventData']['eventPlace'];
+                                                ?>
+                                                <tr>
+                                                    <th scope="row"><?php echo $row['eventData']['eventId'];?></th>
+                                                    <td><?php echo $row['eventData']['eventName'];?></td>
+                                                    <td><?php echo strip_tags($row['eventData']['eventDescription']);?></td>
+                                                    <!--<td><?php /*echo $row['eventData']['eventType'];*/?></td>-->
+                                                    <td><?php $d = date_create($row['eventData']['eventDate']); echo date_format($d,DATE_FORMAT_UI);?></td>
+                                                    <td><?php echo $row['eventData']['startTime'] .' - '.$row['eventData']['endTime'];?></td>
+                                                    <td>
+                                                        <?php
+                                                        switch($row['eventData']['costType'])
+                                                        {
+                                                            case 1:
+                                                                echo 'Free';
+                                                                break;
+                                                            case 2:
+                                                                echo 'Event Fee + Doolally Fee: Rs '.$row['eventData']['eventPrice'];
+                                                                break;
+                                                            case 3:
+                                                                echo 'Event Fee: Rs '.$row['eventData']['eventPrice'];
+                                                                break;
+                                                            case 4:
+                                                                echo 'Doolally Fee: Rs '.$row['eventData']['eventPrice'];
+                                                                break;
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php
                                                         if($row['eventData']['isEventEverywhere'] == '1')
                                                         {
                                                             echo 'All Taprooms';
@@ -744,75 +883,75 @@
                                                         {
                                                             echo $row['eventData']['locData'][0]['locName'];
                                                         }
-                                                    ?>
-                                                </td>
-                                                <td><?php echo $row['eventData']['creatorName'];?></td>
-                                                <td class="my-keepRelative"><!--<a data-toggle="tooltip" title="Edit" href="<?php /*echo base_url().'mugclub/edit/'.$row['mugId'];*/?>">
+                                                        ?>
+                                                    </td>
+                                                    <td><?php echo $row['eventData']['creatorName'];?></td>
+                                                    <td class="my-keepRelative"><!--<a data-toggle="tooltip" title="Edit" href="<?php /*echo base_url().'mugclub/edit/'.$row['mugId'];*/?>">
                                                         <i class="glyphicon glyphicon-edit"></i></a>&nbsp;-->
-                                                    <?php
+                                                        <?php
                                                         if(isset($commLocs) && !in_array($eveLoc,$commLocs))
                                                         {
                                                             ?>
                                                             <div class="my-td-overlay"></div>
                                                             <?php
                                                         }
-                                                    ?>
-                                                <?php
-                                                    if($row['eventData']['ifApproved'] == EVENT_WAITING)
-                                                    {
                                                         ?>
-                                                        <a data-toggle="tooltip" title="Approve" data-costType="<?php echo $row['eventData']['costType'];?>"
-                                                           data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
-                                                           class="even-tracker approveThis-event" href="#" data-url="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
-                                                            <i class="fa fa-15x fa-check my-success-text"></i></a>
-                                                        <a data-toggle="tooltip" title="Decline" href="<?php echo base_url().'dashboard/decline/'.$row['eventData']['eventId'];?>">
-                                                            <i class="fa fa-15x fa-times my-error-text"></i></a>
                                                         <?php
-                                                    }
-                                                    elseif($row['eventData']['ifApproved'] == EVENT_APPROVED && $row['eventData']['ifActive'] == ACTIVE)
-                                                    {
+                                                        if($row['eventData']['ifApproved'] == EVENT_WAITING)
+                                                        {
+                                                            ?>
+                                                            <a data-toggle="tooltip" title="Approve" data-costType="<?php echo $row['eventData']['costType'];?>"
+                                                               data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
+                                                               class="even-tracker approveThis-event" href="#" data-url="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
+                                                                <i class="fa fa-15x fa-check my-success-text"></i></a>
+                                                            <a data-toggle="tooltip" title="Decline" href="<?php echo base_url().'dashboard/decline/'.$row['eventData']['eventId'];?>">
+                                                                <i class="fa fa-15x fa-times my-error-text"></i></a>
+                                                            <?php
+                                                        }
+                                                        elseif($row['eventData']['ifApproved'] == EVENT_APPROVED && $row['eventData']['ifActive'] == ACTIVE)
+                                                        {
+                                                            ?>
+                                                            <a data-toggle="tooltip" title="Active" class="even-tracker" href="<?php echo base_url().'dashboard/setEventDeActive/'.$row['eventData']['eventId'];?>">
+                                                                <i class="fa fa-15x fa-lightbulb-o my-success-text"></i></a>
+                                                            <a class="even-tracker cancel-this-event" data-toggle="tooltip" title="Cancel Event" href="#" data-eventId="<?php echo $row['eventData']['eventId'];?>" >
+                                                                <i class="fa fa-15x fa-times"></i></a>
+                                                            <?php
+                                                        }
+                                                        elseif($row['eventData']['ifApproved'] == EVENT_APPROVED && $row['eventData']['ifActive'] == NOT_ACTIVE)
+                                                        {
+                                                            ?>
+                                                            <a data-toggle="tooltip" title="Not Active" class="even-tracker" href="<?php echo base_url().'dashboard/setEventActive/'.$row['eventData']['eventId'];?>">
+                                                                <i class="fa fa-15x fa-lightbulb-o my-error-text"></i></a>
+                                                            <?php
+                                                        }
+                                                        elseif($row['eventData']['ifApproved'] == EVENT_DECLINED)
+                                                        {
+                                                            ?>
+                                                            <a data-toggle="tooltip" title="Declined" data-costType="<?php echo $row['eventData']['costType'];?>"
+                                                               data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
+                                                               class="even-tracker approveThis-event" href="#" data-url="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
+                                                                <i class="fa fa-15x fa-ban my-error-text"></i></a>
+                                                            <?php
+                                                        }
+                                                        if(isset($row['eventAtt']) && myIsMultiArray($row['eventAtt']))
+                                                        {
+                                                            $imgs = array();
+                                                            foreach($row['eventAtt'] as $attkey => $attrow)
+                                                            {
+                                                                $imgs[] = MOBILE_URL.EVENT_PATH_THUMB.$attrow['filename'];
+                                                            }
+                                                            ?>
+                                                            <a class="view-photos" data-toggle="tooltip" title="View Photos" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
+                                                                <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
+                                                            <?php
+                                                        }
                                                         ?>
-                                                        <a data-toggle="tooltip" title="Active" class="even-tracker" href="<?php echo base_url().'dashboard/setEventDeActive/'.$row['eventData']['eventId'];?>">
-                                                            <i class="fa fa-15x fa-lightbulb-o my-success-text"></i></a>
-                                                        <a class="even-tracker cancel-this-event" data-toggle="tooltip" title="Cancel Event" href="#" data-eventId="<?php echo $row['eventData']['eventId'];?>" >
-                                                            <i class="fa fa-15x fa-times"></i></a>
+                                                        <a data-toggle="tooltip" title="Edit" class="even-tracker"
+                                                           href="<?php echo base_url().'dashboard/editEvent/'.$row['eventData']['eventId']?>">
+                                                            <i class="fa fa-15x fa-pencil-square-o my-black-text"></i></a>
+                                                        <!--<a data-toggle="tooltip" class="eventDelete-icon even-tracker" data-eventId="<?php /*echo $row['eventData']['eventId'];*/?>" title="Delete" href="#">
+                                                            <i class="fa fa-trash-o fa-15x"></i></a>&nbsp;-->
                                                         <?php
-                                                    }
-                                                    elseif($row['eventData']['ifApproved'] == EVENT_APPROVED && $row['eventData']['ifActive'] == NOT_ACTIVE)
-                                                    {
-                                                        ?>
-                                                        <a data-toggle="tooltip" title="Not Active" class="even-tracker" href="<?php echo base_url().'dashboard/setEventActive/'.$row['eventData']['eventId'];?>">
-                                                            <i class="fa fa-15x fa-lightbulb-o my-error-text"></i></a>
-                                                        <?php
-                                                    }
-                                                    elseif($row['eventData']['ifApproved'] == EVENT_DECLINED)
-                                                    {
-                                                        ?>
-                                                        <a data-toggle="tooltip" title="Declined" data-costType="<?php echo $row['eventData']['costType'];?>"
-                                                           data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
-                                                           class="even-tracker approveThis-event" href="#" data-url="<?php echo base_url().'dashboard/approve/'.$row['eventData']['eventId'];?>">
-                                                            <i class="fa fa-15x fa-ban my-error-text"></i></a>
-                                                        <?php
-                                                    }
-                                                if(isset($row['eventAtt']) && myIsMultiArray($row['eventAtt']))
-                                                {
-                                                    $imgs = array();
-                                                    foreach($row['eventAtt'] as $attkey => $attrow)
-                                                    {
-                                                        $imgs[] = MOBILE_URL.EVENT_PATH_THUMB.$attrow['filename'];
-                                                    }
-                                                    ?>
-                                                    <a class="view-photos" data-toggle="tooltip" title="View Photos" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
-                                                        <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
-                                                    <?php
-                                                }
-                                                ?>
-                                                    <a data-toggle="tooltip" title="Edit" class="even-tracker"
-                                                       href="<?php echo base_url().'dashboard/editEvent/'.$row['eventData']['eventId']?>">
-                                                        <i class="fa fa-15x fa-pencil-square-o my-black-text"></i></a>
-                                                    <a data-toggle="tooltip" class="eventDelete-icon even-tracker" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Delete" href="#">
-                                                        <i class="fa fa-trash-o fa-15x"></i></a>&nbsp;
-                                                    <?php
                                                         if($row['eventData']['isRegFull'] == '1')
                                                         {
                                                             ?>
@@ -829,20 +968,22 @@
                                                                 <i class="fa fa-15x fa-times-circle-o"></i></a>&nbsp;
                                                             <?php
                                                         }
-                                                    ?>
+                                                        ?>
 
-                                                    <a data-toggle="tooltip" class="eventCostChange-icon even-tracker"
-                                                       data-costType="<?php echo $row['eventData']['costType'];?>"
-                                                       data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
-                                                       data-url="<?php echo base_url().'dashboard/changeCostType/'.$row['eventData']['eventId'];?>"
-                                                       title="Change Cost Option" href="#">
-                                                        <i class="fa fa-inr fa-15x"></i></a>&nbsp;
+                                                        <a data-toggle="tooltip" class="eventCostChange-icon even-tracker"
+                                                           data-costType="<?php echo $row['eventData']['costType'];?>"
+                                                           data-costPrice="<?php echo $row['eventData']['eventPrice'];?>"
+                                                           data-url="<?php echo base_url().'dashboard/changeCostType/'.$row['eventData']['eventId'];?>"
+                                                           data-doolallyFee="<?php echo $row['eventData']['doolallyFee'];?>"
+                                                           title="Change Cost Option" href="#">
+                                                            <i class="fa fa-inr fa-15x"></i></a>&nbsp;
 
-                                                    <a data-toggle="tooltip" class="eventSignups-icon even-tracker" data-eventName="<?php echo $row['eventData']['eventName'];?>" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Signup List" href="#">
-                                                        <i class="fa fa-users fa-15x"></i></a>&nbsp;
-                                                </td>
-                                            </tr>
-                                            <?php
+                                                        <a data-toggle="tooltip" class="eventSignups-icon even-tracker" data-eventName="<?php echo $row['eventData']['eventName'];?>" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Signup List" href="#">
+                                                            <i class="fa fa-users fa-15x"></i></a>&nbsp;
+                                                    </td>
+                                                </tr>
+                                                <?php
+                                            }
                                         }
                                         ?>
                                         </tbody>
@@ -929,25 +1070,35 @@
                                     </ul>
                                     <br>
                                     <div class="text-left">
-                                        <label>Event Cost :</label>
+                                        <label>Event Cost (<a href="#" data-toggle="modal" data-target="#costModal">?</a>):</label><br>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="freeType">
                                             <input type="radio" id="freeType" class="mdl-radio__button" name="costType" value="1" checked>
                                             <span class="mdl-radio__label">Free</span>
-                                        </label>
+                                        </label><br>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paidType">
                                             <input type="radio" id="paidType" class="mdl-radio__button" name="costType" value="2">
-                                            <span class="mdl-radio__label">Paid (with pint)</span>
+                                            <span class="mdl-radio__label">Event Fee + Doolally Fee</span>
                                         </label>
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label custom-price">
+                                            <input class="mdl-textfield__input" type="text" name="doolallyFee" value="250" pattern="-?[0-9]*(\.[0-9]+)?" id="customPrice">
+                                            <label class="mdl-textfield__label" for="customPrice">Custom Price</label>
+                                            <span class="mdl-textfield__error">Input is not a number!</span>
+                                        </div><br>
                                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid2Type">
                                             <input type="radio" id="paid2Type" class="mdl-radio__button" name="costType" value="3">
-                                            <span class="mdl-radio__label">Paid</span>
-                                        </label>
+                                            <span class="mdl-radio__label">Event Fee</span>
+                                        </label><br>
+                                        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="paid3Type">
+                                            <input type="radio" id="paid3Type" class="mdl-radio__button" name="costType" value="4">
+                                            <span class="mdl-radio__label">Doolally Fee</span>
+                                        </label><br>
 
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label event-price hide">
                                             <input class="mdl-textfield__input" type="text" name="eventPrice" pattern="-?[0-9]*(\.[0-9]+)?" id="eventPrice">
                                             <label class="mdl-textfield__label" for="eventPrice">Price</label>
                                             <span class="mdl-textfield__error">Input is not a number!</span>
                                         </div>
+
                                         <input type="hidden" name="priceFreeStuff" value=""/>
                                         <!--<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label special-offer hide">
                                             <input class="mdl-textfield__input" type="text" name="priceFreeStuff" id="priceFreeStuff" placeholder="">
@@ -1078,10 +1229,13 @@
                                                         echo 'Free';
                                                         break;
                                                     case 2:
-                                                        echo 'Paid (with pint): Rs '.$row['eventPrice'];
+                                                        echo 'Event Fee + Doolally Fee: Rs '.$row['eventPrice'];
                                                         break;
                                                     case 3:
-                                                        echo 'Paid: Rs '.$row['eventPrice'];
+                                                        echo 'Event Fee: Rs '.$row['eventPrice'];
+                                                        break;
+                                                    case 4:
+                                                        echo 'Doolally Fee: Rs '.$row['eventPrice'];
                                                         break;
                                                 }
                                                 ?>
@@ -1103,11 +1257,116 @@
                                                 <!--<a data-toggle="tooltip" title="Edit"
                                                    href="<?php /*echo base_url().'dashboard/editEvent/'.$row['eventId']*/?>">
                                                     <i class="fa fa-15x fa-pencil-square-o my-black-text"></i></a>-->
-                                                <a data-toggle="tooltip" class="eventCompletedDelete-icon" data-eventId="<?php echo $row['eventId'];?>" title="Delete" href="#">
-                                                    <i class="fa fa-trash-o fa-15x"></i></a>&nbsp;
+                                                <!--<a data-toggle="tooltip" class="eventCompletedDelete-icon" data-eventId="<?php /*echo $row['eventId'];*/?>" title="Delete" href="#">
+                                                    <i class="fa fa-trash-o fa-15x"></i></a>&nbsp;-->
+                                                <a data-toggle="tooltip" class="eventSignups-icon even-tracker" data-eventName="<?php echo $row['eventName'];?>" data-eventId="<?php echo $row['eventId'];?>" title="Signup List" href="#">
+                                                    <i class="fa fa-users fa-15x"></i></a>&nbsp;
                                             </td>
                                         </tr>
                                         <?php
+                                    }
+                                    ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <?php
+
+                        }
+                        else
+                        {
+                            echo 'No Records Found!';
+                        }
+                        ?>
+                    </div>
+                    <div id="canEvents" class="tab-pane fade">
+                        <?php
+                        if(isset($eventDetails) && myIsMultiArray($eventDetails))
+                        {
+                            ?>
+                            <div class="mdl-grid table-responsive">
+                                <table id="main-comp-event-table" class="table table-hover table-bordered table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Event Id</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <!--<th>Type</th>-->
+                                        <th>Date</th>
+                                        <th>Timing</th>
+                                        <th>Cost</th>
+                                        <th>Place</th>
+                                        <th>Organizer Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php
+                                    foreach($eventDetails as $key => $row)
+                                    {
+                                        if($row['eventData']['isEventCancel'] == '1')
+                                        {
+                                            ?>
+                                            <tr>
+                                                <th scope="row"><?php echo $row['eventData']['eventId'];?></th>
+                                                <td><?php echo $row['eventData']['eventName'];?></td>
+                                                <td><?php echo strip_tags($row['eventData']['eventDescription']);?></td>
+                                                <!--<td><?php /*echo $row['eventType'];*/?></td>-->
+                                                <td><?php $d = date_create($row['eventData']['eventDate']); echo date_format($d,DATE_FORMAT_UI);?></td>
+                                                <td><?php echo $row['eventData']['startTime'] .' - '.$row['eventData']['endTime'];?></td>
+                                                <td>
+                                                    <?php
+                                                    switch($row['eventData']['costType'])
+                                                    {
+                                                        case 1:
+                                                            echo 'Free';
+                                                            break;
+                                                        case 2:
+                                                            echo 'Event Fee + Doolally Fee: Rs '.$row['eventData']['eventPrice'];
+                                                            break;
+                                                        case 3:
+                                                            echo 'Event Fee: Rs '.$row['eventData']['eventPrice'];
+                                                            break;
+                                                        case 4:
+                                                            echo 'Doolally Fee: Rs '.$row['eventData']['eventPrice'];
+                                                            break;
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php
+                                                    if($row['eventData']['isEventEverywhere'] == '1')
+                                                    {
+                                                        echo 'All Taprooms';
+                                                    }
+                                                    else
+                                                    {
+                                                        echo $row['eventData']['locData'][0]['locName'];
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td><?php echo $row['eventData']['creatorName'];?></td>
+                                                <td><!--<a data-toggle="tooltip" title="Edit" href="<?php /*echo base_url().'mugclub/edit/'.$row['mugId'];*/?>">
+                                                        <i class="glyphicon glyphicon-edit"></i></a>&nbsp;-->
+                                                    <?php
+                                                    if(isset($row['eventAtt']) && myIsMultiArray($row['eventAtt']))
+                                                    {
+                                                        $imgs = array();
+                                                        foreach($row['eventAtt'] as $attkey => $attrow)
+                                                        {
+                                                            $imgs[] = MOBILE_URL.EVENT_PATH_THUMB.$attrow['filename'];
+                                                        }
+                                                        ?>
+                                                        <a class="view-photos" data-toggle="tooltip" title="View Photos" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
+                                                            <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                    <a data-toggle="tooltip" class="eventSignups-icon even-tracker" data-eventName="<?php echo $row['eventData']['eventName'];?>" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Signup List" href="#">
+                                                        <i class="fa fa-users fa-15x"></i></a>&nbsp;
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
                                     }
                                     ?>
                                     </tbody>
@@ -1355,7 +1614,7 @@
                     <h4 class="modal-title">Event Cost Type</h4>
                 </div>
                 <div class="modal-body text-center">
-                    <label>Select Event Cost Type: </label>
+                    <label>Select Event Cost Type (<a href="#" data-toggle="modal" data-target="#costModal">?</a>): </label>
                     <div class="cost-type">
                         <div class="row">
                             <div class="col-sm-12">
@@ -1367,12 +1626,18 @@
                                     </li>
                                     <li>
                                         <div class="radio">
-                                            <label><input type="radio" name="costType" value="2">Paid</label>
+                                            <label><input type="radio" name="costType" value="2">Event Fee + Doolally Fee</label>
+                                        </div>
+                                        <input class="form-control" type="number" name="doolallyFee" id="customPrice" placeholder="Custom Price"/>
+                                    </li>
+                                    <li>
+                                        <div class="radio">
+                                            <label><input type="radio" name="costType" value="3">Event Fee</label>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="radio">
-                                            <label><input type="radio" name="costType" value="3">Paid (Without Pint)</label>
+                                            <label><input type="radio" name="costType" value="4">Doolally Fee</label>
                                         </div>
                                     </li>
                                 </ul>
@@ -1389,6 +1654,28 @@
                         </div>
                     </div><br>
                     <button type="button" class="btn btn-primary save-event-price">Save</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="costModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Cost Information</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Free (NO organiser fee, NO doolally fee, NO coupon code)<br>
+                        Event Fee (organiser fee, NO doolally fee, NO coupon code)<br>
+                        Event Fee + Doolally Fee (organiser fee, doolally fee, coupon code)<br>
+                        Doolally Fee (NO organiser fee, doolally fee, coupon code)</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
 
@@ -1843,7 +2130,7 @@
         if(localStorageUtil.getLocal('tabFnbPage') != null)
         {
             $('.nav-pills a[href="#fnbpanel"]').tab('show');
-            fnbTable =  $('#main-fnb-table').DataTable({
+            fnbTable =  $('#main-beverage-table,#main-food-table').DataTable({
                 "displayStart": localStorageUtil.getLocal('tabFnbPage') * 10,
                 "ordering": false
             });
@@ -1851,7 +2138,7 @@
         }
         else
         {
-            fnbTable =  $('#main-fnb-table').DataTable({
+            fnbTable =  $('#main-beverage-table,#main-food-table').DataTable({
                 "ordering": false
             });
         }
@@ -2136,7 +2423,7 @@
 
 <!-- Instamojo scripts -->
 <script>
-    var dialog = document.querySelector('dialog');
+    var dialog = document.querySelector('dialog.renew-mug');
     if (! dialog.showModal) {
         dialogPolyfill.registerDialog(dialog);
     }
@@ -2147,6 +2434,18 @@
         dialog.close();
     });
 
+
+    var mugdialog = document.querySelector('dialog.newMug-dialog');
+    if (! mugdialog.showModal) {
+        dialogPolyfill.registerDialog(mugdialog);
+    }
+    $(document).on('click','.mug_confirm-btn', function(){
+        mugdialog.showModal();
+    });
+    mugdialog.querySelector('.close').addEventListener('click', function() {
+        mugdialog.close();
+    });
+
     function changeCurrent(ele)
     {
         $('#selectedMug').val($(ele).attr('data-id'));
@@ -2155,6 +2454,41 @@
         $('#mugNum').val($(ele).attr('data-mugId'));
     }
 
+    function changeMugCurrent(ele)
+    {
+        $('#selectedId').val($(ele).attr('data-id'));
+    }
+
+    $(document).on('click','.mug_agree_btn',function(){
+        var mugMemId = $('#selectedId').val();
+        var ifMail = '0';
+        if($('#confirmMail').is(':checked'))
+        {
+            ifMail = '1';
+        }
+
+        $.ajax({
+            type:'POST',
+            dataType:'json',
+            url:'<?php echo base_url();?>mugclub/addInstaMug',
+            data:{memId: mugMemId,ifMail: ifMail},
+            success: function(data)
+            {
+                $('.my-instaMugCard').each(function(i,val){
+                    if($(val).attr('data-id') == mugMemId)
+                    {
+                        mugdialog.close();
+                        $(this).fadeOut("fast");
+                        return false;
+                    }
+                });
+            },
+            error: function()
+            {
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
+    });
     $(document).on('click','.agree_btn',function () {
         var selectedCard = $('#selectedMug').val();
         var paymentId = $('#mugPaymentId').val();
@@ -2805,12 +3139,13 @@
                     if(typeof data.joinData != 'undefined' && data.joinData != null && data.joinData.length != 0)
                     {
                         var tblHtml = '<table class="table table-striped">';
-                        tblHtml += '<thead><tr><th>Name</th><th>Quantitiy</th><th>Signup Date/time</th>';
+                        tblHtml += '<thead><tr><th>Name</th><th>Email</th><th>Quantitiy</th><th>Signup Date/time</th>';
                         tblHtml += '</tr></thead><tbody>';
                         for(var i=0;i<data.joinData.length;i++)
                         {
                             tblHtml += '<tr>';
                             tblHtml += '<td>'+data.joinData[i].firstName+' '+data.joinData[i].lastName+'</td>';
+                            tblHtml += '<td>'+data.joinData[i].emailId+'</td>';
                             tblHtml += '<td>'+data.joinData[i].quantity+'</td>';
                             tblHtml += '<td>'+formatJsDate(data.joinData[i].createdDT)+'</td>';
                             tblHtml += '</tr>';
@@ -2875,7 +3210,7 @@
 </script>
 
 <script>
-    var eveApprovUrl, costPrice, paid1Price, paid2Price;
+    var eveApprovUrl, costPrice, paid1Price, paid2Price, doolallyFee;
     $(document).on('click','#eventView .approveThis-event', function(){
         var eveApprovType = $(this).attr('data-costType');
         eveApprovUrl = $(this).attr('data-url');
@@ -2905,7 +3240,7 @@
             paid1Price = Number(costPrice);
             paid2Price = Number(costPrice) - 250;
         }
-        else if(eveApprovType == '3')
+        else if(eveApprovType == '3' || eveApprovType == '4')
         {
             paid1Price = Number(costPrice) + 250;
             paid2Price = Number(costPrice);
@@ -2921,6 +3256,7 @@
     $(document).on('click','#eventPrice-modal .save-event-price', function(){
         var selectedType = $('#eventPrice-modal input[name="costType"]:checked').val();
         var costEntered = $('#eventPrice-modal #costPrice').val();
+        var customFee = Number($('#eventPrice-modal #customPrice').val());
         if(selectedType != '1')
         {
             if(costEntered == '' || costEntered == 0)
@@ -2936,7 +3272,8 @@
             dataType:'json',
             url: eveApprovUrl,
             data:{costType: $('#eventPrice-modal input[name="costType"]:checked').val(),
-                    costPrice: costEntered},
+                    costPrice: costEntered,
+                    doolallyFee: customFee},
             success: function(data){
                 hideCustomLoader();
                 if(data.status == true)
@@ -2957,10 +3294,13 @@
         });
 
     });
+    var fixDoolallyFee = 250;
+
     $(document).on('click','#eventView .eventCostChange-icon', function(){
        var eveApprovType = $(this).attr('data-costType');
         eveApprovUrl = $(this).attr('data-url');
         costPrice = $(this).attr('data-costPrice');
+        doolallyFee = Number($(this).attr('data-doolallyFee'));
         $('#eventPrice-modal input[name="costType"]').each(function(i,val){
 
             if($(val).val() != eveApprovType)
@@ -2981,14 +3321,16 @@
             }
         });
         $('#eventPrice-modal #costPrice').val(costPrice);
+        $('#eventPrice-modal #customPrice').val(doolallyFee);
         if(eveApprovType == '2')
         {
             paid1Price = Number(costPrice);
-            paid2Price = Number(costPrice) - 250;
+
+            paid2Price = Number(costPrice) - doolallyFee;
         }
-        else if(eveApprovType == '3')
+        else if(eveApprovType == '3' || eveApprovType == '4')
         {
-            paid1Price = Number(costPrice) + 250;
+            paid1Price = Number(costPrice) + doolallyFee;
             paid2Price = Number(costPrice);
         }
         else
@@ -2999,6 +3341,29 @@
         $('#eventPrice-modal').modal('show');
 
     });
+
+    $(document).on("keyup","#eventPrice-modal #customPrice", function(){
+        var oldFee = doolallyFee;
+        if(Number($(this).val()) >= 250)
+        {
+            doolallyFee = Number($(this).val());
+        }
+        else
+        {
+            doolallyFee = 250;
+        }
+        var basicPrice = Number($('#eventPrice-modal #costPrice').val());
+        if($('#eventPrice-modal input[name="costType"]:checked').val() == '2')
+        {
+            paid1Price = basicPrice + (doolallyFee - oldFee);
+            $('#eventPrice-modal #costPrice').val(paid1Price);
+        }
+        else
+        {
+            paid1Price = paid1Price + (doolallyFee - oldFee);
+        }
+    });
+
     $(document).on('change','#eventPrice-modal input[name="costType"]', function(){
         if($(this).val() == '1')
         {
@@ -3018,21 +3383,21 @@
         }
     });
 
-    //focus out event on price input
+    //focus out event on price input of modal
     $(document).on('focusout','#eventPrice-modal #costPrice', function(){
         if($(this).val() != 0)
         {
             var basicPrice = Number($(this).val());
             if($('#eventPrice-modal input[name="costType"]:checked').val() == '2')
             {
-                paid1Price = basicPrice+250;
+                paid1Price = basicPrice+doolallyFee;
                 paid2Price = basicPrice;
                 $(this).val(paid1Price);
             }
             else
             {
                 paid2Price = basicPrice;
-                paid1Price = basicPrice+250;
+                paid1Price = basicPrice+doolallyFee;
                 $(this).val(paid2Price);
             }
         }
@@ -3045,7 +3410,7 @@
         {
             $('.event-price input[name="eventPrice"]').val(addPaid1).parent().removeClass('hide');
         }
-        else if($(this).val() == "3")
+        else if($(this).val() == "3" || $(this).val() == "4")
         {
             if($('.event-price input[name="eventPrice"]').val() != 0)
             {
@@ -3065,19 +3430,42 @@
             var basicPrice = Number($(this).val());
             if($('#eventAdd input[name="costType"]:checked').val() == '2')
             {
-                addPaid1 = basicPrice+250;
-                addPaid2 = basicPrice;
-                $(this).val(addPaid1);
+                if(basicPrice != addPaid1)
+                {
+                    addPaid1 = basicPrice+fixDoolallyFee;
+                    addPaid2 = basicPrice;
+                    $(this).val(addPaid1);
+                }
             }
             else
             {
                 addPaid2 = basicPrice;
-                addPaid1 = basicPrice+250;
+                addPaid1 = basicPrice+fixDoolallyFee;
                 $(this).val(addPaid2);
             }
         }
     });
-
+    $(document).on("keyup","#eventAdd #customPrice", function(){
+        var oldFee = fixDoolallyFee;
+        if(Number($(this).val()) >= 250)
+        {
+            fixDoolallyFee = Number($(this).val());
+        }
+        else
+        {
+            fixDoolallyFee = 250;
+        }
+        var basicPrice = Number($('#eventAdd .event-price input[name="eventPrice"]').val());
+        if($('input[name="costType"]:checked').val() == '2')
+        {
+            addPaid1 = basicPrice + (fixDoolallyFee - oldFee);
+            $('.event-price input[name="eventPrice"]').val(addPaid1);
+        }
+        else
+        {
+            addPaid1 = addPaid1 + (fixDoolallyFee - oldFee);
+        }
+    });
     $(document).on('click','#eventView .cancel-this-event', function(){
         var eveId = $(this).attr('data-eventId');
         bootbox.confirm("Are you sure you want to Cancel Event?", function(result) {

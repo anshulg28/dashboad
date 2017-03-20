@@ -15,7 +15,7 @@
                 <i class="fa fa-chevron-left"></i> Go Back
             </a>
             <h3>Add Employee</h3>
-            <form action="<?php echo base_url();?>saveStaff" method="post">
+            <form id="staff-add-form" action="<?php echo base_url();?>saveStaff" method="post">
                 <div class="error-dup"></div>
                 <div class="mdl-grid">
                     <div class="mdl-cell mdl-cell--6-col">
@@ -107,6 +107,7 @@
         <div class="mdl-cell mdl-cell--2-col"></div>
     </div>
 </main>
+<?php echo $footerView;?>
 </body>
 <?php echo $globalJs; ?>
 
@@ -138,6 +139,48 @@
                 }
             });
         }
+    });
+    $(document).on('keydown', 'input[type=number]', function(e) {
+        if ( e.which == 38 || e.which == 40 )
+            e.preventDefault();
+    });
+
+    $(document).on('submit','#staff-add-form',function(e){
+        e.preventDefault();
+
+        if($('#empId').val() == "")
+        {
+            bootbox.alert('Employee Id Required!');
+            return false;
+        }
+        if($('#firstName').val() == "")
+        {
+            bootbox.alert('First Name Required!');
+            return false;
+        }
+
+        showCustomLoader();
+        $.ajax({
+            type:'POST',
+            dataType:'json',
+            url:$(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(data){
+                hideCustomLoader();
+                if(data.status == true)
+                {
+                    window.location.href=base_url+'empDetails';
+                }
+                else
+                {
+                    $('.error-dup').css('color','red').html(data.errorMsg);
+                }
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert("Some Error Occurred!");
+            }
+        });
     });
 </script>
 </html>

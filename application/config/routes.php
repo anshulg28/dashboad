@@ -83,6 +83,7 @@ $route['mailers/delete/(:any)'] = 'mailers/removePressEmail/$1';
 $route['mugclub/renew/(:any)'] = 'mugclub/renewExistingMug/$1';
 $route['dashboard/custom'] = 'dashboard/getCustomStats';
 $route['dashboard/save'] = 'dashboard/saveRecord';
+//$route['dashboard/newmember'] = 'dashboard/instaMojoNewMember';
 $route['dashboard/instamojo'] = 'dashboard/instaMojoRecord';
 $route['dashboard/instadone/(:any)/(:any)'] = 'dashboard/setInstamojoDone/$1/$2';
 $route['dashboard/approve/(:any)'] = 'dashboard/eventApproved/$1';

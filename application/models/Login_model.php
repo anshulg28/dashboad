@@ -122,6 +122,18 @@ class Login_Model extends CI_Model
         return $data;
     }
 
+    public function checkEmailSender($email)
+    {
+
+        $query = "SELECT firstName,gmailPass "
+            ."FROM doolally_usersmaster "
+            ."where userType IN(0,1,2) AND emailId LIKE '".$email."'";
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+
     public function checkAppUser($userEmail, $userPassword)
     {
         $query = "SELECT userId,ifActive "

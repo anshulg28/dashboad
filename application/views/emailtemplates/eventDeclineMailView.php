@@ -12,10 +12,10 @@
         You can try creating another event here..<a href="<?php echo MOBILE_URL.'mobile?page/create_event';?>" target="_blank">Book an event</a><br><br>
 
         In case you have any questions/queries please don't hesitate to write to me at this mail address or you can reach me at
-        <?php echo $mailData['senderPhone'] .' ('.$mailData['senderName'].')';?><br><br>
+        <?php echo $mailData['senderPhone'] .' ('.ucfirst($mailData['senderName']).')';?><br><br>
 
         Cheers!<br>
-        <?php echo $mailData['senderName']; ?>
+        <?php echo ucfirst($mailData['senderName']); ?>
     </p>
 
 </body>
