@@ -420,7 +420,7 @@ class Mailers extends MY_Controller {
             {
                 $config = array();
                 $config['upload_path'] = './uploads/';
-                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg|pdf|doc|docx';
                 $config['max_size']      = '0';
                 $config['overwrite']     = TRUE;
 
@@ -462,7 +462,11 @@ class Mailers extends MY_Controller {
         foreach($pressEmails as $key)
         {
             $pressInfo = $this->mailers_model->getPressInfoByMail($key);
-            $newBody = $this->replacePressName($mainBody,$pressInfo);
+			$newBody = $mainBody;
+            if(isset($pressInfo) && myIsArray($pressInfo))
+            {
+                $newBody = $this->replacePressName($mainBody,$pressInfo);
+            }
             $cc        = 'tresha@doolally.in';
             $fromName  = 'Doolally';
             if(isset($this->userFirstName))
