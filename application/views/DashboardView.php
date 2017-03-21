@@ -843,7 +843,7 @@
 
                                         foreach($eventDetails as $key => $row)
                                         {
-                                            if($row['eventData']['isEventCancel'] == '0')
+                                            if($row['eventData']['isEventCancel'] == '0' || $row['eventData']['isEventCancel'] == '1')
                                             {
                                                 $eveLoc = $row['eventData']['eventPlace'];
                                                 ?>
@@ -1247,6 +1247,7 @@
                                                 <?php
                                                 if(isset($row['filename']))
                                                 {
+                                                    $imgs = array();
                                                     $imgs[] = MOBILE_URL.EVENT_PATH_THUMB.$row['filename'];
                                                     ?>
                                                     <a class="view-photos" data-toggle="tooltip" title="View Photos" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
@@ -1303,7 +1304,7 @@
                                     <?php
                                     foreach($eventDetails as $key => $row)
                                     {
-                                        if($row['eventData']['isEventCancel'] == '1')
+                                        if($row['eventData']['isEventCancel'] == '2')
                                         {
                                             ?>
                                             <tr>

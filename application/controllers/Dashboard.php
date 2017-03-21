@@ -121,13 +121,24 @@ class Dashboard extends MY_Controller {
 
         if(isset($events) && myIsMultiArray($events))
         {
+            $ImpEvents = array();
+            $otherEvents = array();
             foreach($events as $key => $row)
             {
                 $loc = $this->locations_model->getLocationDetailsById($row['eventPlace']);
                 $row['locData'] = $loc['locData'];
-                $data['eventDetails'][$key]['eventData'] = $row;
-                $data['eventDetails'][$key]['eventAtt'] = $this->dashboard_model->getEventAttById($row['eventId']);
+                if($row['ifApproved'] == EVENT_WAITING)
+                {
+                    $ImpEvents[$key]['eventData'] = $row;
+                    $ImpEvents[$key]['eventAtt'] = $this->dashboard_model->getEventAttById($row['eventId']);
+                }
+                else
+                {
+                    $otherEvents[$key]['eventData'] = $row;
+                    $otherEvents[$key]['eventAtt'] = $this->dashboard_model->getEventAttById($row['eventId']);
+                }
             }
+            $data['eventDetails'] = array_merge($ImpEvents,$otherEvents);
         }
         $data['completedEvents'] = $this->dashboard_model->findCompletedEvents();
 
@@ -1169,7 +1180,8 @@ class Dashboard extends MY_Controller {
 
         $events = $this->dashboard_model->getEventById($eventId);
         $details = array(
-            'ifActive' => '0'
+            'ifActive' => '0',
+            'isEventCancel' => '2'
         );
         $this->dashboard_model->updateEventRecord($details,$eventId);
         $this->sendemail_library->eventCancelUserMail($events);
