@@ -95,14 +95,14 @@
                                         <div class="form-group">
                                             <label class="control-label col-sm-2" for="bdate">BirthDate:</label>
                                             <div class="col-sm-10">
-                                                <input type="date" name="birthdate" value="<?php echo $row['birthDate'];?>"
+                                                <input type="text" name="birthdate" value="<?php echo $row['birthDate'];?>"
                                                        class="form-control" id="bdate" placeholder="Eg. 12 June 1990">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="control-label col-sm-2" for="invoiceDate">Invoice Date:</label>
                                             <div class="col-sm-10">
-                                                <input type="date" name="invoiceDate" value="<?php echo $row['invoiceDate'];?>"
+                                                <input type="text" name="invoiceDate" value="<?php echo $row['invoiceDate'];?>"
                                                        class="form-control" id="invoiceDate" placeholder="Eg. 12 June 2016">
                                             </div>
                                         </div>
@@ -123,14 +123,14 @@
                                         <div class="form-group">
                                             <label class="control-label col-sm-2" for="memberS">Membership Start Date:</label>
                                             <div class="col-sm-10">
-                                                <input type="date" name="memberS" value="<?php echo $row['membershipStart'];?>"
+                                                <input type="text" name="memberS" value="<?php echo $row['membershipStart'];?>"
                                                        class="form-control" id="memberS" placeholder="Eg. 12 June 2016">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="control-label col-sm-2" for="memberE">Membership End Date:</label>
                                             <div class="col-sm-10">
-                                                <input type="date" name="memberE" value="<?php echo $row['membershipEnd'];?>"
+                                                <input type="text" name="memberE" value="<?php echo $row['membershipEnd'];?>"
                                                        class="form-control" id="memberE" placeholder="Eg. 12 June 2016">
                                             </div>
                                         </div>
@@ -170,5 +170,9 @@
     </main>
 </body>
 <?php echo $globalJs; ?>
-
+<script>
+    $('#bdate, #invoiceDate, #memberS, #memberE').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+</script>
 </html>

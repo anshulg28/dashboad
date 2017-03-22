@@ -268,7 +268,7 @@
         return age;
     }
     $('#bdate, #invoiceDate, #memberS, #memberE').datetimepicker({
-        format: 'DD-MM-YYYY'
+        format: 'YYYY-MM-DD'
     });
 </script>
 </html>

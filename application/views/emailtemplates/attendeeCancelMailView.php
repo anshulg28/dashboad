@@ -10,18 +10,25 @@
         Dear <?php echo $mailData['firstName']; ?><br><br>
 
         The organiser <?php echo str_replace('.','',$mailData['creatorName']); ?> has cancelled the event <?php echo trim($mailData['eventName']); ?>.
-         For paid events, the money will be fully refunded to you.<br><br>
+         For paid events, the money will be fully refunded to you.
 
         <?php
             if(isset($mailData['refundId']))
             {
                 ?>
+                The coupon code that we sent you in the earlier mail is now invalid.<br><br>
                 Here are the refund details: <br>
                 Refund Id: <?php echo $mailData['refundId'];?><br>
                 <b>
                     <a href="https://www.instamojo.com/resolutioncenter/cases/<?php echo $mailData['refundId'];?>/?from=email"
                        target="_blank">Click here to track Refund status</a>
                 </b><br><br>
+                <?php
+            }
+            else
+            {
+                ?>
+                <br><br>
                 <?php
             }
         ?>

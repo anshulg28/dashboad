@@ -117,12 +117,13 @@ class Mailers_Model extends CI_Model
         if($mailType == BIRTHDAY_MAIL)
         {
             $details['birthdayMailStatus'] = 1;
+            $details['birthMailDate'] = date('Y-m-d');
         }
         else
         {
             $details['mailStatus'] = 1;
+            $details['mailDate'] = date('Y-m-d');
         }
-        $details['mailDate'] = date('Y-m-d');
 
         $this->db->where('mugId', $mugId);
         $this->db->update('mugmaster', $details);
