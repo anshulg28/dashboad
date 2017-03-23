@@ -64,6 +64,8 @@
                                     </nav>
                                     <div class="col-sm-8">
                                         <form action="<?php echo base_url();?>mailers/sendPressMails/json" id="mainMailerForm" method="post" class="form-horizontal" role="form">
+                                            <input type="hidden" name="senderEmail" id="senderEmail" value="<?php echo $loggedEmail;?>"/>
+                                            <input type="hidden" name="senderPass" id="senderPass" value=""/>
                                             <div class="form-group">
                                                 <label class="control-label col-sm-2" for="toList">To:</label>
                                                 <div class="col-sm-10">
@@ -254,6 +256,7 @@
 
     $(document).on('submit','#mainMailerForm',function(e){
         e.preventDefault();
+        var formVar = $(this);
         if($('textarea[name="pressEmails"]').val() == '')
         {
             bootbox.alert('Email(s) Are Required!',function(){
@@ -276,8 +279,48 @@
             });
             return false;
         }
+        var senderEmail = $('#senderEmail').val();
+        bootbox.prompt({
+            title: "Please provide your Gmail("+senderEmail+") password",
+            inputType: 'password',
+            callback: function (result) {
+                if(result != null && result != '')
+                {
+                    showCustomLoader();
+                    var senderPass = result;
+                    $.ajax({
+                        type:'POST',
+                        dataType:'json',
+                        url: base_url+'mailers/checkGmailLogin',
+                        data:{from:senderEmail,fromPass:senderPass},
+                        success: function(data)
+                        {
+                            hideCustomLoader();
+                            if(data.status === false)
+                            {
+                                bootbox.alert('Invalid Gmail Credentials!');
+                            }
+                            else
+                            {
+                                $('#senderPass').val(senderPass);
+                                submitPressForm(formVar);
+                            }
+                        },
+                        error: function(){
+                            hideCustomLoader();
+                            bootbox.alert('Some Error Occurred!');
+                        }
+                    });
+                }
+            }
+        });
 
         //showCustomLoader();
+
+    });
+
+    function submitPressForm(form)
+    {
         var m_data = new FormData();
         m_data.append( 'pressEmails', $('textarea[name=pressEmails]').val());
         m_data.append( 'mailSubject', $('input[name=mailSubject]').val());
@@ -290,22 +333,20 @@
         {
             m_data.append( 'attachmentUrls', $('textarea[name=attachmentUrls]').val());
         }
-        showCustomLoader();
+        //showCustomLoader();
         $.ajax({
             type:"POST",
-            url:$(this).attr('action'),
+            url:$(form).attr('action'),
             contentType: false,
             processData: false,
             dataType:"json",
             data:m_data,
             success: function(data){
 
-                hideCustomLoader();
+                //hideCustomLoader();
                 if(data.status === true)
                 {
-                    bootbox.alert('Mail Send Successfully', function(){
-                        window.location.href=base_url+'mailers';
-                    });
+
                 }
                 else
                 {
@@ -320,13 +361,12 @@
                 }
             },
             error: function(){
-                hideCustomLoader();
+                //hideCustomLoader();
                 bootbox.alert('<span class="my-danger-text">Some Error occurred</span>');
             }
         });
-
-    });
-
+        bootbox.alert('Mail Send Successfully');
+    }
     $(document).on('change', '.mugCheckList', function(){
         var emails= '';
         $('.mugCheckList:checked').each(function(i,val){

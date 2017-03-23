@@ -22,7 +22,11 @@ $config['phons'] = array(
     'Priyanka' => '9920087855',
     'Daksha' => '9892110655',
     'Shweta' => '7045170006',
-    'Richa' => '7678039911'
+    'Richa' => '7678039911',
+    'Fn Com4' => '9999999999',
+    'Fn Com1' => '9999999999',
+    'Fn Com2' => '9999999999',
+    'Fn Com3' => '9999999999'
 );
 $config['offerTimes'] = array(
     '7-10',
@@ -40,6 +44,14 @@ $config['eventTypes'] = array(
     "Screening",
     "Book Club",
     "Others"
+);
+
+$config['ccList'] = array(
+    "gauravsaha84+cc1@gmail.com",
+    "anshulgupta@rocketmail.com",
+    "gauravsaha84+cc2@gmail.com",
+    "gauravsaha84+cc3@gmail.com",
+    "gauravsaha84+cc4@gmail.com"
 );
 $config['eventTc'] = '<div class="page-content">
     <div class="content-block">

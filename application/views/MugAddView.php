@@ -14,6 +14,8 @@
                 <hr>
                 <br>
                 <form action="<?php echo base_url();?>mugclub/save" id="mugNumSave-form" method="post" class="form-horizontal" role="form">
+                    <input type="hidden" name="senderEmail" id="senderEmail" value="<?php echo $this->userEmail;?>" />
+                    <input type="hidden" name="senderPass" id="senderPass" value="" />
                     <div class="mugNumber-status text-center"></div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="mugNum">Mug No. :</label>
@@ -140,6 +142,7 @@
             </div>
         </div>
     </main>
+<?php echo $footerView;?>
 </body>
 <?php echo $globalJs; ?>
 
@@ -255,6 +258,55 @@
             }
         }
     });
+
+    $(document).on('change','#mugMail',function(){
+        var mailCheck = $(this);
+        if($(this).is(":checked"))
+        {
+            $('form button[type="submit"]').attr('disabled','true');
+            var senderEmail = $('#senderEmail').val();
+            bootbox.prompt({
+                title: "Please provide your Gmail("+senderEmail+") password",
+                inputType: 'password',
+                callback: function (result) {
+                    if(result != null && result != '')
+                    {
+                        showCustomLoader();
+                        var senderPass = result;
+                        $.ajax({
+                            type:'POST',
+                            dataType:'json',
+                            url: base_url+'mailers/checkGmailLogin',
+                            data:{from:senderEmail,fromPass:senderPass},
+                            success: function(data)
+                            {
+                                hideCustomLoader();
+                                if(data.status === false)
+                                {
+                                    bootbox.alert('Invalid Gmail Credentials!');
+                                    $(mailCheck).prop('checked',false);
+                                }
+                                else
+                                {
+                                    $('#senderPass').val(senderPass);
+                                    $('form button[type="submit"]').removeAttr('disabled');
+                                }
+                            },
+                            error: function(){
+                                hideCustomLoader();
+                                bootbox.alert('Some Error Occurred!');
+                            }
+                        });
+                    }
+                    else
+                    {
+                        $(mailCheck).prop('checked',false);
+                    }
+                }
+            });
+        }
+    });
+
     function getAge(dateString)
     {
         var today = new Date();

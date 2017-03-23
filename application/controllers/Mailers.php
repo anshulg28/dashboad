@@ -7,6 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property Mugclub_Model $mugclub_model
  * @property users_model $users_model
  * @property offers_model $offers_model
+ * @property login_model $login_model
 */
 
 class Mailers extends MY_Controller {
@@ -18,6 +19,7 @@ class Mailers extends MY_Controller {
         $this->load->model('mugclub_model');
         $this->load->model('users_model');
         $this->load->model('offers_model');
+        $this->load->model('login_model');
 	}
 	public function index()
 	{
@@ -246,6 +248,8 @@ class Mailers extends MY_Controller {
 
         $data['mailList'] = $mailResult;
 
+        $data['loggedEmail'] = $this->userEmail;
+
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
         $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
@@ -288,20 +292,36 @@ class Mailers extends MY_Controller {
                 $mainBody .= $body .'</body></html>';
                 $newBody = $mainBody;
             }
-            $cc        = 'priyanka@doolally.in,tresha@doolally.in,daksha@doolally.in,shweta@doolally.in,richa@doolally.in';
+            $cc        = implode(',',$this->config->item('ccList'));
             $fromName  = 'Doolally';
             if(isset($this->userFirstName))
             {
                 $fromName = trim(ucfirst($this->userFirstName));
             }
-            $fromEmail = 'priyanka@doolally.in';
+            $fromEmail = DEFAULT_SENDER_EMAIL;
+            $fromPass = DEFAULT_SENDER_PASS;
+            $replyTo = $fromEmail;
 
             if(isset($this->userEmail))
             {
-                $fromEmail = $this->userEmail;
+                $replyTo = $this->userEmail;
+                /*$userInfo = $this->login_model->checkEmailSender($this->userEmail);
+                if(isset($userInfo) && myIsArray($userInfo))
+                {
+                    $fromPass = $userInfo['gmailPass'];
+                    $fromEmail = $this->userEmail;
+                }*/
+
             }
 
-            $this->sendemail_library->sendEmail($mugInfo['mugList'][0]['emailId'],$cc,$fromEmail,$fromName,$newSubject,$newBody);
+            if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                && isset($post['senderPass']) && isStringSet($post['senderPass']))
+            {
+                $fromEmail = $post['senderEmail'];
+                $fromPass = $post['senderPass'];
+            }
+
+            $this->sendemail_library->sendEmail($mugInfo['mugList'][0]['emailId'],$cc,$fromEmail, $fromPass,$fromName,$replyTo,$newSubject,$newBody);
             $this->mailers_model->setMailSend($key,$post['mailType']);
         }
 
@@ -397,6 +417,7 @@ class Mailers extends MY_Controller {
         {
             $data['pressMails'] = $mailResult['mailData'];
         }
+        $data['loggedEmail'] = $this->userEmail;
         $data['mailCats'] = $this->mailers_model->fetchPressCats();
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
@@ -462,25 +483,40 @@ class Mailers extends MY_Controller {
         foreach($pressEmails as $key)
         {
             $pressInfo = $this->mailers_model->getPressInfoByMail($key);
-			$newBody = $mainBody;
+            $newBody = $mainBody;
             if(isset($pressInfo) && myIsArray($pressInfo))
             {
                 $newBody = $this->replacePressName($mainBody,$pressInfo);
             }
-            $cc        = 'tresha@doolally.in';
+            $cc        = 'tresha@brewcraftsindia.com';
             $fromName  = 'Doolally';
             if(isset($this->userFirstName))
             {
                 $fromName = trim(ucfirst($this->userFirstName));
             }
-            $fromEmail = 'priyanka@doolally.in';
+            $fromEmail = DEFAULT_SENDER_EMAIL;
+            $fromPass = DEFAULT_SENDER_PASS;
+            $replyTo = $fromEmail;
 
             if(isset($this->userEmail))
             {
-                $fromEmail = $this->userEmail;
+                $replyTo = $this->userEmail;
+                /*$userInfo = $this->login_model->checkEmailSender($this->userEmail);
+                if(isset($userInfo) && myIsArray($this->userEmail))
+                {
+                    $fromPass = $userInfo['gmailPass'];
+                    $fromEmail = $this->userEmail;
+                }*/
             }
 
-            $this->sendemail_library->sendEmail($key,$cc,$fromEmail,$fromName,$pressSub,$newBody,$attchmentArr);
+            if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                && isset($post['senderPass']) && isStringSet($post['senderPass']))
+            {
+                $fromEmail = $post['senderEmail'];
+                $fromPass = $post['senderPass'];
+            }
+
+            $this->sendemail_library->sendEmail($key,$cc,$fromEmail, $fromPass, $fromName,$replyTo,$pressSub,$newBody,$attchmentArr);
         }
         if($responseType == RESPONSE_JSON)
         {
@@ -615,5 +651,31 @@ class Mailers extends MY_Controller {
 
         $this->offers_model->setSingleCode($toBeInserted);
         return 'BR-'.$newCode;
+    }
+
+    public function checkGmailLogin()
+    {
+        $data = array();
+
+        $post = $this->input->post();
+        require_once APPPATH.'libraries/swift_mailer/swift_required.php';
+
+        $transport = Swift_SmtpTransport::newInstance ('smtp.gmail.com', 465, 'ssl')
+            ->setUsername($post['from'])
+            ->setPassword($post['fromPass']);
+
+        try
+        {
+            $transport->start();
+            $data['status'] = true;
+        }
+        catch(Swift_TransportException $st)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = $st->getMessage();
+        }
+
+        echo json_encode($data);
+
     }
 }

@@ -945,6 +945,12 @@ class Dashboard extends MY_Controller {
                 'eventPlace' => $post['eventPlace']
             );
 
+            if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                && isset($post['senderPass']) && isStringSet($post['senderPass']))
+            {
+                $mailEvent['fromEmail'] = $post['senderEmail'];
+                $mailEvent['fromPass'] = $post['senderPass'];
+            }
             //$loc = $this->locations_model->getLocationDetailsById($post['eventPlace']);
 
             $this->sendemail_library->newEventMail($mailEvent);
@@ -1170,6 +1176,7 @@ class Dashboard extends MY_Controller {
     public function cancelEvent($eventId)
     {
         $data = array();
+        $post = $this->input->post();
         if(isSessionVariableSet($this->isUserSession) === false)
         {
             $data['status'] = false;
@@ -1184,6 +1191,12 @@ class Dashboard extends MY_Controller {
             'isEventCancel' => '2'
         );
         $this->dashboard_model->updateEventRecord($details,$eventId);
+        if(isset($post['from']) && isStringSet($post['from'])
+            && isset($post['fromPass']) && isStringSet($post['fromPass']))
+        {
+            $events['fromEmail'] = $post['from'];
+            $events['fromPass'] = $post['fromPass'];
+        }
         $this->sendemail_library->eventCancelUserMail($events);
         $this->dashboard_model->cancelEventOffers($eventId);
         $allAttendees = $this->dashboard_model->getJoinersInfo($eventId);
@@ -1210,6 +1223,12 @@ class Dashboard extends MY_Controller {
                     {
                         $row['refundId'] = $refundStats['refund']['id'];
                     }
+                }
+                if(isset($post['from']) && isStringSet($post['from'])
+                    && isset($post['fromPass']) && isStringSet($post['fromPass']))
+                {
+                    $row['fromEmail'] = $post['from'];
+                    $row['fromPass'] = $post['fromPass'];
                 }
                 $this->sendemail_library->attendeeCancelMail($row);
             }
@@ -1311,6 +1330,13 @@ class Dashboard extends MY_Controller {
         }
         $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
 
+        if(isset($post['from']) && isStringSet($post['from'])
+            && isset($post['fromPass']) && isStringSet($post['fromPass']))
+        {
+            $eventDetail['fromEmail'] = $post['from'];
+            $eventDetail['fromPass'] = $post['fromPass'];
+        }
+
         if(isset($post['costType']) && $post['costType'] != '')
         {
             if($post['costType'] == '1')
@@ -1342,6 +1368,7 @@ class Dashboard extends MY_Controller {
             }
             $eventDetail['senderName'] = $senderName;
             $eventDetail['senderEmail'] = $senderEmail;
+
             $this->sendemail_library->eventApproveMail($eventDetail);
         }
         else
@@ -1438,6 +1465,7 @@ class Dashboard extends MY_Controller {
     function eventDeclined($eventId)
     {
         $data = array();
+        $post = $this->input->post();
         $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
         $this->dashboard_model->DeclineEvent($eventId);
         $senderName = 'Doolally';
@@ -1449,6 +1477,13 @@ class Dashboard extends MY_Controller {
         }
         $eventDetail['senderName'] = $senderName;
         $eventDetail['senderEmail'] = $senderEmail;
+
+        if(isset($post['from']) && isStringSet($post['from'])
+            && isset($post['fromPass']) && isStringSet($post['fromPass']))
+        {
+            $eventDetail['fromEmail'] = $post['from'];
+            $eventDetail['fromPass'] = $post['fromPass'];
+        }
         $this->sendemail_library->eventDeclineMail($eventDetail);
         $data['status'] = true;
         echo json_encode($data);

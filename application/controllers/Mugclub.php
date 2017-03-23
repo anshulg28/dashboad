@@ -86,6 +86,7 @@ class Mugclub extends MY_Controller {
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
         $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
 
         $this->load->view('MugAddView', $data);
     }
@@ -108,6 +109,7 @@ class Mugclub extends MY_Controller {
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
         $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
 
         $this->load->view('MugEditView', $data);
     }
@@ -183,6 +185,12 @@ class Mugclub extends MY_Controller {
                     "newEndDate" => $post['membershipEnd'],
                     "emailId" => $userEmail
                 );
+                if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                    && isset($post['senderPass']) && isStringSet($post['senderPass']))
+                {
+                    $mailData['fromEmail'] = $post['senderEmail'];
+                    $mailData['fromPass'] = $post['senderPass'];
+                }
                 $this->sendemail_library->membershipRenewSendMail($mailData);
             }
 
@@ -230,6 +238,12 @@ class Mugclub extends MY_Controller {
                 $this->mugclub_model->saveMugRecord($params);
                 if(isset($post['ifMail']) && $post['ifMail'] == '1')
                 {
+                    if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                        && isset($post['senderPass']) && isStringSet($post['senderPass']))
+                    {
+                        $params['fromEmail'] = $post['senderEmail'];
+                        $params['fromPass'] = $post['senderPass'];
+                    }
                     $this->sendemail_library->signUpWelcomeSendMail($params);
                 }
             }
@@ -277,6 +291,12 @@ class Mugclub extends MY_Controller {
                 }
                 if(isset($post['ifMail']) && $post['ifMail'] == '1')
                 {
+                    if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                        && isset($post['senderPass']) && isStringSet($post['senderPass']))
+                    {
+                        $params['fromEmail'] = $post['senderEmail'];
+                        $params['fromPass'] = $post['senderPass'];
+                    }
                     $this->sendemail_library->signUpWelcomeSendMail($params);
                 }
                 if(isset($mugId))

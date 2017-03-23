@@ -151,5 +151,5 @@ defined('EVENT_PAID') OR define('EVENT_PAID','2');
 defined('EVENT_PAID_NO_PINT') OR define('EVENT_PAID_NO_PINT','3');
 defined('EVENT_DOOLALLY_FEE') OR define('EVENT_DOOLALLY_FEE','4');
 
-defined('DEFAULT_SENDER_EMAIL') OR define('DEFAULT_SENDER_EMAIL','admin@brewcraftsindia.com');
-defined('DEFAULT_SENDER_PASS') OR define('DEFAULT_SENDER_PASS','ngks2009');
+defined('DEFAULT_SENDER_EMAIL') OR define('DEFAULT_SENDER_EMAIL','happeningevents@brewcraftsindia.com');
+defined('DEFAULT_SENDER_PASS') OR define('DEFAULT_SENDER_PASS','doolally123');

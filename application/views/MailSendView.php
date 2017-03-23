@@ -21,6 +21,8 @@
                                 ?>
                                 <form action="<?php echo base_url();?>mailers/sendAllMails/json" id="mainMailerForm" method="post" role="form">
                                     <input type="hidden" name="mailType" value="<?php echo $mailType;?>"/>
+                                    <input type="hidden" name="senderEmail" id="senderEmail" value="<?php echo $loggedEmail;?>"/>
+                                    <input type="hidden" name="senderPass" id="senderPass" value=""/>
                                     <nav class="col-sm-2 custom-mugs-list">
                                         <ul class="nav nav-pills nav-stacked text-left">
                                             <?php
@@ -169,6 +171,8 @@
                                     <form action="<?php echo base_url();?>mailers/sendAllMails/json" id="mainMailerForm" method="post" class="form-horizontal" role="form">
                                         <input type="hidden" name="mailType" value="<?php echo $mailType;?>"/>
                                         <input type="hidden" name="isSimpleMail" value="1"/>
+                                        <input type="hidden" name="senderEmail" id="senderEmail" value="<?php echo $loggedEmail;?>"/>
+                                        <input type="hidden" name="senderPass" id="senderPass" value=""/>
                                         <div class="form-group">
                                             <label class="control-label col-sm-2" for="toList">To:</label>
                                             <div class="col-sm-10">
@@ -484,6 +488,7 @@
 
     $(document).on('submit','#mainMailerForm',function(e){
         e.preventDefault();
+        var formVar = $(this);
         if($('textarea[name="mugNums"]').val() == '')
         {
             bootbox.alert('Mug Numbers Are Required!',function(){
@@ -507,12 +512,53 @@
             return false;
         }
 
+        var senderEmail = $('#senderEmail').val();
+
+        bootbox.prompt({
+            title: "Please provide your Gmail("+senderEmail+") password",
+            inputType: 'password',
+            callback: function (result) {
+                if(result != null && result != '')
+                {
+                    showCustomLoader();
+                    var senderPass = result;
+                    $.ajax({
+                        type:'POST',
+                        dataType:'json',
+                        url: base_url+'mailers/checkGmailLogin',
+                        data:{from:senderEmail,fromPass:senderPass},
+                        success: function(data)
+                        {
+                            hideCustomLoader();
+                            if(data.status === false)
+                            {
+                                bootbox.alert('Invalid Gmail Credentials!');
+                            }
+                            else
+                            {
+                                $('#senderPass').val(senderPass);
+                                SubmitMailForm(formVar);
+                            }
+                        },
+                        error: function(){
+                            hideCustomLoader();
+                            bootbox.alert('Some Error Occurred!');
+                        }
+                    });
+                }
+            }
+        });
+
+    });
+
+    function SubmitMailForm(form)
+    {
         showCustomLoader();
         $.ajax({
             type:"POST",
-            url:$(this).attr('action'),
+            url:$(form).attr('action'),
             dataType:"json",
-            data:$(this).serialize(),
+            data:$(form).serialize(),
             success: function(data){
                 hideCustomLoader();
                 if(data.status === true)
@@ -528,8 +574,7 @@
                 bootbox.alert('Some Error occurred');
             }
         });
-
-    });
+    }
 
     $(document).on('click','.mugtags-list li', function(){
         var mugTag = $(this).find('span').html();

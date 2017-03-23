@@ -169,4 +169,10 @@ class Mailers_Model extends CI_Model
         $this->db->insert('mailtemplates', $post);
         return true;
     }
+
+    public function saveSwiftMailLog($post)
+    {
+        $this->db->insert('swiftmailerlogs', $post);
+        return true;
+    }
 }
