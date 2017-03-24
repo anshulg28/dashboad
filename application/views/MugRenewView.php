@@ -13,7 +13,9 @@
                 <h2><i class="fa fa-beer"></i> Renew Mug #<?php echo $mugId; ?></h2>
                 <hr>
                 <br>
-                <form action="<?php echo base_url();?>mugclub/mugRenew/return" method="post" class="form-horizontal" role="form">
+                <form id="mug-renew-form" action="<?php echo base_url();?>mugclub/mugRenew/return" method="post" class="form-horizontal" role="form">
+                    <input type="hidden" name="senderEmail" id="senderEmail" value="<?php echo $this->userEmail;?>"/>
+                    <input type="hidden" name="senderPass" id="senderPass" />
                     <input type="hidden" value="<?php echo $mugId;?>" name="mugId"/>
                     <!--<div class="form-group">
                         <label class="control-label col-sm-2" for="memEnd">Membership End Date :</label>
@@ -38,7 +40,80 @@
             </div>
         </div>
     </main>
+<?php echo $footerView;?>
 </body>
 <?php echo $globalJs; ?>
+
+<script>
+    $(document).on('submit','#mug-renew-form', function(e){
+        e.preventDefault();
+        var renewForm = $(this);
+        var senderEmail = $(this).find('#senderEmail').val();
+        bootbox.prompt({
+            title: "Please provide your Gmail("+senderEmail+") password",
+            inputType: 'password',
+            callback: function (result) {
+                if(result != null && result != '')
+                {
+                    showCustomLoader();
+                    var senderPass = result;
+
+                    $.ajax({
+                        type:'POST',
+                        dataType:'json',
+                        url: base_url+'mailers/checkGmailLogin',
+                        data:{from:senderEmail,fromPass:senderPass},
+                        success: function(data)
+                        {
+                            hideCustomLoader();
+                            if(data.status === false)
+                            {
+                                bootbox.alert('Invalid Gmail Credentials!');
+                            }
+                            else
+                            {
+                                $(renewForm).find('#senderPass').val(senderPass);
+                                renewThisMug(renewForm);
+                            }
+                        },
+                        error: function(){
+                            hideCustomLoader();
+                            bootbox.alert('Some Error Occurred!');
+                        }
+                    });
+                }
+            }
+        });
+
+    });
+
+    function renewThisMug(postData)
+    {
+        showCustomLoader();
+        $.ajax({
+            type:"POST",
+            dataType:"json",
+            url:"<?php echo base_url();?>mugclub/mugRenew/json",
+            data:$(postData).serialize(),
+            success: function(data)
+            {
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    window.location.href=base_url+'mugclub';
+                }
+                else
+                {
+                    bootbox.alert('Try again later!');
+                }
+            },
+            error: function()
+            {
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+            }
+        });
+    }
+</script>
 
 </html>

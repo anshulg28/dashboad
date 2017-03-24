@@ -130,6 +130,7 @@ class Mugclub extends MY_Controller {
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
         $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
 
         $this->load->view('MugRenewView', $data);
     }
@@ -175,6 +176,18 @@ class Mugclub extends MY_Controller {
             $post['invoiceDate'] = date('Y-m-d');
             $post['mailStatus'] = 0;
 
+            $fromEmail = '';
+            $fromPass = '';
+            $isUserSet = false;
+            if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                && isset($post['senderPass']) && isStringSet($post['senderPass']))
+            {
+                $isUserSet = true;
+                $fromEmail = $post['senderEmail'];
+                $fromPass = $post['senderPass'];
+                unset($post['senderEmail'],$post['senderPass']);
+            }
+
             $this->mugclub_model->setMugRenew($post);
 
             if(isset($userEmail) && $userEmail != '')
@@ -185,11 +198,10 @@ class Mugclub extends MY_Controller {
                     "newEndDate" => $post['membershipEnd'],
                     "emailId" => $userEmail
                 );
-                if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
-                    && isset($post['senderPass']) && isStringSet($post['senderPass']))
+                if($isUserSet)
                 {
-                    $mailData['fromEmail'] = $post['senderEmail'];
-                    $mailData['fromPass'] = $post['senderPass'];
+                    $mailData['fromEmail'] = $fromEmail;
+                    $mailData['fromPass'] = $fromPass;
                 }
                 $this->sendemail_library->membershipRenewSendMail($mailData);
             }
@@ -231,7 +243,8 @@ class Mugclub extends MY_Controller {
                 $mugExists = $this->mugclub_model->getMugDataById($post['mugNum']);
             }
 
-            $params = $this->mugclub_model->filterMugParameters($post);
+            $invalidKeys = array('ifMail','senderEmail','senderPass');
+            $params = $this->mugclub_model->filterMugParameters($post,$invalidKeys);
 
             if($mugExists['status'] === false)
             {
@@ -299,6 +312,7 @@ class Mugclub extends MY_Controller {
                     }
                     $this->sendemail_library->signUpWelcomeSendMail($params);
                 }
+                unset($params['fromEmail'],$params['fromPass']);
                 if(isset($mugId))
                 {
                     $this->mugclub_model->updateMugRecord($params,$mugId);
@@ -332,7 +346,8 @@ class Mugclub extends MY_Controller {
             }
             else
             {
-                $params = $this->mugclub_model->filterMugParameters($post);
+                $invalidKeys = array();
+                $params = $this->mugclub_model->filterMugParameters($post,$invalidKeys);
                 $saveMail = array();
                 foreach($params as $key => $row)
                 {
@@ -880,8 +895,8 @@ class Mugclub extends MY_Controller {
         {
             $post = $this->input->post();
             $data = array();
-
-            $params = $this->mugclub_model->filterMugParameters($post);
+            $invalidKeys = array();
+            $params = $this->mugclub_model->filterMugParameters($post, $invalidKeys);
             $this->mugclub_model->updateMugRecord($params);
             $data['status'] = true;
         }

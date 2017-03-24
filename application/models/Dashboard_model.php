@@ -1180,4 +1180,20 @@ class Dashboard_Model extends CI_Model
         }
         return $data;
     }
+
+    public function getMailLastId()
+    {
+        $query = "SELECT id FROM swiftmailerlogs ORDER BY id DESC LIMIT 0,1";
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+
+    public function mailUpdateCount($lastId,$senderEmail)
+    {
+        $query = "SELECT count(*) as 'total' FROM swiftmailerlogs WHERE id > ".$lastId." AND sendFrom= '".$senderEmail."'";
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
 }

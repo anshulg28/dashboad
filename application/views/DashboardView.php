@@ -3408,75 +3408,109 @@
                 return false;
             }
         }
-        var senderEmail = $('#eventView #senderEmail').val();
-        bootbox.prompt({
-            title: "Please provide your Gmail("+senderEmail+") password",
-            inputType: 'password',
-            callback: function (result) {
-                if(result != null && result != '')
-                {
-                    showCustomLoader();
-                    var senderPass = result;
-                    $.ajax({
-                        type:'POST',
-                        dataType:'json',
-                        url: base_url+'mailers/checkGmailLogin',
-                        data:{from:senderEmail,fromPass:senderPass},
-                        success: function(data)
-                        {
-                            hideCustomLoader();
-                            if(data.status === false)
-                            {
-                                bootbox.alert('Invalid Gmail Credentials!');
-                            }
-                            else
-                            {
-                                showCustomLoader();
-                                $.ajax({
-                                    type:'POST',
-                                    dataType:'json',
-                                    url: eveApprovUrl,
-                                    data:{costType: $('#eventPrice-modal input[name="costType"]:checked').val(),
-                                        costPrice: costEntered,
-                                        doolallyFee: customFee,
-                                        from:senderEmail,fromPass:senderPass},
-                                    success: function(data){
-                                        hideCustomLoader();
-                                        if(data.status == true)
-                                        {
-                                            window.location.reload();
-                                        }
-                                        else
-                                        {
-                                            bootbox.alert(data.errorMsg, function(){
-                                                window.location.reload();
-                                            });
-                                        }
-                                    },
-                                    error: function(){
-                                        hideCustomLoader();
-                                        bootbox.alert('Some Error Occurred!');
-                                    }
-                                });
-                            }
-                        },
-                        error: function(){
-                            hideCustomLoader();
-                            bootbox.alert('Some Error Occurred!');
-                        }
-                    });
+        if(isDirectCostChange)
+        {
+            showCustomLoader();
+            $.ajax({
+                type:'POST',
+                dataType:'json',
+                url: eveApprovUrl,
+                data:{costType: $('#eventPrice-modal input[name="costType"]:checked').val(),
+                    costPrice: costEntered,
+                    doolallyFee: customFee},
+                success: function(data){
+                    hideCustomLoader();
+                    if(data.status == true)
+                    {
+                        window.location.reload();
+                    }
+                    else
+                    {
+                        bootbox.alert(data.errorMsg, function(){
+                            window.location.reload();
+                        });
+                    }
+                },
+                error: function(){
+                    hideCustomLoader();
+                    bootbox.alert('Some Error Occurred!');
                 }
-            }
-        });
+            });
+        }
+        else
+        {
+            var senderEmail = $('#eventView #senderEmail').val();
+            bootbox.prompt({
+                title: "Please provide your Gmail("+senderEmail+") password",
+                inputType: 'password',
+                callback: function (result) {
+                    if(result != null && result != '')
+                    {
+                        showCustomLoader();
+                        var senderPass = result;
+                        $.ajax({
+                            type:'POST',
+                            dataType:'json',
+                            url: base_url+'mailers/checkGmailLogin',
+                            data:{from:senderEmail,fromPass:senderPass},
+                            success: function(data)
+                            {
+                                hideCustomLoader();
+                                if(data.status === false)
+                                {
+                                    bootbox.alert('Invalid Gmail Credentials!');
+                                }
+                                else
+                                {
+                                    showCustomLoader();
+                                    $.ajax({
+                                        type:'POST',
+                                        dataType:'json',
+                                        url: eveApprovUrl,
+                                        data:{costType: $('#eventPrice-modal input[name="costType"]:checked').val(),
+                                            costPrice: costEntered,
+                                            doolallyFee: customFee,
+                                            from:senderEmail,fromPass:senderPass},
+                                        success: function(data){
+                                            hideCustomLoader();
+                                            if(data.status == true)
+                                            {
+                                                window.location.reload();
+                                            }
+                                            else
+                                            {
+                                                bootbox.alert(data.errorMsg, function(){
+                                                    window.location.reload();
+                                                });
+                                            }
+                                        },
+                                        error: function(){
+                                            hideCustomLoader();
+                                            bootbox.alert('Some Error Occurred!');
+                                        }
+                                    });
+                                }
+                            },
+                            error: function(){
+                                hideCustomLoader();
+                                bootbox.alert('Some Error Occurred!');
+                            }
+                        });
+                    }
+                }
+            });
+        }
 
     });
     var fixDoolallyFee = 250;
 
+    var isDirectCostChange = false
     $(document).on('click','#eventView .eventCostChange-icon', function(){
        var eveApprovType = $(this).attr('data-costType');
         eveApprovUrl = $(this).attr('data-url');
         costPrice = $(this).attr('data-costPrice');
         doolallyFee = Number($(this).attr('data-doolallyFee'));
+        isDirectCostChange = true;
         $('#eventPrice-modal input[name="costType"]').each(function(i,val){
 
             if($(val).val() != eveApprovType)

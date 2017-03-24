@@ -910,6 +910,18 @@ class Dashboard extends MY_Controller {
             $post['eventSlug'] = $eveSlug;
             $post['eventShareLink'] = MOBILE_URL.'?page/events/'.$eveSlug;
             $post['shortUrl'] = null;
+
+            $fromEmail = '';
+            $fromPass = '';
+            $isUserSet = false;
+            if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                && isset($post['senderPass']) && isStringSet($post['senderPass']))
+            {
+                $fromEmail = $post['senderEmail'];
+                $fromPass = $post['senderPass'];
+                $isUserSet = true;
+                unset($post['senderEmail'],$post['senderPass']);
+            }
             $eventId = $this->dashboard_model->saveEventRecord($post);
 
            /* $details = array(
@@ -945,11 +957,10 @@ class Dashboard extends MY_Controller {
                 'eventPlace' => $post['eventPlace']
             );
 
-            if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
-                && isset($post['senderPass']) && isStringSet($post['senderPass']))
+            if($isUserSet)
             {
-                $mailEvent['fromEmail'] = $post['senderEmail'];
-                $mailEvent['fromPass'] = $post['senderPass'];
+                $mailEvent['fromEmail'] = $fromEmail;
+                $mailEvent['fromPass'] = $fromPass;
             }
             //$loc = $this->locations_model->getLocationDetailsById($post['eventPlace']);
 
@@ -1313,7 +1324,108 @@ class Dashboard extends MY_Controller {
         }
 
         $this->dashboard_model->updateEventRecord($postData,$eventId);
-        $data['status']= true;
+
+        $eventDetails = $this->dashboard_model->getFullEventInfoById($eventId);
+        $instaLinkFailed = false;
+        if(isset($eventDetails[0]['instaSlug']) && isStringSet($eventDetails[0]['instaSlug']))
+        {
+            //Deleting old link
+            $this->curl_library->archiveInstaLink($eventDetails[0]['instaSlug']);
+        }
+
+        // Getting image upload url from api;
+        $instaImgLink = $this->curl_library->getInstaImageLink();
+        $donePost = array();
+        if($instaImgLink['success'] === true)
+        {
+            if(isset($attachement) && isStringSet($attachement))
+            {
+                $coverImg =  $this->curl_library->uploadInstaImage($instaImgLink['upload_url'],$attachement);
+            }
+            else
+            {
+                $coverImg =  $this->curl_library->uploadInstaImage($instaImgLink['upload_url'],$eventDetails[0]['filename']);
+            }
+            if(isset($coverImg) && myIsMultiArray($coverImg) && isset($coverImg['url']))
+            {
+                $postData = array(
+                    'title' => $eventDetails[0]['eventName'],
+                    'description' => $eventDetails[0]['eventDescription'],
+                    'currency' => 'INR',
+                    'base_price' => $eventDetails[0]['eventPrice'],
+                    'start_date' => $eventDetails[0]['eventDate'].' '.date("H:i", strtotime($eventDetails[0]['startTime'])),
+                    'end_date' => $eventDetails[0]['eventDate'].' '.date("H:i", strtotime($eventDetails[0]['endTime'])),
+                    'venue' => $eventDetails[0]['locName'].', Doolally Taproom',
+                    'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
+                    'cover_image_json' => json_encode($coverImg),
+                    'timezone' => 'Asia/Kolkata'
+                );
+                $donePost = $this->curl_library->createInstaLink($postData);
+            }
+        }
+        if(!myIsMultiArray($donePost)) //Creating event without image
+        {
+            if($post['costType'] == EVENT_FREE)
+            {
+                $postData = array(
+                    'title' => $eventDetails[0]['eventName'],
+                    'description' => $eventDetails[0]['eventDescription'],
+                    'currency' => 'INR',
+                    'base_price' => '0',
+                    'start_date' => $eventDetails[0]['eventDate'].' '.date("H:i", strtotime($eventDetails[0]['startTime'])),
+                    'end_date' => $eventDetails[0]['eventDate'].' '.date("H:i", strtotime($eventDetails[0]['endTime'])),
+                    'venue' => $eventDetails[0]['locData'][0]['locName'].', Doolally Taproom',
+                    'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
+                    'timezone' => 'Asia/Kolkata'
+                );
+            }
+            else
+            {
+                $postData = array(
+                    'title' => $eventDetails[0]['eventName'],
+                    'description' => $eventDetails[0]['eventDescription'],
+                    'currency' => 'INR',
+                    'base_price' => $eventDetails[0]['eventPrice'],
+                    'start_date' => $eventDetails[0]['eventDate'].' '.date("H:i", strtotime($eventDetails[0]['startTime'])),
+                    'end_date' => $eventDetails[0]['eventDate'].' '.date("H:i", strtotime($eventDetails[0]['endTime'])),
+                    'venue' => $eventDetails[0]['locData'][0]['locName'].', Doolally Taproom',
+                    'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
+                    'timezone' => 'Asia/Kolkata'
+                );
+            }
+            $donePost = $this->curl_library->createInstaLink($postData);
+        }
+
+        $instaUpLink = array();
+        if(isset($donePost['link']))
+        {
+            if(isset($donePost['link']['shorturl']))
+            {
+                $instaUpLink['eventPaymentLink'] = $donePost['link']['shorturl'];
+                $instaUpLink['instaSlug'] = $donePost['link']['slug'];
+            }
+            else
+            {
+                $instaUpLink['eventPaymentLink'] = $donePost['link']['url'];
+                $instaUpLink['instaSlug'] = $donePost['link']['slug'];
+            }
+
+            $this->dashboard_model->updateEventRecord($instaUpLink,$eventId);
+        }
+        else
+        {
+            $instaLinkFailed = true;
+        }
+
+        if($instaLinkFailed === true)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Failed To Create Link On Instamojo! Try Again Later';
+        }
+        else
+        {
+            $data['status']= true;
+        }
 
         echo json_encode($data);
     }
@@ -1327,14 +1439,6 @@ class Dashboard extends MY_Controller {
             $data['errorMsg'] = 'Session Timed Out, Please Re-login!';
             echo json_encode($data);
             return false;
-        }
-        $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
-
-        if(isset($post['from']) && isStringSet($post['from'])
-            && isset($post['fromPass']) && isStringSet($post['fromPass']))
-        {
-            $eventDetail['fromEmail'] = $post['from'];
-            $eventDetail['fromPass'] = $post['fromPass'];
         }
 
         if(isset($post['costType']) && $post['costType'] != '')
@@ -1355,6 +1459,14 @@ class Dashboard extends MY_Controller {
                 );
             }
             $this->dashboard_model->updateEventRecord($postData,$eventId);
+        }
+        $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
+
+        if(isset($post['from']) && isStringSet($post['from'])
+            && isset($post['fromPass']) && isStringSet($post['fromPass']))
+        {
+            $eventDetail['fromEmail'] = $post['from'];
+            $eventDetail['fromPass'] = $post['fromPass'];
         }
         if(isset($eventDetail[0]['eventPaymentLink']) && isStringSet($eventDetail[0]['eventPaymentLink']))
         {
@@ -1775,4 +1887,23 @@ class Dashboard extends MY_Controller {
         return $uData;
     }
 
+    public function getLastMailLog()
+    {
+        $data = array();
+        $mailLogId = $this->dashboard_model->getMailLastId();
+        $data['id'] = $mailLogId['id'];
+
+        echo json_encode($data);
+    }
+
+    public function getUpdateMailCount()
+    {
+        $data = array();
+        $post = $this->input->post();
+
+        $mailLogId = $this->dashboard_model->mailUpdateCount($post['lastId'],$post['senderEmail']);
+        $data['Count'] = $mailLogId['total'];
+
+        echo json_encode($data);
+    }
 }

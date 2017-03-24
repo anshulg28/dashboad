@@ -303,7 +303,7 @@
                             else
                             {
                                 $('#senderPass').val(senderPass);
-                                submitPressForm(formVar);
+                                submitPressForm(formVar,senderEmail,senderPass);
                             }
                         },
                         error: function(){
@@ -319,7 +319,7 @@
 
     });
 
-    function submitPressForm(form)
+    function submitPressForm(form,senderEmail,senderPass)
     {
         var m_data = new FormData();
         m_data.append( 'pressEmails', $('textarea[name=pressEmails]').val());
@@ -333,7 +333,10 @@
         {
             m_data.append( 'attachmentUrls', $('textarea[name=attachmentUrls]').val());
         }
-        //showCustomLoader();
+        m_data.append('senderEmail',senderEmail);
+        m_data.append('senderPass',senderPass);
+        var lastMailCount,updateInterval;
+        showCustomLoader();
         $.ajax({
             type:"POST",
             url:$(form).attr('action'),
@@ -342,14 +345,17 @@
             dataType:"json",
             data:m_data,
             success: function(data){
-
-                //hideCustomLoader();
+                hideCustomLoader();
                 if(data.status === true)
                 {
-
+                    //clearInterval(updateInterval);
+                    bootbox.alert('Mail Send Successfully', function(){
+                        window.location.href=base_url+'mailers';
+                    });
                 }
                 else
                 {
+                    //clearInterval(updateInterval);
                     if(typeof data.fileName != 'undefined')
                     {
                         bootbox.alert('<span class="my-danger-text">'+data.errorMsg+', File Name: '+data.fileName+'</span>');
@@ -361,12 +367,53 @@
                 }
             },
             error: function(){
-                //hideCustomLoader();
+                hideCustomLoader();
+                //clearInterval(updateInterval);
                 bootbox.alert('<span class="my-danger-text">Some Error occurred</span>');
             }
         });
-        bootbox.alert('Mail Send Successfully');
+        /*$.ajax({
+            type:'GET',
+            url:base_url+'dashboard/getLastMailLog',
+            dataType:'json',
+            success: function(data){
+                lastMailCount = data.id;
+                var senderEmail = $(form).find('#senderEmail').val();
+                updateInterval = setInterval(function(){getMailsUpdate(senderEmail,lastMailCount);},60000);
+
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('Error Connecting To Server!');
+            }
+        });*/
     }
+
+    /*function getMailsUpdate(senderEmail, lastMailCount)
+    {
+        var total = $('#toList').val().split(',').length;
+
+        var http = new XMLHttpRequest();
+        var url = base_url+'dashboard/getUpdateMailCount';
+        var params = "lastId="+lastMailCount+"&senderEmail="+senderEmail;
+        http.open("POST", url, true);
+
+        //Send the proper header information along with the request
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        http.onreadystatechange = function() {//Call a function when the state changes.
+            if(http.readyState == 4 && http.status == 200) {
+                var data = $.parseJSON(http.responseText);
+                if(typeof data.Count != 'undefined')
+                {
+                    $('#myCustomBeerLoader .mail-status-head').html('Status: '+data.Count+"/"+total+" Done");
+                    $('#myCustomBeerLoader .progress-bar').css('width', Math.round(data.Count/total*100)+'%').attr('aria-valuenow',data.Count).html(parseInt(Math.round(data.Count/total*100))+'%');
+                }
+            }
+        };
+        http.send(params);
+    }*/
+
     $(document).on('change', '.mugCheckList', function(){
         var emails= '';
         $('.mugCheckList:checked').each(function(i,val){

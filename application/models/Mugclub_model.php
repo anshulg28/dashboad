@@ -286,7 +286,7 @@ class Mugclub_Model extends CI_Model
 
         return $data;
     }
-    public function filterMugParameters($post)
+    public function filterMugParameters($post, $invalidKeys)
     {
         if(myIsArray($post))
         {
@@ -294,7 +294,7 @@ class Mugclub_Model extends CI_Model
 
             foreach ($post as $key => $row)
             {
-                if ($row != '' && $key != 'ifMail')
+                if ($row != '' && !myInArray($key,$invalidKeys))
                 {
                     switch ($key)
                     {
