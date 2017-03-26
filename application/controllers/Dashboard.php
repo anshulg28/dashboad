@@ -912,10 +912,14 @@ class Dashboard extends MY_Controller {
             $post['shortUrl'] = null;
             $eventId = $this->dashboard_model->saveEventRecord($post);
 
-           /* $details = array(
-                'eventShareLink'=> $eventShareLink,
-                'shortUrl' => null
-            );*/
+            // Adding event slug to new table
+            $newSlugTab = array(
+                'eventId' => $eventId,
+                'eventSlug' => $eveSlug,
+                'insertedDateTime' => date('Y-m-d H:i:s')
+            );
+            $this->dashboard_model->saveEventSlug($newSlugTab);
+
             $shortDWName = $this->googleurlapi->shorten(MOBILE_URL.'?page/events/'.$eveSlug);
             if($shortDWName !== false)
             {
@@ -1133,6 +1137,15 @@ class Dashboard extends MY_Controller {
                 $post['eventSlug'] = $eveSlug;
                 $post['eventShareLink'] = MOBILE_URL.'?page/events/'.$eveSlug;
                 $post['shortUrl'] = null;
+
+                // Adding event slug to new table
+                $newSlugTab = array(
+                    'eventId' => $eventId,
+                    'eventSlug' => $eveSlug,
+                    'insertedDateTime' => date('Y-m-d H:i:s')
+                );
+                $this->dashboard_model->saveEventSlug($newSlugTab);
+
                 $shortDWName = $this->googleurlapi->shorten(MOBILE_URL.'?page/events/'.$eveSlug);
                 if($shortDWName !== false)
                 {
@@ -1185,7 +1198,10 @@ class Dashboard extends MY_Controller {
         );
         $this->dashboard_model->updateEventRecord($details,$eventId);
         $this->sendemail_library->eventCancelUserMail($events);
-        $this->dashboard_model->cancelEventOffers($eventId);
+        if($events[0]['costType'] != EVENT_FREE && $events[0]['eventPrice'] != '0' && isset($eventId))
+        {
+            $this->dashboard_model->cancelEventOffers($eventId);
+        }
         $allAttendees = $this->dashboard_model->getJoinersInfo($eventId);
         if(isset($allAttendees) && myIsArray($allAttendees))
         {
