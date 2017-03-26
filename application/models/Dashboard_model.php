@@ -478,6 +478,7 @@ class Dashboard_Model extends CI_Model
             'ifActive' => '0'
         );
         $this->db->where('offerEvent',$eventId);
+        $this->db->where('offerType','Workshop');
         $this->db->update('offersmaster', $details);
         return true;
     }
@@ -617,10 +618,7 @@ class Dashboard_Model extends CI_Model
     }
     public function findCompletedEvents()
     {
-        $query = "SELECT em.eventId, em.eventName, em.eventDescription, em.eventType, em.eventDate, em.startTime, em.endTime, em.costType, 
-                  em.eventPrice, em.priceFreeStuff, em.eventPlace, em.eventCapacity, em.ifMicRequired, em.ifProjectorRequired, 
-                  em.creatorName, em.creatorPhone, em.creatorEmail, em.aboutCreator, em.userId, em.eventShareLink,
-                  em.eventPaymentLink, em.ifActive, em.ifApproved, ea.filename, l.locName
+        $query = "SELECT em.*, ea.filename, l.locName
                   FROM `eventcompletedmaster` em
                   LEFT JOIN eventattachment ea ON ea.eventId = em.eventId
                   LEFT JOIN locationmaster l ON eventPlace = l.id
@@ -762,11 +760,7 @@ class Dashboard_Model extends CI_Model
 
     public function getFullEventInfoById($eventId)
     {
-        $query = "SELECT em.eventId, em.eventName, em.eventDescription, em.eventType, em.eventDate, em.startTime, em.endTime, em.costType, 
-                  em.eventPrice, em.priceFreeStuff, em.eventPlace, em.eventCapacity, em.ifMicRequired, em.ifProjectorRequired, 
-                  em.creatorName, em.creatorPhone, em.creatorEmail, em.aboutCreator, em.userId, em.eventShareLink, em.eventSlug,
-                  em.instaSlug, em.eventPaymentLink,em.showEventDate, em.showEventTime, em.showEventPrice, em.ifActive,
-                  em.ifApproved, ea.filename, l.locName, l.mapLink
+        $query = "SELECT em.*, ea.filename, l.locName, l.mapLink
                   FROM `eventmaster` em
                   LEFT JOIN eventattachment ea ON ea.eventId = em.eventId
                   LEFT JOIN locationmaster l ON eventPlace = l.id
@@ -1195,5 +1189,11 @@ class Dashboard_Model extends CI_Model
 
         $result = $this->db->query($query)->row_array();
         return $result;
+    }
+
+    public function saveEventSlug($details)
+    {
+        $this->db->insert('eventslugmaster', $details);
+        return true;
     }
 }

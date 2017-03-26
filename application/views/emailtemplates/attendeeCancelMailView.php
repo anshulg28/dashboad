@@ -10,13 +10,12 @@
         Dear <?php echo $mailData['firstName']; ?><br><br>
 
         The organiser <?php echo str_replace('.','',$mailData['creatorName']); ?> has cancelled the event <?php echo trim($mailData['eventName']); ?>.
-         For paid events, the money will be fully refunded to you.
 
         <?php
             if(isset($mailData['refundId']))
             {
                 ?>
-                The coupon code that we sent you in the earlier mail is now invalid.<br><br>
+                 For paid events, the money will be fully refunded to you. The coupon code that we sent you in the earlier mail is now invalid.<br><br>
                 Here are the refund details: <br>
                 Refund Id: <?php echo $mailData['refundId'];?><br>
                 <b>
