@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <p>Hi <?php echo ucfirst($mailData['firstName']);?>,</p>
+    <p>Hi <?php echo ucfirst(trim($mailData['firstName']));?>,</p>
     <p>We have received the payment for your mug #<?php echo $mailData['mugId'];?><br><br>
         We will be extending your expiry date to one year from now i.e <?php $d = date_create($mailData['newEndDate']); echo date_format($d,DATE_MAIL_FORMAT_UI);?><br><br>
 

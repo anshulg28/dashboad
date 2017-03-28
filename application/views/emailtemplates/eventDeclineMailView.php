@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <p>Dear <?php echo $mailData[0]['creatorName'] ?>,</p>
+    <p>Dear <?php echo trim($mailData[0]['creatorName']); ?>,</p>
     <p>
         Sorry, your event has not been approved. Please read our guidelines once again while creating event<br><br>
         You can try creating another event here..<a href="<?php echo MOBILE_URL.'?page/create_event';?>" target="_blank">Create an event</a><br><br>

@@ -71,7 +71,7 @@
                                                 <div class="col-sm-10">
                                                     <div class="row">
                                                         <div class="col-xs-11">
-                                                            <textarea class="form-control" name="pressEmails" id="toList" placeholder="Email Id(s) (comma separated)"></textarea>
+                                                            <textarea class="form-control" name="pressEmails" id="toList" placeholder="Email Id(s) (comma separated)" readonly></textarea>
                                                         </div>
                                                     </div>
                                                 </div>

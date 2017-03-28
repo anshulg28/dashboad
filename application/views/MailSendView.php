@@ -471,19 +471,29 @@
     function changeToList()
     {
         var allChecked = 1;
+        var newMugList = [];
         $('.mailPage .mugCheckList').each(function(i,val){
             if(!$(val).is(':checked')) {
                 allChecked = 0;
             }
+            else
+            {
+                newMugList.push($(val).val());
+            }
         });
-        if(allChecked == 0)
+        if(newMugList.length == 0)
+        {
+            $('.mailPage #toExpiryList').html('Nothing Selected!');
+        }
+        $('.mailPage #toExpiryList').html(newMugList.join());
+        /*if(allChecked == 0)
         {
             $('.mailPage #toExpiryList').html('MANY');
         }
         else
         {
             $('.mailPage #toExpiryList').html('ALL');
-        }
+        }*/
     }
 
     $(document).on('submit','#mainMailerForm',function(e){

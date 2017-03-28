@@ -1597,11 +1597,12 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Signup List for <b><span class="eventName"></span></b></h4>
+                    <div class="signup-for-download hide"></div>
                 </div>
-                <div class="modal-body text-center">
-
+                <div class="modal-body text-center signup-tab">
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-primary exportToExcel hide" onclick="exporttocsv()">Export To Excel</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -3204,6 +3205,22 @@
 
     });
 
+    function exporttocsv() {
+
+        if($('#peopleView-modal .signup-for-download').html() != '')
+        {
+            //var excelTxt = $('#peopleView-modal .signup-for-download').html();
+            //$('#peopleView-modal .signup-tab').find('table').removeClass('table').removeClass('table-striped');
+            var a = document.createElement('a');
+            with (a) {
+                href='data:application/vnd.ms-excel,' + $('#peopleView-modal .signup-for-download').html();
+                download="<?php echo date('d/m/Y');?>_signups.xls";
+            }
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    }
     $(document).on('click','.eventSignups-icon', function(){
         var eventId = $(this).attr('data-eventId');
         var eventName = $(this).attr('data-eventName');
@@ -3219,11 +3236,21 @@
                     $('#peopleView-modal .eventName').html(eventName);
                     if(typeof data.joinData != 'undefined' && data.joinData != null && data.joinData.length != 0)
                     {
+                        var downTbl = '<table>';
                         var tblHtml = '<table class="table table-striped">';
+                        downTbl += '<thead><tr><th>Name</th><th>Email</th><th>Quantitiy</th><th>Signup Date/time</th>';
+                        downTbl += '</tr></thead><tbody>';
                         tblHtml += '<thead><tr><th>Name</th><th>Email</th><th>Quantitiy</th><th>Signup Date/time</th>';
                         tblHtml += '</tr></thead><tbody>';
                         for(var i=0;i<data.joinData.length;i++)
                         {
+                            downTbl += '<tr>';
+                            downTbl += '<td>'+data.joinData[i].firstName+' '+data.joinData[i].lastName+'</td>';
+                            downTbl += '<td>'+data.joinData[i].emailId+'</td>';
+                            downTbl += '<td>'+data.joinData[i].quantity+'</td>';
+                            downTbl += '<td>'+formatJsDate(data.joinData[i].createdDT)+'</td>';
+                            downTbl += '</tr>';
+
                             tblHtml += '<tr>';
                             tblHtml += '<td>'+data.joinData[i].firstName+' '+data.joinData[i].lastName+'</td>';
                             tblHtml += '<td>'+data.joinData[i].emailId+'</td>';
@@ -3231,12 +3258,16 @@
                             tblHtml += '<td>'+formatJsDate(data.joinData[i].createdDT)+'</td>';
                             tblHtml += '</tr>';
                         }
+                        downTbl += '</tbody></table>';
                         tblHtml += '</tbody></table>';
                         $('#peopleView-modal .modal-body').html(tblHtml);
+                        $('#peopleView-modal .signup-for-download').html(downTbl);
+                        $('#peopleView-modal .exportToExcel').removeClass('hide');
                     }
                     else
                     {
                         $('#peopleView-modal .modal-body').html('No Sign ups');
+                        $('#peopleView-modal .exportToExcel').addClass('hide');
                     }
                     $('#peopleView-modal').modal('show');
                 }

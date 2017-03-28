@@ -524,8 +524,9 @@ class Mugclub_Model extends CI_Model
             ." FROM mugmaster "
             ."WHERE birthDate IS NOT NULL AND birthDate != '0000-00-00' AND membershipEnd >= CURRENT_DATE() "
             ."AND DATE_FORMAT(birthDate,'%m-%d') BETWEEN DATE_FORMAT( (CURRENT_DATE() - INTERVAL 1 WEEK ) , '%m-%d')"
-            ." AND DATE_FORMAT( CURRENT_DATE() , '%m-%d' ) AND birthdayMailStatus = 0 ";
-
+            ." AND DATE_FORMAT( CURRENT_DATE() , '%m-%d' ) AND birthdayMailStatus = 0 "
+            ."AND CONCAT( YEAR( CURRENT_DATE( ) ) ,  '-', MONTH( birthDate ) ,  '-', DAY( birthDate ) ) >= membershipStart"
+            ." AND CONCAT( YEAR( CURRENT_DATE( ) ) ,  '-', MONTH( birthDate ) ,  '-', DAY( birthDate ) ) <= membershipEnd";
         if($locSort === true)
         {
             $query .= ' AND homeBase IN('.$locArray.')';

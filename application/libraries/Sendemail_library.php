@@ -316,7 +316,7 @@ class Sendemail_library
         }
         else
         {
-            $userData['senderPhone'] = '9999999999';
+            $userData['senderPhone'] = '';
         }
         //$userData['senderPhone'] = $phons[$userData['senderName']];
         $data['mailData'] = $userData;
@@ -352,7 +352,7 @@ class Sendemail_library
             $fromName = $userData['senderName'];
         }
 
-        $subject = 'Sorry, your event has not been approved';
+        $subject = 'Sorry, '.$userData[0]['eventName'].' has not been approved';
         $toEmail = $userData[0]['creatorEmail'];
 
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);

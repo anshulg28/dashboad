@@ -175,6 +175,7 @@ class Mugclub extends MY_Controller {
             }
             $post['invoiceDate'] = date('Y-m-d');
             $post['mailStatus'] = 0;
+            $post['birthdayMailStatus'] = 0;
 
             $fromEmail = '';
             $fromPass = '';

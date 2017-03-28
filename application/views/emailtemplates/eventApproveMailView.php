@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <p>Dear <?php echo $mailData[0]['creatorName'] ?>,</p>
+    <p>Dear <?php echo trim($mailData[0]['creatorName']); ?>,</p>
     <p>
         1. Your event has been approved! Here's a link to your event - <?php echo $mailData[0]['eventShareLink'] ?><br><br>
         2. Additionally, as an organiser, you are expected:<br>
@@ -26,7 +26,7 @@
         <?php echo $mailData['senderPhone'] .' ('.$mailData['senderName'].')';?><br><br>
 
         Cheers!<br>
-        <?php echo $mailData['senderName']; ?>
+        <?php echo ucfirst($mailData['senderName']); ?>
     </p>
 
 </body>

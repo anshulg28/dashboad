@@ -23,7 +23,7 @@
         <?php echo $mailData['senderPhone'] .' ('.$mailData['senderName'].')';?><br><br>
 
         Cheers!<br>
-        <?php echo $mailData['senderName'];?>
+        <?php echo ucfirst($mailData['senderName']);?>
     </p>
 
 </body>
