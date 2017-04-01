@@ -301,9 +301,11 @@
                     $('#geneCodes').html(myCodesHtml);
                 }
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 $('.location-status').css('color','red').html('Some Error Occurred');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
 

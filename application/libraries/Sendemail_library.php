@@ -366,7 +366,7 @@ class Sendemail_library
         $senderName = 'Doolally';
         $senderEmail = DEFAULT_SENDER_EMAIL;
         $fromPass = DEFAULT_SENDER_PASS;
-        $replyTo = $userData['senderEmail'];
+        $replyTo = $senderEmail;
         $senderPhone = $phons['Tresha'];
 
         if($mailRecord['status'] === true)

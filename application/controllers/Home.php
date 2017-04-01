@@ -775,7 +775,7 @@ class Home extends MY_Controller {
 
             if(isset($walletBal['mobNum']) && $walletBal['mobNum'] != '')
             {
-                $newOtp = mt_rand(10000,999999);
+                $newOtp = mt_rand(1000,99999);
 
                 $details = array(
                     'userOtp'=> $newOtp

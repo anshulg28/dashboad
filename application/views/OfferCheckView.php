@@ -159,9 +159,11 @@
                 }
 
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert('Unable To Connect To Server!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
 
@@ -211,10 +213,12 @@
                             bootbox.alert('<label class="my-danger-text">'+data.errorMsg+'</label>');
                         }
                     },
-                    error: function()
+                    error: function(xhr, status, error)
                     {
                         hideCustomLoader();
                         bootbox.alert('Unable To Connect To Server!');
+                        var err = '<pre>'+xhr.responseText+'</pre>';
+                        saveErrorLog(err);
                     }
                 });
             }

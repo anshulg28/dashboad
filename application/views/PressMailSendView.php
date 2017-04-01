@@ -306,9 +306,11 @@
                                 submitPressForm(formVar,senderEmail,senderPass);
                             }
                         },
-                        error: function(){
+                        error: function(xhr, status, error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
                         }
                     });
                 }
@@ -366,10 +368,12 @@
                     }
                 }
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 //clearInterval(updateInterval);
                 bootbox.alert('<span class="my-danger-text">Some Error occurred</span>');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
         /*$.ajax({

@@ -178,8 +178,10 @@
                             $(parent).fadeOut();
                         }
                     },
-                    error: function(){
+                    error: function(xhr, status, error){
                         bootbox.alert('Some Error Occurred!');
+                        var err = '<pre>'+xhr.responseText+'</pre>';
+                        saveErrorLog(err);
                     }
                 });
             }

@@ -336,6 +336,14 @@ class Dashboard_Model extends CI_Model
 
         return $data;
     }
+
+    public function getFeedbackData()
+    {
+        $query = "SELECT ufm.*, lm.locName FROM usersfeedbackmaster ufm
+                  LEFT JOIN locationmaster lm ON ufm.feedbackLoc  = lm.id";
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
     public function getWeeklyFeedBack()
     {
         $query = "SELECT *
@@ -1194,6 +1202,12 @@ class Dashboard_Model extends CI_Model
     public function saveEventSlug($details)
     {
         $this->db->insert('eventslugmaster', $details);
+        return true;
+    }
+    public function saveErrorLog($details)
+    {
+        $details['insertedDateTime'] = date('Y-m-d H:i:s');
+        $this->db->insert('errorlogger', $details);
         return true;
     }
 }

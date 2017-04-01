@@ -127,10 +127,12 @@
                     $('#mainLoginForm .login-error-block').html(data.errorMsg);
                 }
             },
-            error:function()
+            error:function(xhr, status, error)
             {
                 $('#mainLoginForm button[type="submit"]').removeAttr("disabled");
                 $('#mainLoginForm .login-error-block').html('Some Error Occurred, Try Again!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
         e.preventDefault();

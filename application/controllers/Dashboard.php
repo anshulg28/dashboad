@@ -117,6 +117,7 @@ class Dashboard extends MY_Controller {
             $data['feedbacks']['colaba'] = (int)(($promo['colaba']/$total['colaba'])*100 - ($de['colaba']/$total['colaba'])*100);
         }
 
+        $data['allFeedbacks'] = $this->dashboard_model->getFeedbackData();
         $events = $this->dashboard_model->getAllEvents();
 
         if(isset($events) && myIsMultiArray($events))
@@ -1921,5 +1922,16 @@ class Dashboard extends MY_Controller {
         $data['Count'] = $mailLogId['total'];
 
         echo json_encode($data);
+    }
+
+    public function saveErrorLog()
+    {
+        $post = $this->input->post();
+
+        if(isset($post['errorTxt']))
+        {
+            $this->dashboard_model->saveErrorLog($post);
+        }
+        return true;
     }
 }

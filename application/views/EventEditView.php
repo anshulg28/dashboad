@@ -342,8 +342,10 @@
                             $(parent).remove();
                         }
                     },
-                    error: function(){
+                    error: function(xhr, status, error){
                         bootbox.alert('Some Error Occurred!');
+                        var err = '<pre>'+xhr.responseText+'</pre>';
+                        saveErrorLog(err);
                     }
                 });
             }
@@ -595,9 +597,11 @@
                                 bootbox.alert(data.errorMsg);
                             }
                         },
-                        error: function(){
+                        error: function(xhr, status, error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
                         }
                     });
                 }
@@ -622,9 +626,11 @@
                         bootbox.alert(data.errorMsg);
                     }
                 },
-                error: function(){
+                error: function(xhr, status, error){
                     hideCustomLoader();
                     bootbox.alert('Some Error Occurred!');
+                    var err = '<pre>'+xhr.responseText+'</pre>';
+                    saveErrorLog(err);
                 }
             });
         }

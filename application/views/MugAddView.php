@@ -180,8 +180,10 @@
                         $('form button[type="submit"]').attr('disabled','true');
                     }
                 },
-                error: function(){
+                error: function(xhr, status, error){
                     $('.mugNumber-status').css('color','red').html('Some Error Occurred');
+                    var err = '<pre>'+xhr.responseText+'</pre>';
+                    saveErrorLog(err);
                 }
             });
         }
@@ -221,8 +223,10 @@
                         $('form button[type="submit"]').attr('disabled','true');
                     }
                 },
-                error: function(){
+                error: function(xhr, status, error){
                     $('.mobile-verification-holder  ').css('color','red').html('Some Error Occurred');
+                    var err = '<pre>'+xhr.responseText+'</pre>';
+                    saveErrorLog(err);
                 }
             });
         }
@@ -292,9 +296,11 @@
                                     $('form button[type="submit"]').removeAttr('disabled');
                                 }
                             },
-                            error: function(){
+                            error: function(xhr, status, error){
                                 hideCustomLoader();
                                 bootbox.alert('Some Error Occurred!');
+                                var err = '<pre>'+xhr.responseText+'</pre>';
+                                saveErrorLog(err);
                             }
                         });
                     }

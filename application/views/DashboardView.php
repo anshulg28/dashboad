@@ -499,6 +499,10 @@
                                 data-toggle="modal" data-target="#feedback-modal">
                             Show Graph
                         </button>
+                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                data-toggle="modal" data-target="#feedData-modal">
+                            Show Feedback Data
+                        </button>
                     </div>
                     <div class="mdl-cell mdl-cell--1-col"></div>
                     <!-- Dynamic Form -->
@@ -1542,6 +1546,71 @@
 
         </div>
     </div>
+    <div id="feedData-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Feedback Data</h4>
+                </div>
+                <div class="modal-body">
+                    <?php
+                        if(isset($allFeedbacks) && myIsArray($allFeedbacks))
+                        {
+                            ?>
+                    <table id="main-feedback-table" class="table table-hover table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Rating</th>
+                            <th>Gender</th>
+                            <th>Age</th>
+                            <th>Location</th>
+                            <th>Inserted Date/Time</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            foreach($allFeedbacks as $key => $row)
+                            {
+                                ?>
+                                    <tr>
+                                        <td><?php echo $row['id'];?></td>
+                                        <td><?php echo $row['overallRating'];?></td>
+                                        <td>
+                                            <?php
+                                                if($row['userGender'] == 'M')
+                                                {
+                                                    echo 'Man';
+                                                }
+                                                else
+                                                {
+                                                    echo 'Female';
+                                                }
+                                            ?>
+                                        </td>
+                                        <td><?php echo $row['userAge'];?></td>
+                                        <td><?php echo $row['locName'];?></td>
+                                        <td><?php $d = date_create($row['insertedDateTime']); echo date_format($d,DATE_TIME_FORMAT_UI);?></td>
+                                    </tr>
+                                <?php
+                            }
+                            ?>
+                        </tbody>
+                        </table>
+                            <?php
+                        }
+                    ?>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     <div id="beerLoc-modal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -2268,10 +2337,12 @@
                     }
                 });
             },
-            error: function()
+            error: function(xhr, status, error)
             {
                 hideCustomLoader();
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
 
@@ -2488,9 +2559,11 @@
                     }
                 });
             },
-            error: function()
+            error: function(xhr, status, error)
             {
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });
@@ -2534,9 +2607,11 @@
                                 renewThisMug(postData,selectedCard);
                             }
                         },
-                        error: function(){
+                        error: function(xhr,status, error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
                         }
                     });
                 }
@@ -2571,8 +2646,10 @@
                                 bootbox.alert('Try again later!');
                             }
                         },
-                        error: function(){
+                        error: function(xhr, status, error){
                             bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
                         }
                     });
                     $('.my-instaCard').each(function(i,val){
@@ -2589,9 +2666,11 @@
                     bootbox.alert('Try again later!');
                 }
             },
-            error: function()
+            error: function(xhr, status, error)
             {
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     }
@@ -2624,9 +2703,11 @@
                     window.location.href=data.pageUrl;
                 }
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });
@@ -2686,7 +2767,7 @@
                             '<span class="mdl-radio__label">Female</span>'+
                         '</label></div>';
             formHtml += '<div class="mdl-cell mdl-cell--3-col"><div class="mdl-textfield mdl-js-textfield">'+
-                        '<input class="mdl-textfield__input" name="userAge['+lastFormNumber+']" type="number" min="21" id="age">'+
+                        '<input class="mdl-textfield__input" name="userAge['+lastFormNumber+']" type="number" id="age">'+
                         '<label class="mdl-textfield__label" for="age">Age</label>'+
                         '</div></div>';
             formHtml += '<input type="hidden" name="feedbackLoc['+lastFormNumber+']" value="'+$('#feedbackLoc').val().trim()+'"/>';
@@ -2842,9 +2923,11 @@
                 }
                 $('#beerLoc-modal').modal('show');
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });
@@ -2910,9 +2993,11 @@
                 }
 
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });
@@ -3187,16 +3272,20 @@
                                             bootbox.alert(data.errorMsg);
                                         }
                                     },
-                                    error: function(){
+                                    error: function(xhr, status, error){
                                         hideCustomLoader();
                                         bootbox.alert('Some Error Occurred!');
+                                        var err = '<pre>'+xhr.responseText+'</pre>';
+                                        saveErrorLog(err);
                                     }
                                 });
                             }
                         },
-                        error: function(){
+                        error: function(xhr, status, error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
                         }
                     });
                 }
@@ -3272,9 +3361,11 @@
                     $('#peopleView-modal').modal('show');
                 }
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });
@@ -3313,9 +3404,11 @@
                     bootbox.alert(data.errorMsg);
                 }
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });
@@ -3410,16 +3503,20 @@
                                             });
                                         }
                                     },
-                                    error: function(){
+                                    error: function(xhr, status, error){
                                         hideCustomLoader();
                                         bootbox.alert('Some Error Occurred!');
+                                        var err = '<pre>'+xhr.responseText+'</pre>';
+                                        saveErrorLog(err);
                                     }
                                 });
                             }
                         },
-                        error: function(){
+                        error: function(xhr, status, error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
                         }
                     });
                 }
@@ -3462,9 +3559,11 @@
                         });
                     }
                 },
-                error: function(){
+                error: function(xhr, status, error){
                     hideCustomLoader();
                     bootbox.alert('Some Error Occurred!');
+                    var err = '<pre>'+xhr.responseText+'</pre>';
+                    saveErrorLog(err);
                 }
             });
         }
@@ -3515,16 +3614,20 @@
                                                 });
                                             }
                                         },
-                                        error: function(){
+                                        error: function(xhr, status, error){
                                             hideCustomLoader();
                                             bootbox.alert('Some Error Occurred!');
+                                            var err = '<pre>'+xhr.responseText+'</pre>';
+                                            saveErrorLog(err);
                                         }
                                     });
                                 }
                             },
-                            error: function(){
+                            error: function(xhr, status, error){
                                 hideCustomLoader();
                                 bootbox.alert('Some Error Occurred!');
+                                var err = '<pre>'+xhr.responseText+'</pre>';
+                                saveErrorLog(err);
                             }
                         });
                     }
@@ -3752,18 +3855,22 @@
                                                     bootbox.alert('<label class="my-danger-text">'+data.errorMsg+'</label>');
                                                 }
                                             },
-                                            error: function(){
+                                            error: function(xhr, status, error){
                                                 hideCustomLoader();
                                                 bootbox.alert('Some Error Occurred!');
+                                                var err = '<pre>'+xhr.responseText+'</pre>';
+                                                saveErrorLog(err);
                                             }
                                         });
                                     }
                                 });
                             }
                         },
-                        error: function(){
+                        error: function(xhr, status, error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
                         }
                     });
                 }
@@ -3786,6 +3893,7 @@
                 $('#eventAdd #dashboardEventAdd').find($('#newPlaceInput')).remove();
         }
     });
+    $('#main-feedback-table').DataTable();
 </script>
 
 </html>

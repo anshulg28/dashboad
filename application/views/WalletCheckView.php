@@ -223,10 +223,12 @@
                         $('#checkinBtn').addClass('hide');
                     }
                 },
-                error: function(){
+                error: function(xhr, status, error){
                     hideCustomLoader();
                     bootbox.alert('Some Error Occurred!');
                     $('#checkinBtn').addClass('hide');
+                    var err = '<pre>'+xhr.responseText+'</pre>';
+                    saveErrorLog(err);
                 }
             });
         }

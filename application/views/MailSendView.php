@@ -550,9 +550,11 @@
                                 SubmitMailForm(formVar);
                             }
                         },
-                        error: function(){
+                        error: function(xhr,status,error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
                         }
                     });
                 }
@@ -579,9 +581,11 @@
                     removeNotifications();
                 }
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert('Some Error occurred');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     }

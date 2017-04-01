@@ -144,8 +144,10 @@
                         userVerified = 0;
                     }
                 },
-                error: function(){
+                error: function(xhr, status, error){
                     $('.username-status').css('color','red').html('Some Error Occurred');
+                    var err = '<pre>'+xhr.responseText+'</pre>';
+                    saveErrorLog(err);
                 }
             });
         }

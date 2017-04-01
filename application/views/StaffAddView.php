@@ -125,8 +125,8 @@
                 success: function(data){
                     if(data.status == true)
                     {
-                        $('.error-dup').css('color','green').html('Employee Id Available!');
-                        $('button[type="submit"]').removeAttr('disabled');
+                        //$('.error-dup').css('color','green').html('Employee Id Available!');
+                        //$('button[type="submit"]').removeAttr('disabled');
                     }
                     else
                     {
@@ -176,9 +176,11 @@
                     $('.error-dup').css('color','red').html(data.errorMsg);
                 }
             },
-            error: function(){
+            error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert("Some Error Occurred!");
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });

@@ -211,9 +211,11 @@
                                     $('form button[type="submit"]').removeAttr('disabled');
                                 }
                             },
-                            error: function(){
+                            error: function(xhr, status, error){
                                 hideCustomLoader();
                                 bootbox.alert('Some Error Occurred!');
+                                var err = '<pre>'+xhr.responseText+'</pre>';
+                                saveErrorLog(err);
                             }
                         });
                     }

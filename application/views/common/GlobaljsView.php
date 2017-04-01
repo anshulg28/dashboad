@@ -30,6 +30,18 @@
 </script>
 
 <script>
+
+    function saveErrorLog(errorTxt)
+    {
+        $.ajax({
+            type:'POST',
+            dataType:'json',
+            url:base_url+'dashboard/saveErrorLog',
+            data:{errorTxt: errorTxt},
+            success: function(data){},
+            error: function(){}
+        });
+    }
     $(document).on('submit','#mainLoginForm', function(e){
 
         e.preventDefault();
@@ -62,11 +74,13 @@
                     $('.login-error-block').css('color','red').html(data.errorMsg);
                 }
             },
-            error:function()
+            error:function(xhr, status, error)
             {
                 hideCustomLoader();
                 $('#mainLoginForm button[type="submit"]').removeAttr("disabled");
                 $('.login-error-block').css('color','red').html('Some Error Occurred, Try Again!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });
@@ -313,8 +327,10 @@ $(document).on('click','.homePage .request-otp', function(){
                 $('.homePage .login-error-block').css('color','red').html(data.errorMsg);
             }
         },
-        error: function(){
+        error: function(xhr, status, error){
             bootbox.alert('Some Error Occurred!');
+            var err = '<pre>'+xhr.responseText+'</pre>';
+            saveErrorLog(err);
         }
     });
 });
@@ -371,8 +387,10 @@ $(document).on('click','.homePage .request-otp', function(){
                     $('.loginPage .login-error-block').css('color','red').html(data.errorMsg);
                 }
             },
-            error: function(){
+            error: function(xhr, status, error){
                 bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
             }
         });
     });
