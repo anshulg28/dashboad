@@ -848,7 +848,8 @@
 
                                         foreach($eventDetails as $key => $row)
                                         {
-                                            if($row['eventData']['isEventCancel'] == '0' || $row['eventData']['isEventCancel'] == '1')
+                                            if(($row['eventData']['isEventCancel'] == '0' || $row['eventData']['isEventCancel'] == '1') &&
+                                                $row['eventData']['ifApproved'] != EVENT_DECLINED)
                                             {
                                                 $eveLoc = $row['eventData']['eventPlace'];
                                                 ?>
@@ -1311,7 +1312,7 @@
                                     <?php
                                     foreach($eventDetails as $key => $row)
                                     {
-                                        if($row['eventData']['isEventCancel'] == '2')
+                                        if($row['eventData']['isEventCancel'] == '2' || $row['eventData']['ifApproved'] == EVENT_DECLINED)
                                         {
                                             ?>
                                             <tr>
@@ -3327,15 +3328,16 @@
                     {
                         var downTbl = '<table>';
                         var tblHtml = '<table class="table table-striped">';
-                        downTbl += '<thead><tr><th>Name</th><th>Email</th><th>Quantitiy</th><th>Signup Date/time</th>';
+                        downTbl += '<thead><tr><th>Name</th><th>Email</th><th>Mobile Number</th><th>Quantitiy</th><th>Signup Date/time</th>';
                         downTbl += '</tr></thead><tbody>';
-                        tblHtml += '<thead><tr><th>Name</th><th>Email</th><th>Quantitiy</th><th>Signup Date/time</th>';
+                        tblHtml += '<thead><tr><th>Name</th><th>Email</th><th>Mobile Number</th><th>Quantitiy</th><th>Signup Date/time</th>';
                         tblHtml += '</tr></thead><tbody>';
                         for(var i=0;i<data.joinData.length;i++)
                         {
                             downTbl += '<tr>';
                             downTbl += '<td>'+data.joinData[i].firstName+' '+data.joinData[i].lastName+'</td>';
                             downTbl += '<td>'+data.joinData[i].emailId+'</td>';
+                            downTbl += '<td>'+data.joinData[i].mobNum+'</td>';
                             downTbl += '<td>'+data.joinData[i].quantity+'</td>';
                             downTbl += '<td>'+formatJsDate(data.joinData[i].createdDT)+'</td>';
                             downTbl += '</tr>';
@@ -3343,6 +3345,7 @@
                             tblHtml += '<tr>';
                             tblHtml += '<td>'+data.joinData[i].firstName+' '+data.joinData[i].lastName+'</td>';
                             tblHtml += '<td>'+data.joinData[i].emailId+'</td>';
+                            tblHtml += '<td>'+data.joinData[i].mobNum+'</td>';
                             tblHtml += '<td>'+data.joinData[i].quantity+'</td>';
                             tblHtml += '<td>'+formatJsDate(data.joinData[i].createdDT)+'</td>';
                             tblHtml += '</tr>';

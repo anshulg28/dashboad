@@ -23,6 +23,7 @@ $config['phons'] = array(
     'Daksha' => '9892110655',
     'Shweta' => '7045170006',
     'Richa' => '7678039911',
+    'Belinda' => '9930415379',
     'Fn Com4' => '9999999999',
     'Fn Com1' => '9999999999',
     'Fn Com2' => '9999999999',
@@ -47,11 +48,7 @@ $config['eventTypes'] = array(
 );
 
 $config['ccList'] = array(
-    "gauravsaha84+cc1@gmail.com",
-    "anshulgupta@rocketmail.com",
-    "gauravsaha84+cc2@gmail.com",
-    "gauravsaha84+cc3@gmail.com",
-    "gauravsaha84+cc4@gmail.com"
+    "tresha@brewcraftsindia.com"
 );
 $config['eventTc'] = '<div class="page-content">
     <div class="content-block">

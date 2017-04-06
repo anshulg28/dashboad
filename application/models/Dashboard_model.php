@@ -597,7 +597,7 @@ class Dashboard_Model extends CI_Model
     }
     public function getJoinersInfo($eventId)
     {
-        $query = "SELECT um.firstName, um.lastName, um.emailId, erm.paymentId, erm.quantity, erm.createdDT
+        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.quantity, erm.createdDT
                   FROM eventregistermaster erm
                   LEFT JOIN doolally_usersmaster um ON um.userId = erm.bookerUserId
                   WHERE erm.isUserCancel != 1 AND erm.eventId = $eventId ORDER BY erm.createdDT DESC";
@@ -915,7 +915,7 @@ class Dashboard_Model extends CI_Model
     {
         $query = "SELECT *"
             ." FROM staffbillingmaster"
-            ." WHERE billNum = ".$billNum;
+            ." WHERE billNum LIKE '".$billNum."'";
 
         $result = $this->db->query($query)->result_array();
 
@@ -1207,6 +1207,7 @@ class Dashboard_Model extends CI_Model
     public function saveErrorLog($details)
     {
         $details['insertedDateTime'] = date('Y-m-d H:i:s');
+        $details['fromWhere'] = 'Dashboard';
         $this->db->insert('errorlogger', $details);
         return true;
     }

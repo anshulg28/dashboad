@@ -127,6 +127,7 @@
                                     <th class="">Mug #</th>
                                     <th>Name</th>
                                     <th>Mobile #</th>
+                                    <th>Location</th>
                                     <th>Birth Date</th>
                                 </tr>
                                 </thead>
@@ -171,10 +172,10 @@
                                                     <span class="infoLabel hide">Mobile #</span>
                                                     <span class="infoData"><?php echo $row['mobileNo'];?></span>
                                                 </td>
-                                                <!--<td class="hide">
-                                                    <span class="infoLabel">Email</span>
-                                                    <span class="infoData"><?php /*echo $row['emailId'];*/?></span>
-                                                </td>-->
+                                                <td>
+                                                    <span class="infoLabel hide">Location</span>
+                                                    <span class="infoData"><?php echo $row['locName'];?></span>
+                                                </td>
                                                 <td>
                                                     <span class="infoLabel hide">Birth Date</span>
                                                     <span class="infoData">

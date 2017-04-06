@@ -273,56 +273,59 @@ class Mailers extends MY_Controller {
         }
         foreach($mugNums as $key)
         {
-            $mugInfo = $this->mugclub_model->getMugDataForMailById($key);
-            if($post['mailType'] == BIRTHDAY_MAIL)
+            if(isset($key) && isStringSet($key))
             {
-                $newDate =array("membershipEnd"=> date('Y-m-d', strtotime($mugInfo['mugList'][0]['membershipEnd'].' +3 month')));
-                $this->mugclub_model->extendMemberShip($key,$newDate);
-                $mugInfo['mugList'][0]['membershipEnd'] = $newDate['membershipEnd'];
-            }
-            $newSubject = $this->replaceMugTags($post['mailSubject'],$mugInfo);
-            $newBody = $this->replaceMugTags($post['mailBody'],$mugInfo);
-            if(isset($post['isSimpleMail']) && $post['isSimpleMail'] == '1')
-            {
-                $mainBody = '<html><body>';
-                $body = $newBody;
-                $body = wordwrap($body, 70);
-                $body = nl2br($body);
-                $body = stripslashes($body);
-                $mainBody .= $body .'</body></html>';
-                $newBody = $mainBody;
-            }
-            $cc        = implode(',',$this->config->item('ccList'));
-            $fromName  = 'Doolally';
-            if(isset($this->userFirstName))
-            {
-                $fromName = trim(ucfirst($this->userFirstName));
-            }
-            $fromEmail = DEFAULT_SENDER_EMAIL;
-            $fromPass = DEFAULT_SENDER_PASS;
-            $replyTo = $fromEmail;
-
-            if(isset($this->userEmail))
-            {
-                $replyTo = $this->userEmail;
-                /*$userInfo = $this->login_model->checkEmailSender($this->userEmail);
-                if(isset($userInfo) && myIsArray($userInfo))
+                $mugInfo = $this->mugclub_model->getMugDataForMailById($key);
+                if($post['mailType'] == BIRTHDAY_MAIL)
                 {
-                    $fromPass = $userInfo['gmailPass'];
-                    $fromEmail = $this->userEmail;
-                }*/
+                    $newDate =array("membershipEnd"=> date('Y-m-d', strtotime($mugInfo['mugList'][0]['membershipEnd'].' +3 month')));
+                    $this->mugclub_model->extendMemberShip($key,$newDate);
+                    $mugInfo['mugList'][0]['membershipEnd'] = $newDate['membershipEnd'];
+                }
+                $newSubject = $this->replaceMugTags($post['mailSubject'],$mugInfo);
+                $newBody = $this->replaceMugTags($post['mailBody'],$mugInfo);
+                if(isset($post['isSimpleMail']) && $post['isSimpleMail'] == '1')
+                {
+                    $mainBody = '<html><body>';
+                    $body = $newBody;
+                    $body = wordwrap($body, 70);
+                    $body = nl2br($body);
+                    $body = stripslashes($body);
+                    $mainBody .= $body .'</body></html>';
+                    $newBody = $mainBody;
+                }
+                $cc        = implode(',',$this->config->item('ccList'));
+                $fromName  = 'Doolally';
+                if(isset($this->userFirstName))
+                {
+                    $fromName = trim(ucfirst($this->userFirstName));
+                }
+                $fromEmail = DEFAULT_SENDER_EMAIL;
+                $fromPass = DEFAULT_SENDER_PASS;
+                $replyTo = $fromEmail;
 
+                if(isset($this->userEmail))
+                {
+                    $replyTo = $this->userEmail;
+                    /*$userInfo = $this->login_model->checkEmailSender($this->userEmail);
+                    if(isset($userInfo) && myIsArray($userInfo))
+                    {
+                        $fromPass = $userInfo['gmailPass'];
+                        $fromEmail = $this->userEmail;
+                    }*/
+
+                }
+
+                if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                    && isset($post['senderPass']) && isStringSet($post['senderPass']))
+                {
+                    $fromEmail = $post['senderEmail'];
+                    $fromPass = $post['senderPass'];
+                }
+
+                $this->sendemail_library->sendEmail($mugInfo['mugList'][0]['emailId'],$cc,$fromEmail, $fromPass,$fromName,$replyTo,$newSubject,$newBody);
+                $this->mailers_model->setMailSend($key,$post['mailType']);
             }
-
-            if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
-                && isset($post['senderPass']) && isStringSet($post['senderPass']))
-            {
-                $fromEmail = $post['senderEmail'];
-                $fromPass = $post['senderPass'];
-            }
-
-            $this->sendemail_library->sendEmail($mugInfo['mugList'][0]['emailId'],$cc,$fromEmail, $fromPass,$fromName,$replyTo,$newSubject,$newBody);
-            $this->mailers_model->setMailSend($key,$post['mailType']);
         }
 
         if($responseType == RESPONSE_JSON)

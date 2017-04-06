@@ -249,7 +249,7 @@ class Sendemail_library
         $cc        = implode(',',$this->CI->config->item('ccList'));
         $fromName  = $senderName;
 
-        $subject = 'You have withdrawn from '.$userData['eventName'];
+        $subject = $userData['eventName'].' has been cancelled';
         $toEmail = $userData['emailId'];
 
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
