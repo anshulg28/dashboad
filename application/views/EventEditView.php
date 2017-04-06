@@ -563,11 +563,11 @@
         var startT = $(this).find('#startTime').val();
         var endT = $(this).find('#endTime').val();
 
-        if(startT > endT)
+        /*if(startT > endT)
         {
             bootbox.alert('Event Time is not proper!');
             return false;
-        }
+        }*/
         if($(this).find('#creatorName').val() == '' &&
             $(this).find('#creatorPhone').val() == '' &&
             $(this).find('#creatorEmail').val() == '')

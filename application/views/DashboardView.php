@@ -3210,7 +3210,7 @@
             bootbox.alert('Event Description required!');
             return false;
         }
-        var d = new Date($(this).find('#eventDate').val());
+        /*var d = new Date($(this).find('#eventDate').val());
         var startT = $(this).find('#startTime').val();
         var endT = $(this).find('#endTime').val();
 
@@ -3218,7 +3218,7 @@
         {
             bootbox.alert('Event Time is not proper!');
             return false;
-        }
+        }*/
         if($(this).find('input[name="attachment"]').val() == '')
         {
             bootbox.alert('Event Image Required!');

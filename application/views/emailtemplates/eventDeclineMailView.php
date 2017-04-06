@@ -8,13 +8,12 @@
 <body>
     <p>Dear <?php echo trim($mailData[0]['creatorName']); ?>,</p>
     <p>
-        Sorry, your event has not been approved. Please read our guidelines once again while creating event<br><br>
-        You can try creating another event here..<a href="<?php echo MOBILE_URL.'?page/create_event';?>" target="_blank">Create an event</a><br><br>
+        Your event has been disapproved because the timings you have selected are not available.
+        You can either change your time slot or choose another taproom.<br><br>
 
-        In case you have any questions/queries please don't hesitate to write to me at this mail address or you can reach me at
-        <?php echo $mailData['senderPhone'] .' ('.ucfirst($mailData['senderName']).')';?><br><br>
+        You can reach out to me on <?php echo $mailData['senderPhone'] .' ('.ucfirst($mailData['senderName']).')';?> and I will help you schedule it better.<br><br>
 
-        Cheers!<br>
+        Thanks!<br>
         <?php echo ucfirst($mailData['senderName']); ?>
     </p>
 
