@@ -1930,6 +1930,10 @@ class Dashboard extends MY_Controller {
 
         if(isset($post['errorTxt']))
         {
+            if(isset($_SERVER['HTTP_REFERER']))
+            {
+                $post['refUrl'] = $_SERVER['HTTP_REFERER'];
+            }
             $this->dashboard_model->saveErrorLog($post);
         }
         return true;

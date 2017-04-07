@@ -163,16 +163,17 @@ class Mugclub extends MY_Controller {
 
             $this->mugclub_model->saveRenewRecord($mugDetails);
 
-            $post['membershipStart'] = date('Y-m-d');
+            $post['membershipStart'] = date($mugDetails['membershipEnd']);
+            $post['membershipEnd'] = date('Y-m-d', strtotime($post['membershipStart'].' +12 month'));
 
-            if(date('Y-m-d') <= $mugDetails['membershipEnd'])
+            /*if(date('Y-m-d') <= $mugDetails['membershipEnd'])
             {
                 $post['membershipEnd'] = date('Y-m-d', strtotime($mugDetails['membershipEnd'].' +12 month'));
             }
             else
             {
                 $post['membershipEnd'] = date('Y-m-d', strtotime($post['membershipStart'].' +12 month'));
-            }
+            }*/
             $post['invoiceDate'] = date('Y-m-d');
             $post['mailStatus'] = 0;
             $post['birthdayMailStatus'] = 0;
