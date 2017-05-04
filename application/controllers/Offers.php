@@ -465,4 +465,79 @@ class Offers extends MY_Controller {
 
         redirect($this->pageUrl);
     }
+
+    //Beer Olympics Coupon Codes for Mug Club Members
+    public function mugBeerOlympicsCoupons()
+    {
+        $toBeInserted = array();
+        $couponGens = array();
+
+        $mugList = $this->offers_model->getAllMugClubList();
+
+        if(isset($mugList) && myIsArray($mugList))
+        {
+            foreach($mugList as $key => $row)
+            {
+                $newCode = mt_rand(1000,99999);
+
+                while(myInArray($newCode,$couponGens))
+                {
+                    $newCode = mt_rand(1000,99999);
+                }
+
+                $toBeInserted[] = array(
+                    'couponCode' => 'BO'.$newCode,
+                    'couponType' => 'Percentage',
+                    'couponDetails' => '25',
+                    'ownerDetails' => $row['mugId'],
+                    'couponExpiry' => '2017-05-20',
+                    'isRedeemed' => 0,
+                    'ifActive' => 1,
+                    'createDateTime' => date('Y-m-d H:i:s'),
+                    'useDateTime' => null
+                );
+            }
+        }
+
+        $this->offers_model->saveOlympicsCodes($toBeInserted);
+        echo 'Saved';
+    }
+    public function randomBeerOlympicsCoupons()
+    {
+        $toBeInserted = array();
+        $couponGens = array();
+
+        $coupons = $this->offers_model->getOlympicsCoupons();
+        if(isset($coupons) && myIsArray($coupons))
+        {
+            $coupons = explode(',',$coupons['codes']);
+            for($i=0;$i<100;$i++)
+            {
+                $newCode = mt_rand(1000,99999);
+
+                while(myInArray('BO'.$newCode,$coupons))
+                {
+                    $newCode = mt_rand(1000,99999);
+                }
+
+                $toBeInserted[] = array(
+                    'couponCode' => 'BO'.$newCode,
+                    'couponType' => 'Percentage',
+                    'couponDetails' => '12.5',
+                    'ownerDetails' => 'unknown',
+                    'couponExpiry' => '2017-05-20',
+                    'isRedeemed' => 0,
+                    'ifActive' => 1,
+                    'createDateTime' => date('Y-m-d H:i:s'),
+                    'useDateTime' => null
+                );
+            }
+
+            $this->offers_model->saveOlympicsCodes($toBeInserted);
+            echo 'Saved';
+        }
+        else{
+            echo 'Failed';
+        }
+    }
 }

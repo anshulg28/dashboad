@@ -175,4 +175,49 @@ class Mailers_Model extends CI_Model
         $this->db->insert('swiftmailerlogs', $post);
         return true;
     }
+
+    //Get Beer Olympics Code
+    public function getOlympicsCode($mugId)
+    {
+        $query="SELECT couponCode FROM olympicscouponmaster WHERE ownerDetails LIKE '".$mugId."'";
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+    public function getOlympicsRandomCode()
+    {
+        $query="SELECT id, couponCode FROM olympicscouponmaster WHERE ownerDetails LIKE 'unknown'";
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+    public function updateCouponDone($details,$couponId)
+    {
+        $this->db->where('id', $couponId);
+        $this->db->update('olympicscouponmaster',$details);
+        return true;
+    }
+    public function saveWaitMailLog($post)
+    {
+        $this->db->insert('pendingmailsmaster', $post);
+        return true;
+    }
+    public function getAllPendingMails()
+    {
+        $query = "SELECT * FROM pendingmailsmaster WHERE sendStatus LIKE 'waiting' LIMIT 25";
+
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
+    public function updateMailDetails($details, $mailId)
+    {
+        $this->db->where('id',$mailId);
+        $this->db->update('pendingmailsmaster', $details);
+        return true;
+    }
+    public function saveDummyMugs($data)
+    {
+        $this->db->insert_batch('dummymugmaster',$data);
+        return true;
+    }
 }

@@ -580,4 +580,25 @@ class Mugclub_Model extends CI_Model
         return true;
     }
 
+    public function getDummyMugDataForMail($mugId)
+    {
+        $query = "SELECT mugId, firstName, lastName, mobileNo, emailId, birthDate, membershipEnd "
+            ."FROM dummymugmaster "
+            ."where mugId = ".$mugId;
+
+        $result = $this->db->query($query)->result_array();
+
+        $data['mugList'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
+
 }

@@ -93,6 +93,16 @@
                                 </div>
                             </a>
                         </li>
+                        <!-- For beer Olympics -->
+                        <li>
+                            <a href="<?php echo base_url().'mailers/sendBeer'; ?>">
+                                <div class="menuWrap">
+                                    <i class="fa fa-beer fa-2x"></i>
+                                    <br>
+                                    <span>Beer Olympics</span>
+                                </div>
+                            </a>
+                        </li>
                         <li>
                             <a href="<?php echo base_url().'mailers/pressSend'; ?>">
                                 <div class="menuWrap">

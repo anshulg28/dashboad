@@ -360,6 +360,25 @@ class Mailers extends MY_Controller {
                 break;
             }
         }
+        preg_match_all('/\[[offercode]\w+\]/', $tagStr, $offer_array);
+        if(myIsMultiArray($offer_array))
+        {
+            foreach($offer_array as $key => $row)
+            {
+                foreach($row as $subKey)
+                {
+                    if($subKey == '[offercode]')
+                    {
+                        $olympicCode = $this->mailers_model->getOlympicsCode($mugInfo['mugList'][0]['mugId']);
+                        //$breakCode = $this->generateBreakfastTwoCode($mugInfo['mugList'][0]['mugId']);
+                        $tagStr = str_replace('[offercode]',$olympicCode['couponCode'],$tagStr);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
         foreach($mugInfo['mugList'][0] as $key => $row)
         {
             switch($key)
@@ -391,6 +410,32 @@ class Mailers extends MY_Controller {
 
     function replacePressName($tagStr, $pressInfo)
     {
+        preg_match_all('/\[[offercode]\w+\]/', $tagStr, $offer_array);
+        if(myIsMultiArray($offer_array))
+        {
+            foreach($offer_array as $key => $row)
+            {
+                foreach($row as $subKey)
+                {
+                    if($subKey == '[offercode]')
+                    {
+                        $olympicCode = $this->mailers_model->getOlympicsRandomCode();
+                        if(isset($olympicCode) && myIsArray($olympicCode))
+                        {
+                            $couponDetails = array(
+                                'ownerDetails' => 'assigned'
+                            );
+                            $this->mailers_model->updateCouponDone($couponDetails,$olympicCode['id']);
+                            $tagStr = str_replace('[offercode]',$olympicCode['couponCode'],$tagStr);
+                        }
+                        //$breakCode = $this->generateBreakfastTwoCode($mugInfo['mugList'][0]['mugId']);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
         foreach($pressInfo as $key => $row)
         {
             switch($key)
@@ -681,4 +726,187 @@ class Mailers extends MY_Controller {
         echo json_encode($data);
 
     }
+
+    public function sendBeer()
+    {
+        $data = array();
+
+        $data['mailType'] = '0';
+
+        $mugData = $this->mugclub_model->getCheckInMugClubList();
+        $data['mugData'] = $mugData;
+        //fetching mail Templates according to mail type
+
+        $mailResult = $this->mailers_model->getAllTemplatesByType('0');
+
+        $data['mailList'] = $mailResult;
+
+        $data['loggedEmail'] = $this->userEmail;
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('MailBeerSendView',$data);
+    }
+
+    public function sendOlympicsMails($responseType = RESPONSE_RETURN)
+    {
+        $post = $this->input->post();
+
+        $mugNums = explode(',',$post['mugNums']);;
+
+        foreach($mugNums as $key)
+        {
+            if(isset($key) && isStringSet($key))
+            {
+                $mugInfo = $this->mugclub_model->getMugDataForMailById($key);
+
+                $newSubject = $this->replaceMugTags($post['mailSubject'],$mugInfo);
+                $newBody = $this->replaceMugTags($post['mailBody'],$mugInfo);
+                if(isset($post['isSimpleMail']) && $post['isSimpleMail'] == '1')
+                {
+                    $mainBody = '<html><body>';
+                    $body = $newBody;
+                    $body = wordwrap($body, 70);
+                    $body = nl2br($body);
+                    $body = stripslashes($body);
+                    $mainBody .= $body .'</body></html>';
+                    $newBody = $mainBody;
+                }
+                $list = array(
+                    'tresha@brewcraftsindia.com',
+                    'priyanka@brewcraftsindia.com'
+                );
+                $cc        = implode(',',$list);
+                $fromName  = 'Doolally';
+                /*if(isset($this->userFirstName))
+                {
+                    $fromName = trim(ucfirst($this->userFirstName));
+                }*/
+                $fromEmail = DEFAULT_SENDER_EMAIL;
+                $fromPass = DEFAULT_SENDER_PASS;
+                $replyTo = $fromEmail;
+
+                /*if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                    && isset($post['senderPass']) && isStringSet($post['senderPass']))
+                {
+                    $fromEmail = $post['senderEmail'];
+                    $fromPass = $post['senderPass'];
+                }*/
+
+                $logDetails = array(
+                    'messageId' => null,
+                    'sendTo' => $mugInfo['mugList'][0]['emailId'],
+                    'sendFrom' => $fromEmail,
+                    'sendFromName' => $fromName,
+                    'ccList' => $cc,
+                    'replyTo' => $replyTo,
+                    'mailSubject' => $newSubject,
+                    'mailBody' => $newBody,
+                    'attachments' => '',
+                    'sendStatus' => 'waiting',
+                    'failIds' => null,
+                    'sendDateTime' => null
+                );
+
+                $this->mailers_model->saveWaitMailLog($logDetails);
+
+                //$this->sendemail_library->sendEmail($mugInfo['mugList'][0]['emailId'],$cc,$fromEmail, $fromPass,$fromName,$replyTo,$newSubject,$newBody);
+                //$this->mailers_model->setMailSend($key,$post['mailType']);
+            }
+        }
+
+        if($responseType == RESPONSE_JSON)
+        {
+            $data['status'] = true;
+            echo json_encode($data);
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public function sendPendingMails()
+    {
+        $mails = $this->mailers_model->getAllPendingMails();
+
+        if(isset($mails) && myIsArray($mails))
+        {
+            $attachment = array();
+            foreach($mails as $key => $row)
+            {
+                $attachment = explode(',',$row['attachments']);
+                $this->sendemail_library->sendEmail($row['sendTo'],$row['ccList'],$row['sendFrom'],
+                    DEFAULT_SENDER_PASS,$row['sendFromName'],$row['replyTo'],$row['mailSubject'],
+                    $row['mailBody'],$attachment);
+                $mailData = array(
+                    'sendStatus' => 'done'
+                );
+                $this->mailers_model->updateMailDetails($mailData,$row['id']);
+            }
+        }
+    }
+
+    public function tempMugFunc()
+    {
+        $tobeSaved = array();
+
+        for($i=1;$i<=100;$i++)
+        {
+            if($i <= 50)
+            {
+                $tobeSaved[] = array(
+                    'mugId' => $i,
+                    'mugTag' => 'Tag',
+                    'homeBase' => '1',
+                    'firstName' => 'Gaurav',
+                    'lastName' => 'Saha',
+                    'mobileNo' => '9999999999',
+                    'emailId' => 'gauravsaha84@gmail.com',
+                    'birthDate' => '1985-01-01',
+                    'invoiceNo' => '0000',
+                    'invoiceAmt' => '3000',
+                    'membershipStart' => date('Y-m-d'),
+                    'membershipEnd' => date('Y-m-d'),
+                    'oldHomeBase' => '1',
+                    'ifActive' => '1',
+                    'notes' => '',
+                    'mailStatus' => '0',
+                    'birthdayMailStatus' => '0',
+                    'mailDate' => null,
+                    'birthMailDate' => null
+                );
+            }
+            else
+            {
+                $tobeSaved[] = array(
+                    'mugId' => $i,
+                    'mugTag' => 'Tag',
+                    'homeBase' => '1',
+                    'firstName' => 'Gaurav',
+                    'lastName' => 'Saha',
+                    'mobileNo' => '9999999999',
+                    'emailId' => 'saha@brewcraftsindia.com',
+                    'birthDate' => '1985-01-01',
+                    'invoiceNo' => '0000',
+                    'invoiceAmt' => '3000',
+                    'membershipStart' => date('Y-m-d'),
+                    'membershipEnd' => date('Y-m-d'),
+                    'oldHomeBase' => '1',
+                    'ifActive' => '1',
+                    'notes' => '',
+                    'mailStatus' => '0',
+                    'birthdayMailStatus' => '0',
+                    'mailDate' => null,
+                    'birthMailDate' => null
+                );
+            }
+        }
+
+        $this->mailers_model->saveDummyMugs($tobeSaved);
+    }
+
 }

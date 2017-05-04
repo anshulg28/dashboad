@@ -117,6 +117,7 @@
                                             <div class="col-sm-2"></div>
                                             <ul class="col-sm-10 list-inline mugtags-list">
                                                 <li class="my-pointer-item"><span class="label label-success">[name]</span></li>
+                                                <li class="my-pointer-item"><span class="label label-success">[offercode]</span></li>
                                             </ul>
                                         </div>
                                     </div>

@@ -243,4 +243,28 @@ class Offers_Model extends CI_Model
         return $data;
 
     }
+
+    public function getAllMugClubList()
+    {
+        $query = "SELECT mugId "
+            ."FROM mugmaster";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function saveOlympicsCodes($data)
+    {
+        $this->db->insert_batch('olympicscouponmaster',$data);
+        return true;
+    }
+
+    public function getOlympicsCoupons()
+    {
+        $query = "SELECT GROUP_CONCAT( couponCode ) AS 'codes' FROM  olympicscouponmaster";
+
+        $resut = $this->db->query($query)->row_array();
+        return $resut;
+    }
+
 }
