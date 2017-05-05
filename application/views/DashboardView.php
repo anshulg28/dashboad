@@ -17,6 +17,7 @@
                 <li><a class="my-noBorderRadius" data-toggle="pill" href="#feedback">Feedback</a></li>
                 <li><a class="my-noBorderRadius" data-toggle="pill" href="#fnbpanel">FnB Data</a></li>
                 <li><a class="my-noBorderRadius" data-toggle="pill" href="#eventpanel">Events</a></li>
+                <li><a class="my-noBorderRadius" data-toggle="pill" href="#beerpanel">Beer Olympics</a></li>
             </ul>
             <!--<div class="mdl-layout__tab-bar mdl-js-ripple-effect">
                 <a href="#mugclub" class="mdl-layout__tab">Mug Club</a><br>
@@ -1469,6 +1470,101 @@
                                             <?php
 
                                         }
+                                    ?>
+                                </div>
+                                <div class="mdl-cell mdl-cell--2-col"></div>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+            </section>
+            <section class="tab-pane fade" id="beerpanel">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#beerTab">Olympics Sharing</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <?php
+                    if($this->userType != SERVER_USER)
+                    {
+                        ?>
+                        <div id="beerTab" class="tab-pane fade in active">
+                            <div class="mdl-grid">
+                                <div class="mdl-cell mdl-cell--2-col"></div>
+                                <div class="mdl-cell mdl-cell--8-col">
+                                    <form id="beer-olympics-form" action="<?php echo base_url();?>dashboard/saveBeerMeta" method="post" enctype="multipart/form-data">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
+                                            <input class="mdl-textfield__input" type="text" name="olympicsTitle" id="olympicsTitle">
+                                            <label class="mdl-textfield__label" for="olympicsTitle">Sharing Title</label>
+                                        </div>
+                                        <br>
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
+                                            <label class="mdl-textfield__label" for="olympicsDesc">Sharing Description</label>
+                                            <textarea class="mdl-textfield__input my-singleBorder" rows="5" name="olympicsDescription" id="olympicsDesc"></textarea>
+                                        </div>
+                                        <br>
+                                        <div class="myUploadPanel text-left">
+                                            <input type="file" class="form-control" onchange="beerUploadChange(this)" />
+                                            <input type="hidden" name="olympicsImg" />
+                                        </div>
+                                        <br>
+                                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Save</button>
+                                    </form>
+                                    <br>
+                                    <div class="progress hide">
+                                        <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <?php
+                                    if(isset($olympicsMeta) && myIsArray($olympicsMeta))
+                                    {
+                                        ?>
+                                        <div class="mdl-grid table-responsive">
+                                            <table class="table table-hover table-bordered table-striped">
+                                                <thead>
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th>Title</th>
+                                                    <th>Description</th>
+                                                    <th>Image</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <?php
+                                                foreach($olympicsMeta as $key => $row)
+                                                {
+                                                    ?>
+                                                    <tr>
+                                                        <th scope="row"><?php echo $row['id'];?></th>
+                                                        <td><?php echo $row['metaTitle'];?></td>
+                                                        <td><?php echo $row['metaDescription'];?></td>
+                                                        <?php
+                                                        if(isset($row['metaImg']) && $row['metaImg'] != '')
+                                                        {
+                                                            $imgs = array(MOBILE_URL.'asset/images/thumb/'.$row['metaImg']);
+                                                            ?>
+                                                            <td>
+                                                                <a class="view-photos" data-toggle="tooltip" title="View Photo" href="#" data-imgs="<?php echo implode(',',$imgs);?>">
+                                                                    <i class="fa fa-15x fa-file-image-o my-success-text"></i></a>
+                                                            </td>
+                                                            <?php
+
+                                                        }
+                                                        ?>
+                                                    </tr>
+                                                    <?php
+                                                }
+                                                ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <?php
+
+                                    }
                                     ?>
                                 </div>
                                 <div class="mdl-cell mdl-cell--2-col"></div>
@@ -3146,6 +3242,7 @@
     });
 
     var filesMetaArr = [];
+    var filesOlympicsArr = [];
     function metaUploadChange(ele)
     {
 
@@ -3198,6 +3295,60 @@
     function fillMetaImgs()
     {
         $('#metaTab input[name="metaImg"]').val(filesMetaArr.join());
+    }
+
+    function beerUploadChange(ele)
+    {
+
+        $('#beerTab button[type="submit"]').attr('disabled','true');
+        $('#beerTab .progress').removeClass('hide');
+        var xhr = [];
+        var totalFiles = ele.files.length;
+        for(var i=0;i<totalFiles;i++)
+        {
+            xhr[i] = new XMLHttpRequest();
+            (xhr[i].upload || xhr[i]).addEventListener('progress', function(e) {
+                var done = e.position || e.loaded;
+                var total = e.totalSize || e.total;
+                $('#beerTab .progress-bar').css('width', Math.round(done/total*100)+'%').attr('aria-valuenow', Math.round(done/total*100)).html(parseInt(Math.round(done/total*100))+'%');
+            });
+            xhr[i].addEventListener('load', function(e) {
+                $('#beerTab button[type="submit"]').removeAttr('disabled');
+            });
+            xhr[i].open('post', '<?php echo base_url();?>dashboard/uploadMetaFiles', true);
+
+            var data = new FormData;
+            data.append('attachment', ele.files[i]);
+            xhr[i].send(data);
+            xhr[i].onreadystatechange = function(e) {
+                if (e.srcElement.readyState == 4 && e.srcElement.status == 200) {
+                    if(e.srcElement.responseText == 'Some Error Occurred!')
+                    {
+                        bootbox.alert('File size Limit 30MB');
+                        return false;
+                    }
+                    try
+                    {
+                        var obj = $.parseJSON(e.srcElement.responseText);
+                        if(obj.status == false)
+                        {
+                            bootbox.alert('<label class="my-danger-text">Error: '+obj.errorMsg+'</label>');
+                            return false;
+                        }
+                    }
+                    catch(excep)
+                    {
+                        filesOlympicsArr.push(e.srcElement.responseText);
+                        fillOlympicsImgs();
+                    }
+                }
+            }
+        }
+    }
+
+    function fillOlympicsImgs()
+    {
+        $('#beerTab input[name="olympicsImg"]').val(filesOlympicsArr.join());
     }
 </script>
 
@@ -3391,6 +3542,49 @@
             return false;
         }
         if($(this).find('input[name="metaImg"]').val() == '')
+        {
+            bootbox.alert('Meta Image required!');
+            return false;
+        }
+        showCustomLoader();
+        $.ajax({
+            type:"POST",
+            dataType:'json',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    window.location.reload();
+                }
+                else
+                {
+                    bootbox.alert(data.errorMsg);
+                }
+            },
+            error: function(xhr, status, error){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
+            }
+        });
+    });
+
+    $(document).on('submit','#beer-olympics-form',function(e){
+        e.preventDefault();
+        if($(this).find('#olympicsTitle').val() == '')
+        {
+            bootbox.alert('Meta Title required!');
+            return false;
+        }
+        if($(this).find('#olympicsDesc').val() == '')
+        {
+            bootbox.alert('Meta Description required!');
+            return false;
+        }
+        if($(this).find('input[name="olympicsImg"]').val() == '')
         {
             bootbox.alert('Meta Image required!');
             return false;

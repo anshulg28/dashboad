@@ -1152,6 +1152,7 @@ class Dashboard_Model extends CI_Model
     {
         $query = "SELECT *"
             ." FROM custommetatags"
+            ." WHERE tagType = 0"
             ." ORDER BY id DESC";
 
         $result = $this->db->query($query)->result_array();
@@ -1164,6 +1165,17 @@ class Dashboard_Model extends CI_Model
 
         $this->db->insert('custommetatags', $details);
         return true;
+    }
+    public function getOlympicsMeta()
+    {
+        $query = "SELECT *"
+            ." FROM custommetatags"
+            ." WHERE tagType = 1"
+            ." ORDER BY id DESC";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
     }
 
     public function checkWalletLog($id)

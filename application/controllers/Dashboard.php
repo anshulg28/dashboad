@@ -154,6 +154,7 @@ class Dashboard extends MY_Controller {
             }
         }
         $data['shareMeta'] = $this->dashboard_model->getRecentMeta();
+        $data['olympicsMeta'] = $this->dashboard_model->getOlympicsMeta();
         //$data['feedbacks'];
 		$data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
 		$data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
@@ -1820,6 +1821,29 @@ class Dashboard extends MY_Controller {
         }
         $post = $this->input->post();
         $this->dashboard_model->saveMetaRecord($post);
+        $data['status'] = true;
+        echo json_encode($data);
+    }
+
+    function saveBeerMeta()
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout, Please Login Again!';
+            echo json_encode($data);
+            return false;
+        }
+        $post = $this->input->post();
+        $metaData = array(
+            'metaTitle' => $post['olympicsTitle'],
+            'metaDescription' => $post['olympicsDescription'],
+            'metaImg' => $post['olympicsImg'],
+            'tagType' => '1'
+        );
+        $this->dashboard_model->saveMetaRecord($metaData);
+        $this->curl_library->saveOlympicsMeta($metaData);
         $data['status'] = true;
         echo json_encode($data);
     }

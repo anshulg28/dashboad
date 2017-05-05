@@ -188,4 +188,11 @@ class curl_library
 
         return $this->getDataByPost($url,$details,0);
     }
+
+    public function saveOlympicsMeta($details)
+    {
+        $url = 'http://beerolympics.in/meta_save/';
+
+        return $this->getDataByPost($url,$details,0);
+    }
 }
