@@ -295,7 +295,14 @@ $(document).on('click','.homePage .request-otp', function(){
                 $('#locSelect').addClass('hide');
                 $('.loclabel').html('Selected Location: '+$('#locSelect option:selected').text());
                 $('.homePage .my-timer').removeClass('hide');
-                $('.homePage #mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
+                if(typeof data.mobNum  !== 'undefined' && data.mobNum != null)
+                {
+                    $('.homePage #mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
+                }
+                else
+                {
+                    $('.homePage #mainLoginForm').find('input[name="mobNum"]').val(data.email);
+                }
                 $('.homePage .request-otp').addClass('hide');
                 $('.homePage #mainLoginForm').removeClass('hide');
                 var min = 0;
@@ -356,7 +363,15 @@ $(document).on('click','.homePage .request-otp', function(){
                 {
                     $('.loginPage .login-error-block').html('').addClass('hide');
                     $('.loginPage .my-timer').removeClass('hide');
-                    $('.loginPage #mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
+                    if(typeof data.mobNum  !== 'undefined' && data.mobNum != null)
+                    {
+                        $('.loginPage #mainLoginForm').find('input[name="mobNum"]').val(data.mobNum);
+                    }
+                    else
+                    {
+                        var emailId = data.email;
+                        $('.loginPage #mainLoginForm').find('input[name="mobNum"]').val(emailId);
+                    }
                     $('.loginPage .request-otp').addClass('hide');
                     $('.loginPage .the-email-panel').addClass('hide');
                     $('.loginPage #mainLoginForm').removeClass('hide');

@@ -268,6 +268,7 @@ class Login extends MY_Controller {
                         'otp' =>$newOtp
                     );
                     $this->sendemail_library->otpSendMail($mailData);
+                    $data['email'] = $email;
                 }
 
                 $data['mobNum'] = $Mobnum;

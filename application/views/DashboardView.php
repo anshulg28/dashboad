@@ -2744,7 +2744,7 @@
                 if(j==10)
                 {
                     formHtml += '<label class="btn btn-default mdl-radio mdl-js-radio mdl-js-ripple-effect">'+
-                        '<input type="radio" class="mdl-radio__button" name="overallRating['+lastFormNumber+']" value="'+j+'" checked/>'+
+                        '<input type="radio" class="mdl-radio__button" name="overallRating['+lastFormNumber+']" value="'+j+'"/>'+
                         '<span class="mdl-radio__label">'+j+'</span>'+
                         '</label>';
                 }
@@ -2760,17 +2760,22 @@
             formHtml += '</div></div>';
             formHtml += '<div class="mdl-cell mdl-cell--3-col">';
             formHtml += '<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">'+
-                            '<input type="radio" class="mdl-radio__button" name="userGender['+lastFormNumber+']" value="M" checked/>'+
+                            '<input type="radio" class="mdl-radio__button" name="userGender['+lastFormNumber+']" value="M"/>'+
                             '<span class="mdl-radio__label">Male</span>'+
                         '</label>';
             formHtml += '<label class=" mdl-radio mdl-js-radio mdl-js-ripple-effect">'+
                             '<input type="radio" class="mdl-radio__button" name="userGender['+lastFormNumber+']" value="F"/>'+
                             '<span class="mdl-radio__label">Female</span>'+
                         '</label></div>';
-            formHtml += '<div class="mdl-cell mdl-cell--3-col"><div class="mdl-textfield mdl-js-textfield">'+
-                        '<input class="mdl-textfield__input" name="userAge['+lastFormNumber+']" type="number" id="age">'+
-                        '<label class="mdl-textfield__label" for="age">Age</label>'+
-                        '</div></div>';
+            formHtml += '<div class="mdl-cell mdl-cell--3-col">'+
+                        '<select class="form-control" name="userAge['+lastFormNumber+']" id="age">'+
+                        '<option value="0">Age Select</option>';
+            for(var k=1;k<=100;k++)
+            {
+                formHtml += '<option value="'+k+'">'+k+'</option>';
+            }
+            formHtml += '</select>'+
+                        '</div>';
             formHtml += '<input type="hidden" name="feedbackLoc['+lastFormNumber+']" value="'+$('#feedbackLoc').val().trim()+'"/>';
             formHtml += '<button type="button" onclick="removeThis(this)" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Remove</button></div>';
 
