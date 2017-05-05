@@ -231,6 +231,10 @@
         $('.progress').removeClass('hide');
         var xhr = [];
         var totalFiles = this.files.length;
+        if(filesArr.length != 0)
+        {
+            filesArr = [];
+        }
         for(var i=0;i<totalFiles;i++)
         {
             xhr[i] = new XMLHttpRequest();

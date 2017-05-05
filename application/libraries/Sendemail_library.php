@@ -644,6 +644,7 @@ class Sendemail_library
         $mailer = Swift_Mailer::newInstance($transport);
 
         //Create a message
+        $message = null;
         $message = Swift_Message::newInstance($subject)
             ->setSubject($subject)
             ->setReplyTo($replyTo)

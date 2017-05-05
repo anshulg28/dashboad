@@ -2865,8 +2865,8 @@
                         '</label></div>';
             formHtml += '<div class="mdl-cell mdl-cell--3-col">'+
                         '<select class="form-control" name="userAge['+lastFormNumber+']" id="age">'+
-                        '<option value="0">Age Select</option>';
-            for(var k=1;k<=100;k++)
+                        '<option value="">Age Select</option>';
+            for(var k=0;k<=100;k++)
             {
                 formHtml += '<option value="'+k+'">'+k+'</option>';
             }
