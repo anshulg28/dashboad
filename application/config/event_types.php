@@ -70,8 +70,8 @@ $config['eventTc'] = '<div class="page-content">
 
         <h6><strong>Charges for utilization of the space:</strong></h6>
         <p><ol><li>If you don\'t charge, we don\'t charge.</li>
-            <li>For paid events, we charge Rs 250 per attendee which includes a pint or house fries.</li>
-            <li>The Rs 250 is a cover charge that Doolally levies in form of a voucher. The voucher, however, does not have to be redeemed on that day.</li></ol></p>
+            <li>For paid events, we charge Rs '.NEW_DOOLALLY_FEE.' per attendee which includes a pint or house fries.</li>
+            <li>The Rs '.NEW_DOOLALLY_FEE.' is a cover charge that Doolally levies in form of a voucher. The voucher, however, does not have to be redeemed on that day.</li></ol></p>
 
         <h6><strong>Payment:</strong></h6>
         <p><ol><li>For paid events, we will collect money from the customer on your behalf. This is to ensure complete refund in case of cancelled events.</li>

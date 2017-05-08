@@ -1089,7 +1089,7 @@
                                             <span class="mdl-radio__label">Event Fee + Doolally Fee</span>
                                         </label>
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label custom-price">
-                                            <input class="mdl-textfield__input" type="text" name="doolallyFee" value="250" pattern="-?[0-9]*(\.[0-9]+)?" id="customPrice">
+                                            <input class="mdl-textfield__input" type="text" name="doolallyFee" value="<?php echo (int)NEW_DOOLALLY_FEE;?>" pattern="-?[0-9]*(\.[0-9]+)?" id="customPrice">
                                             <label class="mdl-textfield__label" for="customPrice">Custom Price</label>
                                             <span class="mdl-textfield__error">Input is not a number!</span>
                                         </div><br>
@@ -3645,11 +3645,11 @@
         if(eveApprovType == '2')
         {
             paid1Price = Number(costPrice);
-            paid2Price = Number(costPrice) - 250;
+            paid2Price = Number(costPrice) - <?php echo NEW_DOOLALLY_FEE;?>;
         }
         else if(eveApprovType == '3' || eveApprovType == '4')
         {
-            paid1Price = Number(costPrice) + 250;
+            paid1Price = Number(costPrice) + <?php echo NEW_DOOLALLY_FEE;?>;
             paid2Price = Number(costPrice);
         }
         else
@@ -3838,7 +3838,7 @@
         }
 
     });
-    var fixDoolallyFee = 250;
+    var fixDoolallyFee = <?php echo NEW_DOOLALLY_FEE;?>;
 
     var isDirectCostChange = false
     $(document).on('click','#eventView .eventCostChange-icon', function(){
@@ -3890,13 +3890,13 @@
 
     $(document).on("keyup","#eventPrice-modal #customPrice", function(){
         var oldFee = doolallyFee;
-        if(Number($(this).val()) >= 250)
+        if(Number($(this).val()) >= <?php echo NEW_DOOLALLY_FEE;?>)
         {
             doolallyFee = Number($(this).val());
         }
         else
         {
-            doolallyFee = 250;
+            doolallyFee = <?php echo NEW_DOOLALLY_FEE;?>;
         }
         var basicPrice = Number($('#eventPrice-modal #costPrice').val());
         if($('#eventPrice-modal input[name="costType"]:checked').val() == '2')
@@ -3993,13 +3993,13 @@
     });
     $(document).on("keyup","#eventAdd #customPrice", function(){
         var oldFee = fixDoolallyFee;
-        if(Number($(this).val()) >= 250)
+        if(Number($(this).val()) >= <?php echo NEW_DOOLALLY_FEE;?>)
         {
             fixDoolallyFee = Number($(this).val());
         }
         else
         {
-            fixDoolallyFee = 250;
+            fixDoolallyFee = <?php echo NEW_DOOLALLY_FEE;?>;
         }
         var basicPrice = Number($('#eventAdd .event-price input[name="eventPrice"]').val());
         if($('input[name="costType"]:checked').val() == '2')

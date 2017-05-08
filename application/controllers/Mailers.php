@@ -557,14 +557,54 @@ class Mailers extends MY_Controller {
                 }*/
             }
 
-            if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+            /*if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
                 && isset($post['senderPass']) && isStringSet($post['senderPass']))
             {
                 $fromEmail = $post['senderEmail'];
                 $fromPass = $post['senderPass'];
+            }*/
+
+            if(myIsArray($attchmentArr))
+            {
+                //Queuing the mails for press mailer
+                $logDetails = array(
+                    'messageId' => null,
+                    'sendTo' => $key,
+                    'sendFrom' => $fromEmail,
+                    'sendFromName' => $fromName,
+                    'ccList' => $cc,
+                    'replyTo' => $replyTo,
+                    'mailSubject' => $pressSub,
+                    'mailBody' => $newBody,
+                    'attachments' => implode(',',$attchmentArr),
+                    'sendStatus' => 'waiting',
+                    'failIds' => null,
+                    'sendDateTime' => null
+                );
+            }
+            else
+            {
+                //Queuing the mails for press mailer
+                $logDetails = array(
+                    'messageId' => null,
+                    'sendTo' => $key,
+                    'sendFrom' => $fromEmail,
+                    'sendFromName' => $fromName,
+                    'ccList' => $cc,
+                    'replyTo' => $replyTo,
+                    'mailSubject' => $pressSub,
+                    'mailBody' => $newBody,
+                    'attachments' => '',
+                    'sendStatus' => 'waiting',
+                    'failIds' => null,
+                    'sendDateTime' => null
+                );
             }
 
-            $this->sendemail_library->sendEmail($key,$cc,$fromEmail, $fromPass, $fromName,$replyTo,$pressSub,$newBody,$attchmentArr);
+
+            $this->mailers_model->saveWaitMailLog($logDetails);
+
+            //$this->sendemail_library->sendEmail($key,$cc,$fromEmail, $fromPass, $fromName,$replyTo,$pressSub,$newBody,$attchmentArr);
         }
         if($responseType == RESPONSE_JSON)
         {
@@ -839,13 +879,16 @@ class Mailers extends MY_Controller {
             foreach($mails as $key => $row)
             {
                 $attachment = explode(',',$row['attachments']);
-                $this->sendemail_library->sendEmail($row['sendTo'],$row['ccList'],$row['sendFrom'],
+                $mailStatus = $this->sendemail_library->sendEmail($row['sendTo'],$row['ccList'],$row['sendFrom'],
                     DEFAULT_SENDER_PASS,$row['sendFromName'],$row['replyTo'],$row['mailSubject'],
                     $row['mailBody'],$attachment);
-                $mailData = array(
-                    'sendStatus' => 'done'
-                );
-                $this->mailers_model->updateMailDetails($mailData,$row['id']);
+                if($mailStatus == 'Success')
+                {
+                    $mailData = array(
+                        'sendStatus' => 'done'
+                    );
+                    $this->mailers_model->updateMailDetails($mailData,$row['id']);
+                }
             }
         }
     }

@@ -285,7 +285,8 @@
             return false;
         }
         var senderEmail = $('#senderEmail').val();
-        bootbox.prompt({
+        submitPressForm(formVar,'','');
+        /*bootbox.prompt({
             title: "Please provide your Gmail("+senderEmail+") password",
             inputType: 'password',
             callback: function (result) {
@@ -320,7 +321,7 @@
                     });
                 }
             }
-        });
+        });*/
 
         //showCustomLoader();
 

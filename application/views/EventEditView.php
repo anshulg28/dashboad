@@ -517,13 +517,13 @@
     });
     $(document).on("keyup","#customPrice", function(){
         var oldFee = fixDoolallyFee;
-        if(Number($(this).val()) >= 250)
+        if(Number($(this).val()) >= <?php echo NEW_DOOLALLY_FEE;?>)
         {
             fixDoolallyFee = Number($(this).val());
         }
         else
         {
-            fixDoolallyFee = 250;
+            fixDoolallyFee = <?php echo NEW_DOOLALLY_FEE;?>;
         }
         var basicPrice = Number($('.event-price input[name="eventPrice"]').val());
 

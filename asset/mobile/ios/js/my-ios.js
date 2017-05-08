@@ -313,7 +313,7 @@ myApp.onPageInit('eventAdd', function (page) {
         });
     });
     $$(document).on('keyup','#eventPrice', function(){
-        var basic = 250;
+        var basic = 300;
         var inputVal = Number($(this).val());
         var total = basic+inputVal;
         $$('.event-add .total-event-price').html(total);
@@ -683,7 +683,7 @@ myApp.onPageInit('eventEdit', function (page) {
         });
     });
     $$(document).on('keyup','#eventPrice', function(){
-        var basic = 250;
+        var basic = 300;
         var inputVal = Number($(this).val());
         var total = basic+inputVal;
         $$('.event-add .total-event-price').html(total);
