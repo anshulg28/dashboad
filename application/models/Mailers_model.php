@@ -57,6 +57,7 @@ class Mailers_Model extends CI_Model
     }
     function fetchPressCats()
     {
+        $this->db->simple_query('SET SESSION group_concat_max_len=1000000');
         $query = "SELECT GROUP_CONCAT(pmm.pressEmail) as 'emails', ptm.catName
                     FROM pressmailmaster pmm
                     LEFT JOIN presstypemaster ptm ON ptm.id = pmm.pressMailType

@@ -274,3 +274,19 @@ if(!function_exists('slugify'))
         return $text;
     }
 }
+
+if(!function_exists('isValidEmail'))
+{
+    function isValidEmail($email)
+    {
+        $validEmail = false;
+
+        $newEmail = filter_var($email, FILTER_SANITIZE_EMAIL);
+
+        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL) === false)
+        {
+            $validEmail = true;
+        }
+        return $validEmail;
+    }
+}

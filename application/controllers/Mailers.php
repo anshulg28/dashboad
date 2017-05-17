@@ -530,80 +530,83 @@ class Mailers extends MY_Controller {
 
         foreach($pressEmails as $key)
         {
-            $pressInfo = $this->mailers_model->getPressInfoByMail($key);
-            $newBody = $mainBody;
-            if(isset($pressInfo) && myIsArray($pressInfo))
+            if(isValidEmail($key))
             {
-                $newBody = $this->replacePressName($mainBody,$pressInfo);
-            }
-            $cc        = 'tresha@brewcraftsindia.com';
-            $fromName  = 'Doolally';
-            if(isset($this->userFirstName))
-            {
-                $fromName = trim(ucfirst($this->userFirstName));
-            }
-            $fromEmail = DEFAULT_SENDER_EMAIL;
-            $fromPass = DEFAULT_SENDER_PASS;
-            $replyTo = $fromEmail;
-
-            if(isset($this->userEmail))
-            {
-                $replyTo = $this->userEmail;
-                /*$userInfo = $this->login_model->checkEmailSender($this->userEmail);
-                if(isset($userInfo) && myIsArray($this->userEmail))
+                $pressInfo = $this->mailers_model->getPressInfoByMail($key);
+                $newBody = $mainBody;
+                if(isset($pressInfo) && myIsArray($pressInfo))
                 {
-                    $fromPass = $userInfo['gmailPass'];
-                    $fromEmail = $this->userEmail;
+                    $newBody = $this->replacePressName($mainBody,$pressInfo);
+                }
+                $cc        = 'tresha@brewcraftsindia.com';
+                $fromName  = 'Doolally';
+                if(isset($this->userFirstName))
+                {
+                    $fromName = trim(ucfirst($this->userFirstName));
+                }
+                $fromEmail = DEFAULT_SENDER_EMAIL;
+                $fromPass = DEFAULT_SENDER_PASS;
+                $replyTo = $fromEmail;
+
+                if(isset($this->userEmail))
+                {
+                    $replyTo = $this->userEmail;
+                    /*$userInfo = $this->login_model->checkEmailSender($this->userEmail);
+                    if(isset($userInfo) && myIsArray($this->userEmail))
+                    {
+                        $fromPass = $userInfo['gmailPass'];
+                        $fromEmail = $this->userEmail;
+                    }*/
+                }
+
+                /*if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
+                    && isset($post['senderPass']) && isStringSet($post['senderPass']))
+                {
+                    $fromEmail = $post['senderEmail'];
+                    $fromPass = $post['senderPass'];
                 }*/
+
+                if(myIsArray($attchmentArr))
+                {
+                    //Queuing the mails for press mailer
+                    $logDetails = array(
+                        'messageId' => null,
+                        'sendTo' => $key,
+                        'sendFrom' => $fromEmail,
+                        'sendFromName' => $fromName,
+                        'ccList' => $cc,
+                        'replyTo' => $replyTo,
+                        'mailSubject' => $pressSub,
+                        'mailBody' => $newBody,
+                        'attachments' => implode(',',$attchmentArr),
+                        'sendStatus' => 'waiting',
+                        'failIds' => null,
+                        'sendDateTime' => date('Y-m-d H:i:s')
+                    );
+                }
+                else
+                {
+                    //Queuing the mails for press mailer
+                    $logDetails = array(
+                        'messageId' => null,
+                        'sendTo' => $key,
+                        'sendFrom' => $fromEmail,
+                        'sendFromName' => $fromName,
+                        'ccList' => $cc,
+                        'replyTo' => $replyTo,
+                        'mailSubject' => $pressSub,
+                        'mailBody' => $newBody,
+                        'attachments' => '',
+                        'sendStatus' => 'waiting',
+                        'failIds' => null,
+                        'sendDateTime' => date('Y-m-d H:i:s')
+                    );
+                }
+
+
+                $this->mailers_model->saveWaitMailLog($logDetails);
+
             }
-
-            /*if(isset($post['senderEmail']) && isStringSet($post['senderEmail'])
-                && isset($post['senderPass']) && isStringSet($post['senderPass']))
-            {
-                $fromEmail = $post['senderEmail'];
-                $fromPass = $post['senderPass'];
-            }*/
-
-            if(myIsArray($attchmentArr))
-            {
-                //Queuing the mails for press mailer
-                $logDetails = array(
-                    'messageId' => null,
-                    'sendTo' => $key,
-                    'sendFrom' => $fromEmail,
-                    'sendFromName' => $fromName,
-                    'ccList' => $cc,
-                    'replyTo' => $replyTo,
-                    'mailSubject' => $pressSub,
-                    'mailBody' => $newBody,
-                    'attachments' => implode(',',$attchmentArr),
-                    'sendStatus' => 'waiting',
-                    'failIds' => null,
-                    'sendDateTime' => null
-                );
-            }
-            else
-            {
-                //Queuing the mails for press mailer
-                $logDetails = array(
-                    'messageId' => null,
-                    'sendTo' => $key,
-                    'sendFrom' => $fromEmail,
-                    'sendFromName' => $fromName,
-                    'ccList' => $cc,
-                    'replyTo' => $replyTo,
-                    'mailSubject' => $pressSub,
-                    'mailBody' => $newBody,
-                    'attachments' => '',
-                    'sendStatus' => 'waiting',
-                    'failIds' => null,
-                    'sendDateTime' => null
-                );
-            }
-
-
-            $this->mailers_model->saveWaitMailLog($logDetails);
-
             //$this->sendemail_library->sendEmail($key,$cc,$fromEmail, $fromPass, $fromName,$replyTo,$pressSub,$newBody,$attchmentArr);
         }
         if($responseType == RESPONSE_JSON)
@@ -836,22 +839,25 @@ class Mailers extends MY_Controller {
                     $fromPass = $post['senderPass'];
                 }*/
 
-                $logDetails = array(
-                    'messageId' => null,
-                    'sendTo' => $mugInfo['mugList'][0]['emailId'],
-                    'sendFrom' => $fromEmail,
-                    'sendFromName' => $fromName,
-                    'ccList' => $cc,
-                    'replyTo' => $replyTo,
-                    'mailSubject' => $newSubject,
-                    'mailBody' => $newBody,
-                    'attachments' => '',
-                    'sendStatus' => 'waiting',
-                    'failIds' => null,
-                    'sendDateTime' => null
-                );
+                if(isValidEmail($mugInfo['mugList'][0]['emailId']))
+                {
+                    $logDetails = array(
+                        'messageId' => null,
+                        'sendTo' => $mugInfo['mugList'][0]['emailId'],
+                        'sendFrom' => $fromEmail,
+                        'sendFromName' => $fromName,
+                        'ccList' => $cc,
+                        'replyTo' => $replyTo,
+                        'mailSubject' => $newSubject,
+                        'mailBody' => $newBody,
+                        'attachments' => '',
+                        'sendStatus' => 'waiting',
+                        'failIds' => null,
+                        'sendDateTime' => null
+                    );
 
-                $this->mailers_model->saveWaitMailLog($logDetails);
+                    $this->mailers_model->saveWaitMailLog($logDetails);
+                }
 
                 //$this->sendemail_library->sendEmail($mugInfo['mugList'][0]['emailId'],$cc,$fromEmail, $fromPass,$fromName,$replyTo,$newSubject,$newBody);
                 //$this->mailers_model->setMailSend($key,$post['mailType']);

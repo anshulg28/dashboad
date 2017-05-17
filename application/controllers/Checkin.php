@@ -158,6 +158,7 @@ class Checkin extends MY_Controller {
             }
             else
             {
+                $mugInfo = $this->mugclub_model->getMugDataById($params['mugId']);
                 $mugData = $this->checkin_model->fetchMugDataForMissingInfo($params['mugId']);
                 $missingData = array();
                 foreach($mugData as $key => $row)
@@ -170,11 +171,22 @@ class Checkin extends MY_Controller {
 
                 if(myIsArray($missingData))
                 {
-                    $mailData = array(
-                        'locId' => $this->currentLocation,
-                        'missingData' => implode(',',$missingData),
-                        'mugId' => $params['mugId']
-                    );
+                    if($mugInfo['status'] === true)
+                    {
+                        $mailData = array(
+                            'locId' => $mugInfo['mugList'][0]['homeBase'],
+                            'missingData' => implode(',',$missingData),
+                            'mugId' => $params['mugId']
+                        );
+                    }
+                    else
+                    {
+                        $mailData = array(
+                            'locId' => $this->currentLocation,
+                            'missingData' => implode(',',$missingData),
+                            'mugId' => $params['mugId']
+                        );
+                    }
                     $this->sendemail_library->checkinMissMail($mailData);
                 }
                 $this->checkin_model->saveCheckInRecord($params);
