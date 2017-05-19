@@ -27,7 +27,7 @@
                                 <div class="mdl-cell mdl-cell--6-col">
                                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
                                         <input class="mdl-textfield__input" type="text" name="empId" id="empId"
-                                               value="<?php echo $row['empId'];?>" readonly>
+                                               value="<?php echo $row['empId'];?>">
                                         <label class="mdl-textfield__label" for="empId">Employee Id</label>
                                     </div>
                                 </div>
