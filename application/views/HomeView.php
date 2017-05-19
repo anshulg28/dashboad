@@ -89,20 +89,20 @@
                                         {
                                             ?>
                                             <li>
-                                                <a href="<?php echo base_url().'wallet';?>">
-                                                    <div class="menuWrap">
-                                                        <i class="fa fa-money fa-2x"></i>
-                                                        <br>
-                                                        <span>Wallet Page</span>
-                                                    </div>
-                                                </a>
-                                            </li>
-                                            <li>
                                                 <a href="<?php echo base_url() . 'empDetails'; ?>">
                                                     <div class="menuWrap">
                                                         <i class="fa fa-users fa-2x"></i>
                                                         <br>
                                                         <span>Wallet Users</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="<?php echo base_url() . 'twitterPage'; ?>">
+                                                    <div class="menuWrap">
+                                                        <i class="fa fa-twitter fa-2x"></i>
+                                                        <br>
+                                                        <span>Twitter Page</span>
                                                     </div>
                                                 </a>
                                             </li>

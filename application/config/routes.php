@@ -109,6 +109,7 @@ $route['freeStaff/(:any)'] = 'home/freeStaff/$1';
 $route['generateOtp'] = 'home/sendOtp';
 $route['getOtp'] = 'login/sendNormalOtp';
 //$route['share-event/(:any)/(:any)'] = 'home/eventFetch/$1/$2';
+$route['twitterPage'] = 'dashboard/twitterStuff';
 
 /* Mobile Routes */
 $route['mobile'] = 'page404';

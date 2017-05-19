@@ -1962,4 +1962,102 @@ class Dashboard extends MY_Controller {
         }
         return true;
     }
+
+    public function twitterStuff()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $data = array();
+
+        $data['existingTweets'] = $this->dashboard_model->getAllTweets();
+
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        $this->load->view('TwitterStuffView', $data);
+    }
+    public function uploadTweetFiles()
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout, Please Login Again!';
+            echo json_encode($data);
+            return false;
+        }
+        $attchmentArr = '';
+        $this->load->library('upload');
+        if(isset($_FILES))
+        {
+            if($_FILES['attachment']['error'] != 1)
+            {
+                $config = array();
+                $config['upload_path'] = '../mobile/'.TWITTER_BOT_PATH; // FOOD_PATH_THUMB; //'uploads/food/';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size']      = '0';
+                $config['overwrite']     = TRUE;
+
+                $this->upload->initialize($config);
+                if(!$this->upload->do_upload('attachment'))
+                {
+                    log_message('error','Fnb: '.$this->upload->display_errors());
+                    $data['status'] = false;
+                    $data['errorMsg'] = $this->upload->display_errors();
+                    echo json_encode($data);
+                    return false;
+                }
+                else
+                {
+                    $upload_data = $this->upload->data();
+                    $attchmentArr= $this->image_thumb($upload_data['file_path'],$upload_data['file_name']);
+                    if($attchmentArr == 'error')
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Error in resizing image!';
+                        echo json_encode($data);
+                        return false;
+                    }
+                    else
+                    {
+                        echo $attchmentArr;
+                    }
+                }
+            }
+            else
+            {
+                echo 'Some Error Occurred!';
+            }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'No Image Files Received!';
+            echo json_encode($data);
+            return false;
+        }
+    }
+
+    public function saveTweet()
+    {
+        $post = $this->input->post();
+        $data = array();
+        if(isset($post['tweetText']) || isset($post['attachment']))
+        {
+            $dataToSave = array(
+                'userId' => $this->userId,
+                'tweetText' => $post['tweetText'],
+                'tweetImage' => $post['attachment'],
+                'masterTweetCount' => $post['masterTweetCount'],
+                'insertedDateTime' => date('Y-m-d H:i:s')
+            );
+            $this->dashboard_model->saveTweet($dataToSave);
+        }
+        $data['status'] = true;
+        echo json_encode($data);
+    }
 }

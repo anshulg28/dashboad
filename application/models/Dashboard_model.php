@@ -1225,4 +1225,15 @@ class Dashboard_Model extends CI_Model
         $this->db->insert('errorlogger', $details);
         return true;
     }
+    public function getAllTweets()
+    {
+        $query = "SELECT * FROM twitterbotmaster";
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
+    public function saveTweet($details)
+    {
+        $this->db->insert('twitterbotmaster', $details);
+        return true;
+    }
 }
