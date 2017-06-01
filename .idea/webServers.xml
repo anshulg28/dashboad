@@ -2,14 +2,6 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="41664771-0323-4da3-8bc5-7cf88e8fbf22" name="dashboard" url="http://doolally.io">
-        <fileTransfer host="doolally.io" port="22" privateKey="C:\Users\anshul\Downloads\doolallydev.ppk" rootFolder="/var/www/html/dashboad" accessType="SFTP" keyPair="true">
-          <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" />
-          </advancedOptions>
-          <option name="port" value="22" />
-        </fileTransfer>
-      </webServer>
       <webServer id="29438fc5-53b6-46c0-8ea3-3abd54ffa424" name="new Dashboard" url="http://doolally.io">
         <fileTransfer host="doolally.io" port="22" privateKey="C:\Users\anshul\Downloads\doolProd.ppk" accessType="SFTP" keyPair="true">
           <advancedOptions>

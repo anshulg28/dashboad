@@ -588,7 +588,7 @@ class Home extends MY_Controller {
 
             $walletRecord = array(
                 'staffId' => $id,
-                'amount' => '1500',
+                'amount' => $post['walletBalance'],
                 'amtAction' => '2',
                 'notes' => 'New Staff Added',
                 'loggedDT' => date('Y-m-d H:i:s'),

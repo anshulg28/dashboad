@@ -2,16 +2,6 @@
 <project version="4">
   <component name="PublishConfigData" serverName="new Dashboard">
     <serverData>
-      <paths name="dashboard">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-          <excludedPaths>
-            <excludedPath local="true" path="$PROJECT_DIR$/application/config/config.php" />
-          </excludedPaths>
-        </serverdata>
-      </paths>
       <paths name="new Dashboard">
         <serverdata>
           <mappings>

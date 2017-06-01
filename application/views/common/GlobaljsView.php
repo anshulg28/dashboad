@@ -152,9 +152,12 @@
                         if(data.status === true)
                         {
                             localStorageUtil.setLocal('foundM1','1',(23 * 60 * 60 * 1000));
-                            $('.notification-indicator').addClass('notification-animate-cls');
-                            $('.notification-indicator-mobile').addClass('notification-animate-cls');
-                            $('.notification-indicator-big').addClass('notification-animate-cls');
+                            if(!$('.notification-indicator').hasClass('notification-animate-cls'))
+                            {
+                                $('.notification-indicator').addClass('notification-animate-cls');
+                                $('.notification-indicator-mobile').addClass('notification-animate-cls');
+                                $('.notification-indicator-big').addClass('notification-animate-cls');
+                            }
                         }
                         else
                         {
@@ -247,10 +250,22 @@
             else if(localStorageUtil.getLocal('foundM1') == '1' ||
                     localStorageUtil.getLocal('foundM3') == '1')
             {
+                checkExpiredMugs();
+                //checkExpiringMugs();
+                checkBirthdayMugs();
+                if(localStorageUtil.getLocal('foundM1') == '0' && localStorageUtil.getLocal('foundM3') == '0')
+                {
+                    $('.notification-indicator').removeClass('notification-animate-cls');
+                    $('.notification-indicator-mobile').removeClass('notification-animate-cls');
+                    $('.notification-indicator-big').removeClass('notification-animate-cls');
+                }
+                else
+                {
+                    $('.notification-indicator').addClass('notification-animate-cls');
+                    $('.notification-indicator-mobile').addClass('notification-animate-cls');
+                    $('.notification-indicator-big').addClass('notification-animate-cls');
+                }
                 localStorageUtil.setLocal('foundM2','0',(23 * 60 * 60 * 1000));
-                $('.notification-indicator').addClass('notification-animate-cls');
-                $('.notification-indicator-mobile').addClass('notification-animate-cls');
-                $('.notification-indicator-big').addClass('notification-animate-cls');
             }
             else
             {

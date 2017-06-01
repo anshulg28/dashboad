@@ -125,8 +125,9 @@
                 success: function(data){
                     if(data.status == true)
                     {
+                        $('.error-dup').html('');
                         //$('.error-dup').css('color','green').html('Employee Id Available!');
-                        //$('button[type="submit"]').removeAttr('disabled');
+                        $('button[type="submit"]').removeAttr('disabled');
                     }
                     else
                     {
