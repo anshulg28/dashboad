@@ -1177,6 +1177,10 @@ class Dashboard extends MY_Controller {
             {
                 $post['isEventEverywhere'] = '2';
             }
+            if(isset($post['costType']) && $post['costType'] == EVENT_DOOLALLY_FEE)
+            {
+                $post['doolallyFee'] = $post['eventPrice'];
+            }
             $this->dashboard_model->updateEventRecord($post,$eventId);
 
             if(isset($attachement) && $attachement != '')
@@ -1334,11 +1338,23 @@ class Dashboard extends MY_Controller {
         }
         else
         {
-            $postData = array(
-                'costType' => $post['costType'],
-                'eventPrice' => $post['costPrice'],
-                'doolallyFee' => $post['doolallyFee']
-            );
+            if($post['costType'] == EVENT_DOOLALLY_FEE)
+            {
+                $postData = array(
+                    'costType' => $post['costType'],
+                    'eventPrice' => $post['costPrice'],
+                    'doolallyFee' => $post['costPrice']
+                );
+            }
+            else
+            {
+                $postData = array(
+                    'costType' => $post['costType'],
+                    'eventPrice' => $post['costPrice'],
+                    'doolallyFee' => $post['doolallyFee']
+                );
+            }
+
         }
 
         $this->dashboard_model->updateEventRecord($postData,$eventId);
@@ -1470,11 +1486,22 @@ class Dashboard extends MY_Controller {
             }
             else
             {
-                $postData = array(
-                    'costType' => $post['costType'],
-                    'eventPrice' => $post['costPrice'],
-                    'doolallyFee' => $post['doolallyFee']
-                );
+                if($post['costType'] == EVENT_DOOLALLY_FEE)
+                {
+                    $postData = array(
+                        'costType' => $post['costType'],
+                        'eventPrice' => $post['costPrice'],
+                        'doolallyFee' => $post['costPrice']
+                    );
+                }
+                else
+                {
+                    $postData = array(
+                        'costType' => $post['costType'],
+                        'eventPrice' => $post['costPrice'],
+                        'doolallyFee' => $post['doolallyFee']
+                    );
+                }
             }
             $this->dashboard_model->updateEventRecord($postData,$eventId);
         }

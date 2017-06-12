@@ -808,7 +808,7 @@
             <section class="tab-pane fade" id="eventpanel">
                 <ul class="nav nav-tabs">
                     <li class="active"><a data-toggle="tab" href="#eventView">Event Records</a></li>
-                    <li><a data-toggle="tab" href="#eventAdd">Add Event</a></li>
+                    <!--<li><a data-toggle="tab" href="#eventAdd">Add Event</a></li>-->
                     <li><a data-toggle="tab" href="#compEvents">Completed</a></li>
                     <li><a data-toggle="tab" href="#canEvents">Cancelled</a></li>
                     <?php

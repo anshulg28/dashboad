@@ -32,7 +32,7 @@
             }
         ?>
         In case you have any questions/queries please don't hesitate to write to me at
-        this mail address or you can reach me at <?php echo $mailData['senderPhone'];?><br><br>
+        this mail address <!--or you can reach me at --><?php /*echo $mailData['senderPhone'];*/?><br><br>
 
         Thanks,<br>
         <?php echo ucfirst($mailData['senderName']);?>

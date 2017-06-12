@@ -11,7 +11,7 @@
         Your event has been disapproved because the timings you have selected are not available.
         You can either change your time slot or choose another taproom.<br><br>
 
-        You can reach out to me on <?php echo $mailData['senderPhone'] .' ('.ucfirst($mailData['senderName']).')';?> and I will help you schedule it better.<br><br>
+        <!--You can reach out to me on <?php /*echo $mailData['senderPhone'] .' ('.ucfirst($mailData['senderName']).')';*/?> and I will help you schedule it better.<br><br>-->
 
         Thanks!<br>
         <?php echo ucfirst($mailData['senderName']); ?>
