@@ -451,9 +451,9 @@ class Dashboard extends MY_Controller {
             {
                 $insert_values[] = array(
                     'overallRating' => $post['overallRating'][$i],
-                    'userGender' => $post['userGender'][$i],
-                    'userAge' => $post['userAge'][$i],
-                    'feedbackLoc' => $post['feedbackLoc'][$i],
+                    'userGender' => (!isset($post['userGender'][$i])) ? null : $post['userGender'][$i],
+                    'userAge' => (!isset($post['userAge'][$i])) ? null : $post['userAge'][$i],
+                    'feedbackLoc' => (!isset($post['feedbackLoc'][$i])) ? null : $post['feedbackLoc'][$i],
                     'insertedDateTime' => date('Y-m-d H:i:s')
                 );
             }
