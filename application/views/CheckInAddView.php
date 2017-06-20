@@ -21,7 +21,10 @@
                         </span>
                     </h2>
                     <hr>
-                    <br>
+                    <div class="row text-center">
+                        <p class="new-checkin-alerts"></p>
+                        <p class="new-breakfast-status"></p>
+                    </div>
                     <!--<div class="pull-right">
                         <a href="#" data-toggle="tooltip" title="Search"><i class="fa fa-search"></i></a> &nbsp;
                         <a href="#" class="my-info-filler"><i class="fa fa-file-text-o"></i></a>
@@ -105,6 +108,10 @@
                 </div>
                 <div class="col-sm-2 col-xs-1"></div>
             </div>
+        </div>
+        <div id="mobile-alert-toast" class="mdl-js-snackbar mdl-snackbar">
+            <div class="mdl-snackbar__text"></div>
+            <button class="mdl-snackbar__action" type="button"></button>
         </div>
     </main>
 
@@ -370,6 +377,7 @@
                 hideCustomLoader();
                 if(data.status === true)
                 {
+                    var isTodayBirth = false;
                     var myBigStatusHtml = '<ul>';
                     var mugList = data.mugList;
 
@@ -383,7 +391,8 @@
                         'Home Base': mugList[0].locName,
                         'Expiry Date': formatJsDate(mugList[0].membershipEnd)
                     };
-
+                    $('.new-breakfast-status').html('');
+                    $('.new-checkin-alerts').html('');
 
                     for(var mugIndex in myFormatedData)
                     {
@@ -391,6 +400,21 @@
                         {
                             dataMissing[mugIndex] =  myFormatedData[mugIndex];
                             myBigStatusHtml += '<li class="my-common-highlighter">'+mugIndex+': '+myFormatedData[mugIndex]+'</li>';
+                        }
+                        else if(mugIndex == 'Birth Date')
+                        {
+                            var nowDate = new Date();
+                            var mugBirth = new Date(mugList[0].birthDate);
+                            if(nowDate.getDate() == mugBirth.getDate() && nowDate.getMonth() == mugBirth.getMonth())
+                            {
+                                isTodayBirth = true;
+                                myBigStatusHtml += '<li>'+mugIndex+': '+myFormatedData[mugIndex]+'<a href="#" id="bday-item" data-toggle="popover" data-content="Mug holder has Birthday Today" data-placement="right">&nbsp;</a></li>';
+
+                            }
+                            else
+                            {
+                                myBigStatusHtml += '<li>'+mugIndex+': '+myFormatedData[mugIndex]+'</li>';
+                            }
                         }
                         else
                         {
@@ -404,11 +428,27 @@
                     checkedInMugNum = mugList[0].mugId;
                     $('.mugCheckIn .final-checkIn-row').removeClass('hide');
 
+                    if(mugList[0].ifActive == '1')
+                    {
+                        if(mugList[0].isRedeemed == '0')
+                            $('.new-breakfast-status').css('color','green').html('Breakfast Not Redeemed!');
+                        else
+                            $('.new-breakfast-status').css('color','red').html('Breakfast Already Redeemed!');
+                    }
+
                     //validity and location check
                     if(checkMemberLocation(mugList[0].homeBase) === true)
                     {
                         if(checkMembershipValidity(mugList[0].membershipEnd) === true)
                         {
+                            if(checkMembershipGrace(mugList[0].membershipEnd) === true) // If 1 month Grace Period is also over
+                            {
+                                $('.new-checkin-alerts').html('Your membership (grace period too) has ended.<br> Please renew your membership to continue the experience of drinking from a mug.');
+                            }
+                            else // Under the grace period
+                            {
+                                $('.new-checkin-alerts').html('The grace period to renew your mug is almost coming to an end.<br> Please renew your membership so that you can drink from your mug next time.');
+                            }
                             $('.visual-status-icons').removeClass('hide').find('i').addClass('hide');
                             $('.visual-status-icons').find('i:first-child').removeClass('hide my-success-text').addClass('my-danger-text');
                         }
@@ -417,11 +457,24 @@
                             $('.visual-status-icons').removeClass('hide').find('i').addClass('hide');
                             $('.visual-status-icons').find('i:first-child').removeClass('hide my-danger-text').addClass('my-success-text');
                         }
+                        if($('.new-checkin-alerts').html() == '')
+                        {
+                            $('.new-checkin-alerts').html('Please collect the right tag (number, tag name) and attach it to the mug.');
+                        }
                     }
                     else
                     {
                         if (checkMembershipValidity(mugList[0].membershipEnd) === true)
                         {
+                            if(checkMembershipGrace(mugList[0].membershipEnd) === true) // If 1 month Grace Period is also over
+                            {
+                                $('.new-checkin-alerts').html('Your membership (grace period too) has ended.<br> Please renew your membership to continue the experience of drinking from a mug.');
+                            }
+                            else // Under the grace period
+                            {
+                                $('.new-checkin-alerts').html('The grace period to renew your mug is almost coming to an end.<br> Please renew your membership so that you can drink from your mug next time.');
+                            }
+
                             $('.visual-status-icons').removeClass('hide').find('i').addClass('hide');
                             $('.visual-status-icons').find('i:last-child').removeClass('hide my-success-text').addClass('my-danger-text');
                         }
@@ -430,11 +483,24 @@
                             $('.visual-status-icons').removeClass('hide').find('i').addClass('hide');
                             $('.visual-status-icons').find('i:last-child').removeClass('hide my-danger-text').addClass('my-success-text');
                         }
+                        if($('.new-checkin-alerts').html() == '')
+                        {
+                            $('.new-checkin-alerts').html('Please collect a roaming tag and attach it to the mug.');
+                        }
                     }
 
                     fillMissingParams(mugList[0]);
                     checkMissingInfo();
-                        
+
+                    //Calling Toast
+                    var snackbarContainer = document.querySelector('#mobile-alert-toast');
+                    var toastData = {message: 'Please verify the mobile number!',timeout: 5000};
+                    snackbarContainer.MaterialSnackbar.showSnackbar(toastData);
+                    if(isTodayBirth)
+                    {
+                        $('[data-toggle="popover"]').popover();
+                        $('#bday-item').click();
+                    }
                 }
                 else
                 {

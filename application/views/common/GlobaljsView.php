@@ -105,6 +105,13 @@
         var today = new Date();
         return today > endDate;
     }
+    function checkMembershipGrace(membershipEndDate)
+    {
+        var endDate = new Date(membershipEndDate);
+        var graceDate = endDate.setMonth(endDate.getMonth()+1);
+        var today = new Date();
+        return today > graceDate;
+    }
     function checkMemberLocation(location)
     {
         return location == currentLocation;
