@@ -3752,7 +3752,18 @@
                     hideCustomLoader();
                     if(data.status == true)
                     {
-                        window.location.reload();
+                        if(typeof data.meetupError !== 'undefined')
+                        {
+                            bootbox.alert('Meetup Error: '+data.meetupError);
+                        }
+                        if(typeof data.apiData !== 'undefined')
+                        {
+                            createEventsHigh(data.apiData);
+                        }
+                        else
+                        {
+                            window.location.reload();
+                        }
                     }
                     else
                     {
@@ -3803,15 +3814,26 @@
                                             costPrice: costEntered,
                                             doolallyFee: customFee,
                                             from:senderEmail,fromPass:senderPass},
-                                        success: function(data){
+                                        success: function(subData){
                                             hideCustomLoader();
-                                            if(data.status == true)
+                                            if(subData.status == true)
                                             {
-                                                window.location.reload();
+                                                if(typeof subData.meetupError !== 'undefined')
+                                                {
+                                                    bootbox.alert('Meetup Error: '+subData.meetupError);
+                                                }
+                                                if(typeof subData.apiData !== 'undefined')
+                                                {
+                                                    createEventsHigh(subData.apiData);
+                                                }
+                                                else
+                                                {
+                                                    window.location.reload();
+                                                }
                                             }
                                             else
                                             {
-                                                bootbox.alert(data.errorMsg, function(){
+                                                bootbox.alert(subData.errorMsg, function(){
                                                     window.location.reload();
                                                 });
                                             }
@@ -4096,6 +4118,7 @@
         }
     });
     $('#main-feedback-table').DataTable();
+
 </script>
 
 </html>

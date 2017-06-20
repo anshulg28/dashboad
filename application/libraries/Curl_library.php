@@ -195,4 +195,10 @@ class curl_library
 
         return $this->getDataByPost($url,$details,0);
     }
+    //EventsHigh Enable Event
+    public function enableEventsHigh($eventsHighId)
+    {
+        $url = 'https://developer.eventshigh.com/enable_event/'.$eventsHighId.'?key='.EVENT_HIGH_KEY;
+        return $this->getDataByGet($url,0, array());
+    }
 }

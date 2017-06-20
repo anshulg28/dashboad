@@ -590,7 +590,18 @@
                             hideCustomLoader();
                             if(data.status === true)
                             {
-                                window.location.href = base_url+'dashboard';
+                                if(typeof data.meetupError !== 'undefined')
+                                {
+                                    bootbox.alert('Meetup Error: '+data.meetupError);
+                                }
+                                if(typeof data.apiData !== 'undefined')
+                                {
+                                    createEventsHigh(data.apiData);
+                                }
+                                else
+                                {
+                                    window.location.href = base_url+'dashboard';
+                                }
                             }
                             else
                             {
@@ -619,7 +630,18 @@
                     hideCustomLoader();
                     if(data.status === true)
                     {
-                        window.location.href = base_url+'dashboard';
+                        if(typeof data.meetupError !== 'undefined')
+                        {
+                            bootbox.alert('Meetup Error: '+data.meetupError);
+                        }
+                        if(typeof data.apiData !== 'undefined')
+                        {
+                            createEventsHigh(data.apiData);
+                        }
+                        else
+                        {
+                            window.location.href = base_url+'dashboard';
+                        }
                     }
                     else
                     {

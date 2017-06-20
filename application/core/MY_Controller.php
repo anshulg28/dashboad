@@ -7,6 +7,7 @@
  * @property Sendemail_library $sendemail_library
  * @property curl_library $curl_library
  * @property Twitter $twitter
+ * @property meetup $meetup
  * @property GoogleUrlApi $googleurlapi
  * @property Mobile_Detect $mobile_detect
  * @property CI_User_agent $agent
@@ -53,6 +54,7 @@ class MY_Controller extends CI_Controller
 		$this->load->library('Mobile_Detect');
 		$this->load->library('curl_library');
         $this->load->library('Twitter');
+        $this->load->library('meetup');
         $this->load->library('GoogleUrlApi');
 
 		//

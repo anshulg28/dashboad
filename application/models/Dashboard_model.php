@@ -770,10 +770,11 @@ class Dashboard_Model extends CI_Model
 
     public function getFullEventInfoById($eventId)
     {
-        $query = "SELECT em.*, ea.filename, l.locName, l.mapLink
+        $query = "SELECT em.*, ea.filename, l.locName, l.locAddress, l.mapLink, l.meetupVenueId, um.mobNum
                   FROM `eventmaster` em
                   LEFT JOIN eventattachment ea ON ea.eventId = em.eventId
                   LEFT JOIN locationmaster l ON eventPlace = l.id
+                  LEFT JOIN doolally_usersmaster um ON FIND_IN_SET(l.id,um.assignedLoc)
                   WHERE em.eventId = ".$eventId." GROUP BY em.eventId";
 
         $result = $this->db->query($query)->result_array();
@@ -787,6 +788,32 @@ class Dashboard_Model extends CI_Model
 
         $this->db->insert('eventregistermaster', $details);
         return true;
+    }
+    public function saveEventHigh($details)
+    {
+        $this->db->insert('eventshighmaster', $details);
+        return true;
+    }
+    public function saveMeetup($details)
+    {
+        $this->db->insert('meetupmaster', $details);
+        return true;
+    }
+    public function getEventHighRecord($eventId)
+    {
+        $query = "SELECT highId FROM eventshighmaster WHERE highStatus = 1 AND eventId = ".$eventId;
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+    public function getMeetupRecord($eventId)
+    {
+        $query = "SELECT meetupId FROM meetupmaster WHERE meetupStatus = 1 AND eventId = ".$eventId;
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
     }
 
     //For Fnb

@@ -429,4 +429,109 @@ $(document).on('click','.homePage .request-otp', function(){
         var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
         return regex.test(email);
     }
+
+    function createEventsHigh(eventData)
+    {
+        var price_data = {};
+        price_data["name"] = "Per Person";
+        if(eventData.costType == <?php echo EVENT_FREE;?>)
+        {
+            price_data["value"] = 0;
+        }
+        else
+        {
+            price_data["value"] = eventData.eventPrice;
+        }
+
+        var postData = {
+            'title': eventData.eventName,
+            'description' : eventData.eventDescription,
+            'venue_name' : eventData.locName+', Doolally Taproom',
+            'venue_address' : eventData.locAddress,
+            'city' : 'Mumbai',
+            'img_url' : '<?php echo MOBILE_URL.EVENT_PATH_THUMB;?>'+eventData.filename,
+            'start_date' : eventData.eventDate,
+            'start_time' : eventData.startTime+":00",
+            'end_date' : eventData.eventDate,
+            'end_time' : eventData.endTime+":00",
+            'prices_data' : [price_data],
+            'organizer_account_name' : 'doolally',
+            'organizer_name' : 'Doolally',
+            'organizer_email' : 'events@brewcraftsindia.com',
+            'organizer_phone' : eventData.mobNum
+        };
+        if(typeof eventData.highId !== 'undefined')
+        {
+            postData['id'] = eventData.highId;
+        }
+
+        showCustomLoader();
+        $.ajax({
+            type:'POST',
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            url:'https://developer.eventshigh.com/add_or_edit_event?key=ev3nt5h1ghte5tK3y',
+            data: JSON.stringify(postData),
+            success: function(data){
+                if(data.status == 'error')
+                {
+                    if(typeof data.message !== 'undefined')
+                    {
+                        hideCustomLoader();
+                        bootbox.alert(data.message);
+                    }
+                }
+                if(typeof eventData.highId !== 'undefined')
+                {
+                    $.ajax({
+                        type:'POST',
+                        dataType:'json',
+                        url:base_url+'dashboard/enableEventHigh',
+                        data: {highId: eventData.highId},
+                        success: function(subData){
+                            hideCustomLoader();
+                            if(subData.status === true)
+                            {
+                                window.location.href = base_url+'dashboard';
+                            }
+                        },
+                        error: function(xhr, status, error){
+                            hideCustomLoader();
+                            bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
+                        }
+                    });
+                }
+                else
+                {
+                    $.ajax({
+                        type:'POST',
+                        dataType:'json',
+                        url:base_url+'dashboard/saveEventHighData/'+eventData.eventId,
+                        data: data,
+                        success: function(subData){
+                            hideCustomLoader();
+                            if(subData.status === true)
+                            {
+                                window.location.reload();
+                            }
+                        },
+                        error: function(xhr, status, error){
+                            hideCustomLoader();
+                            bootbox.alert('Some Error Occurred!');
+                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            saveErrorLog(err);
+                        }
+                    });
+                }
+            },
+            error: function(xhr, status, error){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
+            }
+        });
+    }
 </script>

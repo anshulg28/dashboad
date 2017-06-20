@@ -1196,6 +1196,33 @@ class Dashboard extends MY_Controller {
                     $this->dashboard_model->saveEventAttachment($attArr);
                 }
             }
+
+            $externalAPIData = $this->dashboard_model->getFullEventInfoById($eventId);
+            $externalAPIData = $externalAPIData[0];
+            // Editing the event at meetup
+            $meetupRecord = $this->dashboard_model->getMeetupRecord($eventId);
+            if(isset($meetupRecord) && myIsArray($meetupRecord))
+            {
+                $meetupResponse = $this->meetMeUp($externalAPIData,$eventId,$meetupRecord['meetupId']);
+            }
+            else
+            {
+                $meetupResponse = $this->meetMeUp($externalAPIData, $eventId);
+            }
+
+            if($meetupResponse['status'] === false)
+            {
+                $data['meetupError'] = $meetupResponse['errorMsg'];
+            }
+
+            //Checking any eventsHigh record in DB for corresponding event
+            $eventHighRecord = $this->dashboard_model->getEventHighRecord($eventId);
+            if(isset($eventHighRecord) && myIsArray($eventHighRecord))
+            {
+                $externalAPIData['highId'] = $eventHighRecord['highId'];
+            }
+            $data['apiData'] = $externalAPIData;
+
             $data['status'] = true;
         }
 
@@ -1360,6 +1387,7 @@ class Dashboard extends MY_Controller {
         $this->dashboard_model->updateEventRecord($postData,$eventId);
 
         $eventDetails = $this->dashboard_model->getFullEventInfoById($eventId);
+        $externalAPIData = $eventDetails[0];
         $instaLinkFailed = false;
         if(isset($eventDetails[0]['instaSlug']) && isStringSet($eventDetails[0]['instaSlug']))
         {
@@ -1458,6 +1486,29 @@ class Dashboard extends MY_Controller {
         }
         else
         {
+            // Editing the event at meetup
+            $meetupRecord = $this->dashboard_model->getMeetupRecord($eventId);
+            if(isset($meetupRecord) && myIsArray($meetupRecord))
+            {
+                $meetupResponse = $this->meetMeUp($externalAPIData,$eventId,$meetupRecord['meetupId']);
+            }
+            else
+            {
+                $meetupResponse = $this->meetMeUp($externalAPIData, $eventId);
+            }
+
+            if($meetupResponse['status'] === false)
+            {
+                $data['meetupError'] = $meetupResponse['errorMsg'];
+            }
+
+            //Checking any eventsHigh record in DB for corresponding event
+            $eventHighRecord = $this->dashboard_model->getEventHighRecord($eventId);
+            if(isset($eventHighRecord) && myIsArray($eventHighRecord))
+            {
+                $externalAPIData['highId'] = $eventHighRecord['highId'];
+            }
+            $data['apiData'] = $externalAPIData;
             $data['status']= true;
         }
 
@@ -1506,7 +1557,7 @@ class Dashboard extends MY_Controller {
             $this->dashboard_model->updateEventRecord($postData,$eventId);
         }
         $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
-
+        $externalAPIData = $eventDetail[0];
         if(isset($post['from']) && isStringSet($post['from'])
             && isset($post['fromPass']) && isStringSet($post['fromPass']))
         {
@@ -1615,6 +1666,161 @@ class Dashboard extends MY_Controller {
                 }
                 $this->dashboard_model->updateEventRecord($details, $eventDetail[0]['eventId']);
             }
+        }
+
+        // Editing the event at meetup
+        $meetupRecord = $this->dashboard_model->getMeetupRecord($eventId);
+        if(isset($meetupRecord) && myIsArray($meetupRecord))
+        {
+            $meetupResponse = $this->meetMeUp($externalAPIData,$eventId,$meetupRecord['meetupId']);
+        }
+        else
+        {
+            $meetupResponse = $this->meetMeUp($externalAPIData, $eventId);
+        }
+        if($meetupResponse['status'] === false)
+        {
+            $data['meetupError'] = $meetupResponse['errorMsg'];
+        }
+        $data['status'] = true;
+        //Checking any eventsHigh record in DB for corresponding event
+        $eventHighRecord = $this->dashboard_model->getEventHighRecord($eventId);
+        if(isset($eventHighRecord) && myIsArray($eventHighRecord))
+        {
+            $externalAPIData['highId'] = $eventHighRecord['highId'];
+        }
+        $data['apiData'] = $externalAPIData;
+        echo json_encode($data);
+    }
+
+    public function meetMeUp($eventInfo, $eventId, $meetupId = '')
+    {
+        $meetData = array();
+        if($eventInfo['costType'] == EVENT_FREE)
+        {
+            $description = '<a href="'.$eventInfo['shortUrl'].'">Register Here (Free)</a> - '.$eventInfo['eventDescription'];
+        }
+        else
+        {
+            $description = '<a href="'.$eventInfo['shortUrl'].'">Register Here ('.$eventInfo['eventPrice'].')</a> - '.$eventInfo['eventDescription'];
+        }
+
+        $description = (strlen($description) > 45000) ? substr($description, 0, 45000) . '..' : $description;
+
+        $assigned_time = $eventInfo['startTime'];
+        $completed_time= $eventInfo['endTime'];
+
+        $d1 = new DateTime($assigned_time);
+        $d2 = new DateTime($completed_time);
+        $interval = $d2->diff($d1);
+
+        $hours = $interval->format('%H');
+
+        $eventStart = $eventInfo['eventDate'].' '.$eventInfo['startTime'];
+
+        //Meetup Event Creation And Update
+        try
+        {
+            if(!isStringSet($meetupId))
+            {
+                $meetUpPost = array(
+                    'description' => $description,
+                    'group_urlname' => MEETUP_GROUP,
+                    'guest_limit' => '50',
+                    'duration' => $hours * 60 * 60 * 1000,
+                    'announce' => true,
+                    'time' => strtotime($eventStart)*1000,
+                    'name' => (strlen($eventInfo['eventName']) > 75) ? substr($eventInfo['eventName'], 0, 75) . '..' : $eventInfo['eventName'],
+                    'venue_id' => $eventInfo['meetupVenueId']
+                );
+                $meetupCreate = $this->meetup->postEvent($meetUpPost);
+                $saveMeetup = array(
+                    'meetupId' => $meetupCreate['id'],
+                    'eventId' => $eventId,
+                    'meetupStatus' => 1,
+                    'meetupError' => null,
+                    'meetupLink' => $meetupCreate['link'],
+                    'insertedDT' => date('Y-m-d H:i:s')
+                );
+                $this->dashboard_model->saveMeetup($saveMeetup);
+            }
+            else
+            {
+                $announceStatus = true;
+                if($eventInfo['ifActive'] == NOT_ACTIVE && $eventInfo['ifApproved'] == EVENT_WAITING)
+                {
+                    $announceStatus = false;
+                }
+                $meetUpPost = array(
+                    'description' => $description,
+                    'group_urlname' => MEETUP_GROUP,
+                    'guest_limit' => '50',
+                    'duration' => $hours * 60 * 60 * 1000,
+                    'announce' => $announceStatus,
+                    'time' => strtotime($eventStart)*1000,
+                    'name' => (strlen($eventInfo['eventName']) > 75) ? substr($eventInfo['eventName'], 0, 75) . '..' : $eventInfo['eventName'],
+                    'venue_id' => $eventInfo['meetupVenueId']
+                );
+                $meetupCreate = $this->meetup->updateEvent($meetUpPost,$meetupId);
+            }
+            $meetData['status'] = true;
+
+        }
+        catch(Exception $ex)
+        {
+            $saveMeetup = array(
+                'meetupId' => null,
+                'eventId' => $eventId,
+                'meetupStatus' => 2,
+                'meetupError' => $ex->getMessage(),
+                'meetupLink' => null,
+                'insertedDT' => date('Y-m-d H:i:s')
+            );
+            $this->dashboard_model->saveMeetup($saveMeetup);
+            $meetData['status'] = false;
+            $meetData['errorMsg'] = $ex->getMessage();
+        }
+
+        return $meetData;
+    }
+
+    function saveEventHighData($eventId)
+    {
+        $post = $this->input->post();
+        $data = array();
+
+        if($post['status'] == 'error')
+        {
+            $postData = array(
+                'highId' => null,
+                'eventId' => $eventId,
+                'highStatus' => 2,
+                'highError' => $post['message'],
+                'insertedDT' => date('Y-m-d H:i:s')
+            );
+        }
+        else
+        {
+            $postData = array(
+                'highId' => $post['id'],
+                'eventId' => $eventId,
+                'highStatus' => 1,
+                'highError' => null,
+                'insertedDT' => date('Y-m-d H:i:s')
+            );
+        }
+        $this->dashboard_model->saveEventHigh($postData);
+        $data['status'] = true;
+        echo json_encode($data);
+    }
+    public function enableEventHigh()
+    {
+        $post = $this->input->post();
+        $data = array();
+
+        if(isset($post['highId']))
+        {
+            $this->curl_library->enableEventsHigh($post['highId']);
         }
         $data['status'] = true;
         echo json_encode($data);
