@@ -375,6 +375,8 @@
             success: function(data)
             {
                 hideCustomLoader();
+                $('.new-breakfast-status').html('');
+                $('.new-checkin-alerts').html('');
                 if(data.status === true)
                 {
                     var isTodayBirth = false;
@@ -391,8 +393,6 @@
                         'Home Base': mugList[0].locName,
                         'Expiry Date': formatJsDate(mugList[0].membershipEnd)
                     };
-                    $('.new-breakfast-status').html('');
-                    $('.new-checkin-alerts').html('');
 
                     for(var mugIndex in myFormatedData)
                     {
