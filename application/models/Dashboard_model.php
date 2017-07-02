@@ -981,8 +981,9 @@ class Dashboard_Model extends CI_Model
     }
     public function getWalletTrans($id)
     {
-        $query = "SELECT wlm.amount, wlm.amtAction, wlm.notes, wlm.loggedDT, wlm.updatedBy"
+        $query = "SELECT wlm.amount, wlm.amtAction, wlm.notes, wlm.loggedDT, wlm.updatedBy, sb.billNum"
             ." FROM walletlogmaster wlm"
+            ." LEFT JOIN staffbillingmaster sb ON wlm.staffId = sb.staffId AND wlm.amount = sb.billAmount"
             ." WHERE wlm.staffId = ".$id
             ." ORDER BY loggedDT ASC";
 
@@ -1261,6 +1262,25 @@ class Dashboard_Model extends CI_Model
     public function saveTweet($details)
     {
         $this->db->insert('twitterbotmaster', $details);
+        return true;
+    }
+
+    public function saveEventChangeRecord($details)
+    {
+        $this->db->insert('eventchangesmaster', $details);
+        return true;
+    }
+    public function getEditRecord($eventId)
+    {
+        $query = "SELECT * FROM eventchangesmaster WHERE isPending = 0 AND eventId = ".$eventId." ORDER BY insertedDT DESC";
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+    public function updateEditRecord($details,$id)
+    {
+        $this->db->where('id', $id);
+        $this->db->update('eventchangesmaster', $details);
         return true;
     }
 }

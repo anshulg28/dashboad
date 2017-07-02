@@ -84,6 +84,7 @@
                                     <th class="mdl-data-table__cell--non-numeric">Notes</th>
                                     <th class="mdl-data-table__cell--non-numeric">Updated Date/Time</th>
                                     <th class="mdl-data-table__cell--non-numeric">Updated By</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Bill #</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -112,6 +113,7 @@
                                             </td>
                                             <td><?php $d = date_create($row['loggedDT']); echo date_format($d,DATE_TIME_FORMAT_UI); ?></td>
                                             <td><?php echo $row['updatedBy']; ?></td>
+                                            <td><?php if(isset($row['billNum'])){echo $row['billNum'];} ?></td>
                                         </tr>
                                         <?php
                                     }

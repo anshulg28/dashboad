@@ -440,7 +440,7 @@ $(document).on('click','.homePage .request-otp', function(){
         }
         else
         {
-            price_data["value"] = eventData.eventPrice;
+            price_data["value"] = Number(eventData.eventPrice);
         }
 
         var postData = {
@@ -455,7 +455,7 @@ $(document).on('click','.homePage .request-otp', function(){
             'end_date' : eventData.eventDate,
             'end_time' : eventData.endTime+":00",
             'prices_data' : [price_data],
-            'organizer_account_name' : 'doolally',
+            'organizer_account_name' : 'events@brewcraftsindia.com',
             'organizer_name' : 'Doolally',
             'organizer_email' : 'events@brewcraftsindia.com',
             'organizer_phone' : eventData.mobNum
@@ -465,6 +465,7 @@ $(document).on('click','.homePage .request-otp', function(){
             postData['id'] = eventData.highId;
         }
 
+        var ifError = '';
         showCustomLoader();
         $.ajax({
             type:'POST',
@@ -478,6 +479,7 @@ $(document).on('click','.homePage .request-otp', function(){
                     if(typeof data.message !== 'undefined')
                     {
                         hideCustomLoader();
+                        ifError = data.message;
                         bootbox.alert(data.message);
                     }
                 }
@@ -514,7 +516,16 @@ $(document).on('click','.homePage .request-otp', function(){
                             hideCustomLoader();
                             if(subData.status === true)
                             {
-                                window.location.reload();
+                                if(ifError != '')
+                                {
+                                    bootbox.alert(ifError, function(){
+                                       window.location.reload();
+                                    });
+                                }
+                                else
+                                {
+                                    window.location.reload();
+                                }
                             }
                         },
                         error: function(xhr, status, error){

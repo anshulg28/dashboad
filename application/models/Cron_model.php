@@ -187,6 +187,32 @@ class Cron_Model extends CI_Model
         return true;
     }
 
+    public function updateWeeklyFeedback($post,$id)
+    {
+        $this->db->where('id',$id);
+        $this->db->update('feedbackweekscore', $post);
+        return true;
+    }
+
+    public function getAllWeekly()
+    {
+        $query = "SELECT * FROM feedbackweekscore";
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
+    public function getSingleLocFeedbacks($uptoDate)
+    {
+        $query = "SELECT DISTINCT (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                 WHERE feedbackLoc = 4 AND DATE(insertedDateTime) <= '".$uptoDate."') as 'total_overall',
+                 (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                 WHERE feedbackLoc = 4 AND overallRating >= 9 AND DATE(insertedDateTime) <= '".$uptoDate."') as 'promo_overall',
+                 (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                 WHERE feedbackLoc = 4 AND overallRating < 7 AND DATE(insertedDateTime) <= '".$uptoDate."') as 'de_overall'";
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+
     public function updateSongs($restId, $post)
     {
         $post['updateDateTime'] = date('Y-m-d H:i:s');

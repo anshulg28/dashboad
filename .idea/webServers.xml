@@ -10,6 +10,14 @@
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
+      <webServer id="f35b5bd9-7825-44e5-a5a5-af1bc351d145" name="demo dashboard" url="http://dtest.doolally.in">
+        <fileTransfer host="dtest.doolally.in" port="22" privateKey="C:\Users\anshul\Downloads\doolProd.ppk" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

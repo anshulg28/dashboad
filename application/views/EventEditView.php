@@ -167,48 +167,51 @@
                                             <label class="mdl-textfield__label" for="priceFreeStuff">Special Offer With Price?</label>
                                         </div>-->
                                     </div>
-                                    <br>
+                                    <!--<br>
                                     <div class="text-left">
                                         <div class="row">
                                             <div class="col-sm-6">
                                                 <?php
-                                                    if($row['eventData']['isEventEverywhere'] == '1')
+/*                                                    if($row['eventData']['isEventEverywhere'] == '1')
                                                     {
-                                                        ?>
+                                                        */?>
                                                         <input id="newPlaceInput" type="hidden" name="eventPlace"
-                                                               value="<?php echo $row['eventData']['eventPlace'];?>"/>
+                                                               value="<?php /*echo $row['eventData']['eventPlace'];*/?>"/>
                                                         <?php
-                                                    }
-                                                ?>
+/*                                                    }
+                                                */?>
                                                 <label>Event Place: </label>
                                                 <select id="eventPlace" name="eventPlace" class="form-control"
-                                                    <?php if($row['eventData']['isEventEverywhere'] == '1'){echo 'disabled="disabled"';} ?>>
+                                                    <?php /*if($row['eventData']['isEventEverywhere'] == '1'){echo 'disabled="disabled"';} */?>>
                                                     <?php
-                                                    if(isset($locations))
+/*                                                    if(isset($locations))
                                                     {
                                                         foreach($locations as $lockey => $locrow)
                                                         {
                                                             if(isset($locrow['id']))
                                                             {
-                                                                ?>
-                                                                <option value="<?php echo $locrow['id'];?>"
-                                                                    <?php if($locrow['id'] == $row['eventData']['eventPlace']){echo 'selected';}?>><?php echo $locrow['locName'];?></option>
+                                                                */?>
+                                                                <option value="<?php /*echo $locrow['id'];*/?>"
+                                                                    <?php /*if($locrow['id'] == $row['eventData']['eventPlace']){echo 'selected';}*/?>><?php /*echo $locrow['locName'];*/?></option>
                                                                 <?php
-                                                            }
+/*                                                            }
                                                         }
                                                     }
-                                                    ?>
+                                                    */?>
                                                 </select>
                                             </div>
                                             <div class="col-sm-6 all-loc-block">
                                                 <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="isEventEverywhere">
                                                     <input type="checkbox" name="isEventEverywhere" value="1" id="isEventEverywhere" class="mdl-checkbox__input"
-                                                        <?php if($row['eventData']['isEventEverywhere'] == '1'){echo 'checked';} ?>>
+                                                        <?php /*if($row['eventData']['isEventEverywhere'] == '1'){echo 'checked';} */?>>
                                                     <span class="mdl-checkbox__label">Available At All Locations?</span>
                                                 </label>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>-->
+                                    <input type="hidden" name="eventPlace" value="<?php echo $row['eventData']['eventPlace'];?>"/>
+                                    <input type="hidden" name="isEventEverywhere" value="<?php echo $row['eventData']['isEventEverywhere'];?>"/>
+
                                     <br>
                                     <div class="text-left">
                                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">

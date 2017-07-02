@@ -795,11 +795,16 @@ class Dashboard extends MY_Controller {
         {
             if($_FILES['attachment']['error'] != 1)
             {
+                $filePath = $_FILES['attachment']['name'];
+                $fileName = preg_replace('/\(|\)/','',$filePath);
+                $fileName = preg_replace('/[^a-zA-Z0-9.]\.]/', '', $fileName);
+                $fileName = str_replace(' ','_',$fileName);
                 $config = array();
                 $config['upload_path'] = '../mobile/uploads/events/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
                 $config['max_size']      = '0';
                 $config['overwrite']     = TRUE;
+                $config['file_name']     = $fileName;
 
                 $this->upload->initialize($config);
                 if(!$this->upload->do_upload('attachment'))
@@ -1022,6 +1027,8 @@ class Dashboard extends MY_Controller {
         $impChanges = array('eventName','eventDescription','eventDate','startTime','endTime','costType',
                         'eventPrice','eventPlace');
         $changeCheck = array();
+        $changesRecord = array();
+        $isEventNameChanged = false;
 
         //Separating attachment
         if(isset($post['attachment']))
@@ -1035,6 +1042,7 @@ class Dashboard extends MY_Controller {
         $eventDetails = $this->dashboard_model->getFullEventInfoById($eventId);
         $eventOldInfo = $eventDetails[0];
 
+        //Checking for the actual change in the event details
         foreach($eventOldInfo as $key => $row)
         {
             if(isset($post[$key]))
@@ -1043,12 +1051,14 @@ class Dashboard extends MY_Controller {
                 {
                     if(myInArray($key,$impChanges))
                     {
-                        $isImpChange = true;
+                        $isImpChange = true; // change is detected in the event details;
                         $changeCheck[] = $key;
+                        $changesRecord[$key] = $row;
                     }
                 }
             }
         }
+
 
         $instaLinkFailed = false;
         if(isset($eventDetails) && myIsArray($eventDetails) && $isImpChange)
@@ -1152,6 +1162,7 @@ class Dashboard extends MY_Controller {
         {
             if(myInArray('eventName', $changeCheck))
             {
+                $isEventNameChanged = true;
                 $eveSlug = slugify($post['eventName']);
                 $post['eventSlug'] = $eveSlug;
                 $post['eventShareLink'] = MOBILE_URL.'?page/events/'.$eveSlug;
@@ -1169,6 +1180,44 @@ class Dashboard extends MY_Controller {
                 if($shortDWName !== false)
                 {
                     $post['shortUrl'] = $shortDWName;
+                }
+            }
+
+            //Check if event date is changed or not
+            if(myInArray('eventDate',$changeCheck))
+            {
+                if($isEventNameChanged)
+                {
+                    $dateMailData = array(
+                        'eventName' => $post['eventName'],
+                        'eventSlug' => $post['eventSlug'],
+                        'oldDate' => $eventDetails[0]['eventDate'],
+                        'newDate' => $post['eventDate'],
+                        'costType' => $eventDetails[0]['costType'],
+                        'eventPlace' => $eventDetails[0]['eventPlace']
+                    );
+                }
+                else
+                {
+                    $dateMailData = array(
+                        'eventName' => $eventDetails[0]['eventName'],
+                        'eventSlug' => $eventDetails[0]['eventSlug'],
+                        'oldDate' => $eventDetails[0]['eventDate'],
+                        'newDate' => $post['eventDate'],
+                        'costType' => $eventDetails[0]['costType'],
+                        'eventPlace' => $eventDetails[0]['eventPlace']
+                    );
+                }
+
+                $allAttendees = $this->dashboard_model->getJoinersInfo($eventId);
+                if(isset($allAttendees) && myIsArray($allAttendees))
+                {
+                    foreach($allAttendees as $key => $row)
+                    {
+                        $dateMailData['attendeeName'] = $row['firstName'];
+                        $dateMailData['emailId'] = $row['emailId'];
+                        $this->sendemail_library->attendeeChangeMail($dateMailData);
+                    }
                 }
             }
             $post['startTime'] = date('H:i', strtotime($post['startTime']));
@@ -1196,6 +1245,12 @@ class Dashboard extends MY_Controller {
                     $this->dashboard_model->saveEventAttachment($attArr);
                 }
             }
+
+            $changesRecord['eventId'] = $eventId;
+            $changesRecord['fromWhere'] = 'Dashboard';
+            $changesRecord['insertedDT'] = date('Y-m-d H:i:s');
+            $changesRecord['isPending'] = 1;
+            $this->dashboard_model->saveEventChangeRecord($changesRecord);
 
             $externalAPIData = $this->dashboard_model->getFullEventInfoById($eventId);
             $externalAPIData = $externalAPIData[0];
@@ -1294,9 +1349,45 @@ class Dashboard extends MY_Controller {
             }
         }
         //$this->sendemail_library->eventCancelMail($events);
+
+        //Pause Event listing on EventsHigh and Meetup
+        $meetupRecord = $this->dashboard_model->getMeetupRecord($eventId);
+        if(isset($meetupRecord) && myIsArray($meetupRecord))
+        {
+            $meetupResponse = $this->cancelMeetMeUp($meetupRecord['meetupId']);
+        }
+
+        //Checking any eventsHigh record in DB for corresponding event
+        $eventHighRecord = $this->dashboard_model->getEventHighRecord($eventId);
+        if(isset($eventHighRecord) && myIsArray($eventHighRecord))
+        {
+            $this->curl_library->disableEventsHigh($eventHighRecord['highId']);
+        }
+
         $data['status'] = true;
         echo json_encode($data);
 
+    }
+
+    public function cancelMeetMeUp($meetupId = '')
+    {
+        $meetData = array();
+
+        //Meetup Event On Pause
+        try
+        {
+            $meetUpPost = array();
+            $meetupCreate = $this->meetup->deleteEvent($meetUpPost,$meetupId);
+            $meetData['status'] = true;
+
+        }
+        catch(Exception $ex)
+        {
+            $meetData['status'] = false;
+            $meetData['errorMsg'] = $ex->getMessage();
+        }
+
+        return $meetData;
     }
     function eventEmailApprove($sUser, $eventId)
     {
@@ -1556,6 +1647,19 @@ class Dashboard extends MY_Controller {
             }
             $this->dashboard_model->updateEventRecord($postData,$eventId);
         }
+
+        //Checking if event is editted and came for review
+        $editRecord = $this->dashboard_model->getEditRecord($eventId);
+        $eventStatus = 'Approved';
+        if(isset($editRecord) && myIsArray($editRecord))
+        {
+            $eventStatus = 'Reviewed';
+            $upDetail = array(
+                'isPending' => 1
+            );
+            $this->dashboard_model->updateEditRecord($upDetail,$editRecord['id']);
+        }
+
         $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
         $externalAPIData = $eventDetail[0];
         if(isset($post['from']) && isStringSet($post['from'])
@@ -1564,6 +1668,7 @@ class Dashboard extends MY_Controller {
             $eventDetail['fromEmail'] = $post['from'];
             $eventDetail['fromPass'] = $post['fromPass'];
         }
+
         if(isset($eventDetail[0]['eventPaymentLink']) && isStringSet($eventDetail[0]['eventPaymentLink']))
         {
             $this->dashboard_model->ApproveEvent($eventId);
@@ -1576,6 +1681,7 @@ class Dashboard extends MY_Controller {
             }
             $eventDetail['senderName'] = $senderName;
             $eventDetail['senderEmail'] = $senderEmail;
+            $eventDetail['eventStatus'] = $eventStatus;
 
             $this->sendemail_library->eventApproveMail($eventDetail);
         }
@@ -1646,6 +1752,7 @@ class Dashboard extends MY_Controller {
             }
             $eventDetail['senderName'] = $senderName;
             $eventDetail['senderEmail'] = $senderEmail;
+            $eventDetail['eventStatus'] = $eventStatus;
             $this->sendemail_library->eventApproveMail($eventDetail);
             $details = array();
             if(isset($donePost['link']))
@@ -1667,6 +1774,35 @@ class Dashboard extends MY_Controller {
                 $this->dashboard_model->updateEventRecord($details, $eventDetail[0]['eventId']);
             }
         }
+
+        //Sending mails if event date is Modified!
+        if(isset($editRecord) && myIsArray($editRecord))
+        {
+            if(isset($editRecord['eventDate']))
+            {
+                $dateMailData = array(
+                    'eventName' => $externalAPIData['eventName'],
+                    'eventSlug' => $externalAPIData['eventSlug'],
+                    'oldDate' => $editRecord['eventDate'],
+                    'newDate' => $externalAPIData['eventDate'],
+                    'costType' => $externalAPIData['costType'],
+                    'eventPlace' => $externalAPIData['eventPlace']
+                );
+
+                $allAttendees = $this->dashboard_model->getJoinersInfo($eventId);
+                if(isset($allAttendees) && myIsArray($allAttendees))
+                {
+                    foreach($allAttendees as $key => $row)
+                    {
+                        $dateMailData['attendeeName'] = $row['firstName'];
+                        $dateMailData['emailId'] = $row['emailId'];
+                        $this->sendemail_library->attendeeChangeMail($dateMailData);
+                    }
+                }
+            }
+        }
+
+
 
         // Editing the event at meetup
         $meetupRecord = $this->dashboard_model->getMeetupRecord($eventId);
@@ -1725,7 +1861,6 @@ class Dashboard extends MY_Controller {
             {
                 $meetUpPost = array(
                     'description' => $description,
-                    'group_urlname' => MEETUP_GROUP,
                     'guest_limit' => '50',
                     'duration' => $hours * 60 * 60 * 1000,
                     'announce' => true,
@@ -1735,11 +1870,11 @@ class Dashboard extends MY_Controller {
                 );
                 $meetupCreate = $this->meetup->postEvent($meetUpPost);
                 $saveMeetup = array(
-                    'meetupId' => $meetupCreate['id'],
+                    'meetupId' => $meetupCreate->id,
                     'eventId' => $eventId,
                     'meetupStatus' => 1,
                     'meetupError' => null,
-                    'meetupLink' => $meetupCreate['link'],
+                    'meetupLink' => $meetupCreate->link,
                     'insertedDT' => date('Y-m-d H:i:s')
                 );
                 $this->dashboard_model->saveMeetup($saveMeetup);
@@ -1753,7 +1888,6 @@ class Dashboard extends MY_Controller {
                 }
                 $meetUpPost = array(
                     'description' => $description,
-                    'group_urlname' => MEETUP_GROUP,
                     'guest_limit' => '50',
                     'duration' => $hours * 60 * 60 * 1000,
                     'announce' => $announceStatus,

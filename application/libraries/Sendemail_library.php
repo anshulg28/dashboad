@@ -301,6 +301,10 @@ class Sendemail_library
         }
 
         $subject = 'Event Approved';
+        if($userData['eventStatus'] == 'Reviewed')
+        {
+            $subject = 'Event Reviewed';
+        }
         $toEmail = $userData[0]['creatorEmail'];
 
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
@@ -627,6 +631,59 @@ class Sendemail_library
 
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
     }
+
+    public function attendeeChangeMail($userData)
+    {
+        $phons = $this->CI->config->item('phons');
+        $mailRecord = $this->CI->users_model->searchUserByLoc($userData['eventPlace']);
+        $senderName = 'Doolally';
+        $senderEmail = DEFAULT_SENDER_EMAIL;
+        $fromPass = DEFAULT_SENDER_PASS;
+        $replyTo = $senderEmail;
+
+        $senderPhone = $phons['Tresha'];
+
+        if($mailRecord['status'] === true)
+        {
+            $senderName = $mailRecord['userData']['firstName'];
+            $replyTo = $mailRecord['userData']['emailId'];
+            //$senderEmail = $mailRecord['userData']['emailId'];
+            if(isset($phons[ucfirst($senderName)]))
+            {
+                $senderPhone = $phons[ucfirst($senderName)];
+            }
+            else
+            {
+                $senderPhone = '9999999999';
+            }
+            //$senderPhone = $phons[$senderName];
+            //$fromPass = $mailRecord['userData']['gmailPass'];
+        }
+        $userData['senderName'] = $senderName;
+        $userData['senderEmail'] = $replyTo;
+        $userData['senderPhone'] = $senderPhone;
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/attendeeChangeMailView', $data, true);
+
+        $fromEmail = $senderEmail;
+
+        if(isset($userData['fromEmail']) && isset($userData['fromPass']))
+        {
+            $fromEmail = $userData['fromEmail'];
+            $fromPass = $userData['fromPass'];
+            $replyTo = $userData['fromEmail'];
+        }
+
+        $cc        = implode(',',$this->CI->config->item('ccList'));
+        $fromName  = $senderName;
+
+        $subject = $userData['eventName'].' has been Rescheduled';
+        $toEmail = $userData['emailId'];
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
+    }
+
 
     public function sendEmail($to, $cc = '', $from, $fromPass, $fromName,$replyTo, $subject, $content, $attachment = array())
     {

@@ -43,7 +43,12 @@ class Meetup
    /**
     * Parameters for requests
     * @var array
-   */       
+   */
+    /**
+     * PATCH request
+     * @const
+     */
+    const PATCH    = 5;
     protected $_parameters = array();
   /**
     * The response object from the request
@@ -177,7 +182,7 @@ class Meetup
    */   
     public function updateEvent(array $parameters = array(), $meetupId)
     {
-    	return $this->post('/'.MEETUP_GROUP.'/events/'.$meetupId, $parameters);
+    	return $this->patch('/'.MEETUP_GROUP.'/events/'.$meetupId, $parameters);
     }
    /**
     * Stub for deleting an event
@@ -186,9 +191,9 @@ class Meetup
     * @return mixed A json object containing response data
     * @throws Exception if anything goes wrong
    */       
-    public function deleteEvent(array $parameters = array())
+    public function deleteEvent(array $parameters = array(), $meetupId)
     {
-    	return $this->delete('/2/event/:id', $parameters);
+    	return $this->delete('/'.MEETUP_GROUP.'/events/'.$meetupId, $parameters);
     }   
    /**
     * Perform a get on any url supported by meetup, use : to specify parameters that use
@@ -224,8 +229,15 @@ class Meetup
     public function post($path, array $parameters = array())
     {
      	list($url, $params) = $this->params($path, $parameters);
-    	
-        return $this->api(self::BASE . $url, $params, self::POST);   
+
+        return $this->api(self::BASE . $url, $params, self::POST);
+    }
+
+    public function patch($path, array $parameters = array())
+    {
+        list($url, $params) = $this->params($path, $parameters);
+
+        return $this->api(self::BASE . $url, $params, self::PATCH);
     }
     /**
     * Perform a put on any url supported by meetup, use : to specify parameters that use
@@ -403,13 +415,16 @@ class Meetup
     		case self::PUT:
     			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
     		break;
+            case self::PATCH:
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+            break;
     	}
     	    	  	
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
          
     	//fetch content
     	$content = curl_exec($ch);
-	    		    	   	
+
     	//was there an error on the connection?
     	if (curl_errno($ch))
     	{
@@ -418,7 +433,7 @@ class Meetup
     		 
     		throw new Exception("Failed retrieving  '" . $url . "' because of connection issue: ' " . $error . "'.");
     	}
-    	
+
     	//retrieve json and store it internally
     	$this->_response = json_decode($content);
     	$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);

@@ -263,12 +263,48 @@ class Cron extends MY_Controller
         {
             $data[] = (int)(($promo['kemps-corner']/$total['kemps-corner'])*100 - ($de['kemps-corner']/$total['kemps-corner'])*100);
         }
+        if($total['colaba'] != 0)
+        {
+            $data[] = (int)(($promo['colaba']/$total['colaba'])*100 - ($de['colaba']/$total['colaba'])*100);
+        }
 
         $details = array(
             'locs' => implode(',',$data),
             'insertedDate' => date('Y-m-d')
         );
         $this->cron_model->insertWeeklyFeedback($details);
+    }
+
+    public function fixForColaba()
+    {
+        $weekFeed = $this->cron_model->getAllWeekly();
+        if(isset($weekFeed) && myIsArray($weekFeed))
+        {
+            foreach($weekFeed as $key => $row)
+            {
+                $allData = explode(',',$row['locs']);
+                $gotRec = $this->cron_model->getSingleLocFeedbacks($row['insertedDate']);
+                if(isset($gotRec) && myIsArray($gotRec))
+                {
+                    if((int)$gotRec['total_overall'] != 0)
+                    {
+                        $allData[] = (int)(($gotRec['promo_overall']/$gotRec['total_overall'])*100 - ($gotRec['de_overall']/$gotRec['total_overall'])*100);
+                        $postData = array(
+                            'locs' => implode(',',$allData)
+                        );
+                        $this->cron_model->updateWeeklyFeedback($postData,$row['id']);
+                    }
+                    else
+                    {
+                        $allData[] = 0;
+                        $postData = array(
+                            'locs' => implode(',',$allData)
+                        );
+                        $this->cron_model->updateWeeklyFeedback($postData,$row['id']);
+                    }
+                }
+            }
+        }
     }
 
     public function fetchJukeBoxLists()

@@ -8,7 +8,7 @@
 <body>
     <p>Dear <?php echo trim($mailData[0]['creatorName']); ?>,</p>
     <p>
-        1. Your event has been approved! Here's a link to your event - <?php echo $mailData[0]['eventShareLink'] ?><br><br>
+        1. Your event has been <?php echo $mailData['eventStatus'];?>! Here's a link to your event - <?php echo $mailData[0]['eventShareLink'] ?><br><br>
         2. Additionally, as an organiser, you are expected:<br>
         &nbsp;&nbsp;To set up and manage the ticket counter for any ticketed events.<br>
         &nbsp;&nbsp;To chip in with the arrangements of the event.<br>
