@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="new Dashboard">
+  <component name="PublishConfigData" serverName="new Dashboard" uploadOnCheckin="29438fc5-53b6-46c0-8ea3-3abd54ffa424">
     <serverData>
       <paths name="demo dashboard">
         <serverdata>
@@ -17,5 +17,6 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myUploadOnCheckinName" value="new Dashboard" />
   </component>
 </project>

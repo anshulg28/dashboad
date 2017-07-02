@@ -395,6 +395,18 @@ input::-webkit-inner-spin-button {
     text-decoration: none;
     cursor:default;
 }
+.mugCheckIn .new-checkin-alerts
+{
+    color:red;
+    font-size:16px;
+    letter-spacing: 1px;
+}
+.mugCheckIn .new-breakfast-status
+{
+    font-size:16px;
+    letter-spacing:1px;
+    font-weight:bold;
+}
 .info-fill-overlay{
     position: absolute;
     width: 100%;
@@ -686,6 +698,11 @@ display:block;
     .mugCheckIn .form-adjust-insmall
     {
         width:0 !important;
+    }
+    .mugCheckIn .new-checkin-alerts
+    {
+        padding-left:20px;
+        padding-right:20px;
     }
 }
 

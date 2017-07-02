@@ -113,9 +113,10 @@ class Mugclub_Model extends CI_Model
     public function getMugDataById($mugId)
     {
         $query = "SELECT mugId,mugTag,homeBase,l.locName,firstName,lastName,mobileNo, emailId, birthDate, membershipEnd,"
-            ."invoiceDate,invoiceNo,invoiceAmt,membershipStart,oldHomeBase,m.ifActive,notes "
+            ."invoiceDate,invoiceNo,invoiceAmt,membershipStart,oldHomeBase,m.ifActive,notes,om.isRedeemed,om.ifActive "
             ."FROM mugmaster m "
-            ."LEFT JOIN locationmaster l ON id = m.homeBase"
+            ."LEFT JOIN locationmaster l ON id = m.homeBase "
+            ."LEFT JOIN offersmaster om ON m.mugId = om.offerMug"
             ." Where mugId = ".$mugId;
 
         $result = $this->db->query($query)->result_array();
