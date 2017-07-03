@@ -728,6 +728,35 @@ class Home extends MY_Controller {
         
         echo json_encode($data);
     }
+    function checkStaffMob()
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $post = $this->input->post();
+        $data = array();
+
+        if(isset($post['mobNum']))
+        {
+            $staffCheck = $this->dashboard_model->checkStaffByMob($post['mobNum']);
+            if($staffCheck['status'] == true)
+            {
+                $data['status'] = false;
+            }
+            else
+            {
+                $data['status'] = true;
+            }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'No Mobile Number Provided!';
+        }
+
+        echo json_encode($data);
+    }
     function empDetails()
     {
         if(isSessionVariableSet($this->isUserSession) === false)

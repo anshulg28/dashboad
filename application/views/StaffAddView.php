@@ -17,6 +17,7 @@
             <h3>Add Employee</h3>
             <form id="staff-add-form" action="<?php echo base_url();?>saveStaff" method="post">
                 <div class="error-dup"></div>
+                <div class="error-dup1"></div>
                 <div class="mdl-grid">
                     <div class="mdl-cell mdl-cell--6-col">
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
@@ -50,7 +51,7 @@
                     </div>
                     <div class="mdl-cell mdl-cell--6-col">
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label my-fullWidth">
-                            <input class="mdl-textfield__input" type="number" name="mobNum" id="mobNum">
+                            <input class="mdl-textfield__input" type="number" name="mobNum" id="mobNum" required>
                             <label class="mdl-textfield__label" for="mobNum">Mobile Number</label>
                         </div>
                     </div>
@@ -112,6 +113,8 @@
 <?php echo $globalJs; ?>
 
 <script>
+    var empIdError = false;
+    var mobError = false;
     $(document).on('focusout','#empId', function(){
         if($(this).val() != '')
         {
@@ -125,13 +128,46 @@
                 success: function(data){
                     if(data.status == true)
                     {
+                        empIdError = false;
                         $('.error-dup').html('');
                         //$('.error-dup').css('color','green').html('Employee Id Available!');
                         $('button[type="submit"]').removeAttr('disabled');
                     }
                     else
                     {
+                        empIdError = true;
                         $('.error-dup').css('color','red').html('Employee Already Exists!');
+                        $('button[type="submit"]').attr('disabled','disabled');
+                    }
+                },
+                error: function(){
+
+                }
+            });
+        }
+    });
+    $(document).on('focusout', '#mobNum', function(){
+        if($(this).val() != '')
+        {
+            var empId = $(this).val();
+
+            $.ajax({
+                type:'POST',
+                dataType:'json',
+                url:base_url+'home/checkStaffMob',
+                data: {mobNum:empId},
+                success: function(data){
+                    if(data.status == true)
+                    {
+                        mobError = false;
+                        $('.error-dup1').html('');
+                        //$('.error-dup').css('color','green').html('Employee Id Available!');
+                        $('button[type="submit"]').removeAttr('disabled');
+                    }
+                    else
+                    {
+                        mobError = true;
+                        $('.error-dup1').css('color','red').html('Mobile Number Already Exists!');
                         $('button[type="submit"]').attr('disabled','disabled');
                     }
                 },
@@ -159,7 +195,17 @@
             bootbox.alert('First Name Required!');
             return false;
         }
+        if(empIdError)
+        {
+            bootbox.alert('Employee Already Exists!');
+            return false;
+        }
 
+        if(mobError)
+        {
+            bootbox.alert('Mobile Number Already Exists!');
+            return false;
+        }
         showCustomLoader();
         $.ajax({
             type:'POST',
