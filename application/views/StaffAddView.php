@@ -54,6 +54,10 @@
                             <input class="mdl-textfield__input" type="number" name="mobNum" id="mobNum" required>
                             <label class="mdl-textfield__label" for="mobNum">Mobile Number</label>
                         </div>
+                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect text-left" for="useDefault">
+                            <input type="checkbox" id="useDefault" value="1" class="mdl-checkbox__input">
+                            <span class="mdl-checkbox__label">No Mobile No. Use Default?</span>
+                        </label>
                     </div>
                     <div class="mdl-cell mdl-cell--12-col">
                         <label for="recurringFreq">Recurring Frequency</label>
@@ -175,6 +179,18 @@
 
                 }
             });
+        }
+    });
+    $(document).on('change','#useDefault', function(){
+        if($(this).is(':checked'))
+        {
+            $('#mobNum').val(<?php echo DEFAULT_STAFF_MOB;?>).attr('readonly','readonly').parent().addClass('is-focused');
+            $('#mobNum').focusout();
+
+        }
+        else
+        {
+            $('#mobNum').val('').removeAttr('readonly').parent().removeClass('is-focused');
         }
     });
     $(document).on('keydown', 'input[type=number]', function(e) {

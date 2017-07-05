@@ -6,6 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property generalfunction_library $generalfunction_library
  * @property locations_model $locations_model
  * @property dashboard_model $dashboard_model
+ * @property mugclub_model $mugclub_model
  * @property login_model $login_model
  */
 
@@ -288,7 +289,7 @@ class Home extends MY_Controller {
     {
         $post = $this->input->post();
         $data = array();
-        $isMobile = false;
+        $isDefaultNum = false;
         if(isSessionVariableSet($this->isUserSession) === false)
         {
             redirect(base_url());
@@ -296,7 +297,14 @@ class Home extends MY_Controller {
 
         if(isset($post['userInput']))
         {
-            $walletBal = $this->dashboard_model->getBalanceByInput($post['userInput']);
+            if($post['userInput'] == DEFAULT_STAFF_MOB)
+            {
+                $isDefaultNum = TRUE;
+            }
+            else
+            {
+                $walletBal = $this->dashboard_model->getBalanceByInput($post['userInput']);
+            }
         }
         /*else
         {
@@ -369,9 +377,15 @@ class Home extends MY_Controller {
             $data['status'] = true;
             $data['balance'] = $walletBal;
         }
+        elseif($isDefaultNum)
+        {
+            $data['status'] = 'false';
+            $data['errorMsg'] = 'Invalid Mobile Number!';
+        }
         else
         {
             $data['status'] = false;
+            $data['errorMsg'] = 'No Employee Found!';
         }
         echo json_encode($data);
     }
@@ -510,6 +524,24 @@ class Home extends MY_Controller {
         if(isSessionVariableSet($this->isUserSession) === false)
         {
             redirect(base_url());
+        }
+        $this->load->model('mugclub_model');
+        if(!isset($this->currentLocation) || isSessionVariableSet($this->currentLocation) === false)
+        {
+            $this->session->set_userdata('page_url', base_url(uri_string()));
+            if($this->userType != GUEST_USER || $this->userType == OFFERS_USER)
+            {
+                $gotLocId = $this->mugclub_model->fetchLocIdByMob($this->userId);
+                if(isset($gotLocId['id']))
+                {
+                    $this->generalfunction_library->setSessionVariable("currentLocation",$gotLocId['id']);
+                    $this->currentLocation = $gotLocId['id'];
+                }
+                else
+                {
+                    redirect(base_url().'location-select');
+                }
+            }
         }
         /*$checkinDetail = $this->dashboard_model->getCheckinById($id);
         if (isset($checkinDetail) && myIsMultiArray($checkinDetail))
@@ -739,14 +771,21 @@ class Home extends MY_Controller {
 
         if(isset($post['mobNum']))
         {
-            $staffCheck = $this->dashboard_model->checkStaffByMob($post['mobNum']);
-            if($staffCheck['status'] == true)
+            if($post['mobNum'] == DEFAULT_STAFF_MOB)
             {
-                $data['status'] = false;
+                $data['status'] = true;
             }
             else
             {
-                $data['status'] = true;
+                $staffCheck = $this->dashboard_model->checkStaffByMob($post['mobNum']);
+                if($staffCheck['status'] == true)
+                {
+                    $data['status'] = false;
+                }
+                else
+                {
+                    $data['status'] = true;
+                }
             }
         }
         else
@@ -792,51 +831,112 @@ class Home extends MY_Controller {
         }
         if(isset($post['empId']))
         {
-            $walletBal = $this->dashboard_model->getBalanceByInput($post['empId']);
-            /*if(is_numeric($post['empId']))
+            if($post['empId'] == DEFAULT_STAFF_MOB)
             {
-
-            }*/
-            /*else
-            {
-                $walletBal = $this->dashboard_model->getBalanceByEmp($post['empId']);
-            }*/
-
-            if(isset($walletBal['mobNum']) && $walletBal['mobNum'] != '')
-            {
-                $newOtp = mt_rand(1000,99999);
-
-                $details = array(
-                    'userOtp'=> $newOtp
-                );
-                $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
-
-                $numbers = array('91'.$walletBal['mobNum']);
-
-                $postDetails = array(
-                    'apiKey' => TEXTLOCAL_API,
-                    'numbers' => implode(',', $numbers),
-                    'sender'=> urlencode('DOLALY'),
-                    'message' => rawurlencode($newOtp.' is Your OTP for wallet')
-                );
-                $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
-                if($smsStatus['status'] == 'failure')
-                {
-                    if(isset($smsStatus['warnings']))
-                    {
-                        $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
-                    }
-                    else
-                    {
-                        $data['errorMsg'] = $smsStatus['errors'][0]['message'];
-                    }
-                }
-                $data['status'] = true;
+                $data['status'] = false;
+                $data['errorMsg'] = 'Invalid Mobile Number!';
             }
             else
             {
-                $data['status'] = false;
-                $data['errorMsg'] = 'No Mobile Number Available!';
+                $walletBal = $this->dashboard_model->getBalanceByInput($post['empId']);
+                /*if(is_numeric($post['empId']))
+                {
+
+                }*/
+                /*else
+                {
+                    $walletBal = $this->dashboard_model->getBalanceByEmp($post['empId']);
+                }*/
+
+                if(isset($walletBal['mobNum']) && $walletBal['mobNum'] != '')
+                {
+                    if($walletBal['mobNum'] == DEFAULT_STAFF_MOB)
+                    {
+                        $locDetail = $this->locations_model->getLocationDetailsById($this->currentLocation);
+                        if($locDetail['status'] == true)
+                        {
+                            $walletBal['mobNum'] = $locDetail['locData'][0]['phoneNumber'];
+                        }
+                        else
+                        {
+                            $data['status'] = false;
+                            $data['errorMsg'] = 'No Mobile Number Available!';
+                            echo json_encode($data);
+                            return false;
+                        }
+                    }
+                    $newOtp = mt_rand(1000,99999);
+
+                    $details = array(
+                        'userOtp'=> $newOtp
+                    );
+                    $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
+
+                    $numbers = array('91'.$walletBal['mobNum']);
+
+                    $postDetails = array(
+                        'apiKey' => TEXTLOCAL_API,
+                        'numbers' => implode(',', $numbers),
+                        'sender'=> urlencode('DOLALY'),
+                        'message' => rawurlencode($newOtp.' is Your OTP for wallet')
+                    );
+                    $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                    if($smsStatus['status'] == 'failure')
+                    {
+                        if(isset($smsStatus['warnings']))
+                        {
+                            $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                        }
+                        else
+                        {
+                            $data['errorMsg'] = $smsStatus['errors'][0]['message'];
+                        }
+                    }
+                    $data['status'] = true;
+                }
+                else
+                {
+                    $locDetail = $this->locations_model->getLocationDetailsById($this->currentLocation);
+                    if($locDetail['status'] == true)
+                    {
+                        $walletBal['mobNum'] = $locDetail['locData'][0]['phoneNumber'];
+                        $newOtp = mt_rand(1000,99999);
+
+                        $details = array(
+                            'userOtp'=> $newOtp
+                        );
+                        $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
+
+                        $numbers = array('91'.$walletBal['mobNum']);
+
+                        $postDetails = array(
+                            'apiKey' => TEXTLOCAL_API,
+                            'numbers' => implode(',', $numbers),
+                            'sender'=> urlencode('DOLALY'),
+                            'message' => rawurlencode($newOtp.' is Your OTP for wallet')
+                        );
+                        $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                        if($smsStatus['status'] == 'failure')
+                        {
+                            if(isset($smsStatus['warnings']))
+                            {
+                                $data['errorMsg'] = $smsStatus['warnings'][0]['message'];
+                            }
+                            else
+                            {
+                                $data['errorMsg'] = $smsStatus['errors'][0]['message'];
+                            }
+                        }
+                        $data['status'] = true;
+                    }
+                    else
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'No Mobile Number Available!';
+                        echo json_encode($data);
+                        return false;
+                    }
+                }
             }
         }
         else
@@ -857,109 +957,120 @@ class Home extends MY_Controller {
 
         if(isset($post['empId']) && isStringSet($post['empId']))
         {
-            $staffDetails = $this->dashboard_model->getBalanceByInput($post['empId']);
-
-            if(isset($staffDetails) && myIsArray($staffDetails))
+            if($post['empId'] == DEFAULT_STAFF_MOB)
             {
-                $userOtp = $this->dashboard_model->checkStaffOtp($staffDetails['mobNum'], $post['userOtp']);
-                if($userOtp['status'] == false)
-                {
-                    $data['status'] = false;
-                    $data['errorMsg'] = 'Invalid OTP';
-                }
-                else
-                {
-                    $details = array(
-                        'userOtp' => null
-                    );
-                    $this->dashboard_model->updateStaffRecord($userOtp['id'],$details);
-                    $billCheck = $this->dashboard_model->checkBillNum($post['billNum']);
-                    if(!myIsArray($billCheck))
-                    {
-                        $postBillNum = $post['billNum'];
-                        $postBillAmt = $post['billAmount'];
-
-                        //Wallet Balance Calculation
-                        $oldBalance = $staffDetails['walletBalance']; // $post['walletBalance'];
-                        if((int)$oldBalance < (int)$postBillAmt)
-                        {
-                            $data['status'] = FALSE;
-                            $data['errorMsg'] = "Insufficient Wallet Balance!";
-                        }
-                        else
-                        {
-                            $usedAmt = $postBillAmt;
-                            $finalBal = $oldBalance - $usedAmt;
-                            //$this->dashboard_model->setCouponUsed($coupon['id']);
-                            $billLog = array(
-                                'billNum' => $postBillNum,
-                                'offerId' => null,
-                                'staffId' => $staffDetails['id'],
-                                'billAmount' => $postBillAmt,
-                                'insertedDT' => date('Y-m-d H:i:s')
-                            );
-                            $this->dashboard_model->saveBillLog($billLog);
-                            //$this->dashboard_model->clearCheckinLog($post['checkInId']);
-
-                            $walletRecord = array(
-                                'staffId' => $staffDetails['id'],
-                                'amount' => $usedAmt,
-                                'amtAction' => '1',
-                                'notes' => 'Wallet Balance Used',
-                                'loggedDT' => date('Y-m-d H:i:s'),
-                                'updatedBy' => 'system'
-                            );
-                            //Log Insertion in the wallet
-                            $this->dashboard_model->updateWalletLog($walletRecord);
-
-                            $details = array(
-                                'walletBalance' => $finalBal
-                            );
-                            $this->dashboard_model->updateStaffRecord($staffDetails['id'],$details);
-
-                            $numbers = array('91'.$staffDetails['mobNum']);
-
-                            $postDetails = array(
-                                'apiKey' => TEXTLOCAL_API,
-                                'numbers' => implode(',', $numbers),
-                                'sender'=> urlencode('DOLALY'),
-                                'message' => rawurlencode('Available Wallet Balance: '.$finalBal)
-                            );
-                            $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
-                            if($smsStatus['status'] == 'failure')
-                            {
-                                if(isset($smsStatus['warnings']))
-                                {
-                                    $data['smsError'] = $smsStatus['warnings'][0]['message'];
-                                }
-                                else
-                                {
-                                    $data['smsError'] = $smsStatus['errors'][0]['message'];
-                                }
-                            }
-                            $data['status'] = true;
-                        }
-                    }
-                    else
-                    {
-                        $billLog = array(
-                            'billNum' => $post['billNum'],
-                            'offerId' => null,
-                            'staffId' => $staffDetails['id'],
-                            'billAmount' => $post['billAmount'],
-                            'insertedDT' => date('Y-m-d H:i:s')
-                        );
-                        $this->dashboard_model->saveFailBillLog($billLog);
-
-                        $data['status'] = false;
-                        $data['errorMsg'] = 'Bill Number Already Associated!';
-                    }
-                }
+                $data['status'] = false;
+                $data['errorMsg'] = 'Invalid Mobile Number!';
             }
             else
             {
-                $data['status'] = false;
-                $data['errorMsg'] = 'No Employee Found!';
+                $staffDetails = $this->dashboard_model->getBalanceByInput($post['empId']);
+
+                if(isset($staffDetails) && myIsArray($staffDetails))
+                {
+                    $userOtp = $this->dashboard_model->checkStaffOtp($staffDetails['id'], $post['userOtp']);
+                    if($userOtp['status'] == false)
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Invalid OTP';
+                    }
+                    else
+                    {
+                        $details = array(
+                            'userOtp' => null
+                        );
+                        $this->dashboard_model->updateStaffRecord($userOtp['id'],$details);
+                        $billCheck = $this->dashboard_model->checkBillNum($post['billNum']);
+                        if(!myIsArray($billCheck))
+                        {
+                            $postBillNum = $post['billNum'];
+                            $postBillAmt = $post['billAmount'];
+
+                            //Wallet Balance Calculation
+                            $oldBalance = $staffDetails['walletBalance']; // $post['walletBalance'];
+                            if((int)$oldBalance < (int)$postBillAmt)
+                            {
+                                $data['status'] = FALSE;
+                                $data['errorMsg'] = "Insufficient Wallet Balance!";
+                            }
+                            else
+                            {
+                                $usedAmt = $postBillAmt;
+                                $finalBal = $oldBalance - $usedAmt;
+                                //$this->dashboard_model->setCouponUsed($coupon['id']);
+                                $billLog = array(
+                                    'billNum' => $postBillNum,
+                                    'offerId' => null,
+                                    'staffId' => $staffDetails['id'],
+                                    'billAmount' => $postBillAmt,
+                                    'insertedDT' => date('Y-m-d H:i:s')
+                                );
+                                $this->dashboard_model->saveBillLog($billLog);
+                                //$this->dashboard_model->clearCheckinLog($post['checkInId']);
+
+                                $walletRecord = array(
+                                    'staffId' => $staffDetails['id'],
+                                    'amount' => $usedAmt,
+                                    'amtAction' => '1',
+                                    'notes' => 'Wallet Balance Used',
+                                    'loggedDT' => date('Y-m-d H:i:s'),
+                                    'updatedBy' => 'system'
+                                );
+                                //Log Insertion in the wallet
+                                $this->dashboard_model->updateWalletLog($walletRecord);
+
+                                $details = array(
+                                    'walletBalance' => $finalBal
+                                );
+                                $this->dashboard_model->updateStaffRecord($staffDetails['id'],$details);
+
+                                if(isset($staffDetails['mobNum']) && isStringSet($staffDetails['mobNum']) && $staffDetails['mobNum'] != DEFAULT_STAFF_MOB)
+                                {
+                                    $numbers = array('91'.$staffDetails['mobNum']);
+
+                                    $postDetails = array(
+                                        'apiKey' => TEXTLOCAL_API,
+                                        'numbers' => implode(',', $numbers),
+                                        'sender'=> urlencode('DOLALY'),
+                                        'message' => rawurlencode('Available Wallet Balance: '.$finalBal)
+                                    );
+                                    $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+                                    if($smsStatus['status'] == 'failure')
+                                    {
+                                        if(isset($smsStatus['warnings']))
+                                        {
+                                            $data['smsError'] = $smsStatus['warnings'][0]['message'];
+                                        }
+                                        else
+                                        {
+                                            $data['smsError'] = $smsStatus['errors'][0]['message'];
+                                        }
+                                    }
+                                }
+                                $data['status'] = true;
+                            }
+                        }
+                        else
+                        {
+                            $billLog = array(
+                                'billNum' => $post['billNum'],
+                                'offerId' => null,
+                                'staffId' => $staffDetails['id'],
+                                'billAmount' => $post['billAmount'],
+                                'insertedDT' => date('Y-m-d H:i:s')
+                            );
+                            $this->dashboard_model->saveFailBillLog($billLog);
+
+                            $data['status'] = false;
+                            $data['errorMsg'] = 'Bill Number Already Associated!';
+                        }
+                    }
+                }
+                else
+                {
+                    $data['status'] = false;
+                    $data['errorMsg'] = 'No Employee Found!';
+                }
             }
         }
         else

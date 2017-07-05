@@ -1060,105 +1060,7 @@ class Dashboard extends MY_Controller {
         }
 
 
-        $instaLinkFailed = false;
-        if(isset($eventDetails) && myIsArray($eventDetails) && $isImpChange)
-        {
-            if(isset($eventDetails[0]['instaSlug']) && isStringSet($eventDetails[0]['instaSlug']))
-            {
-                //Deleting old link
-                $this->curl_library->archiveInstaLink($eventDetails[0]['instaSlug']);
-            }
-            //Get location info
-            $locInfo = $this->locations_model->getLocationDetailsById($post['eventPlace']);
-
-            // Getting image upload url from api;
-            $instaImgLink = $this->curl_library->getInstaImageLink();
-            $donePost = array();
-            if($instaImgLink['success'] === true)
-            {
-                if(isset($attachement) && isStringSet($attachement))
-                {
-                    $coverImg =  $this->curl_library->uploadInstaImage($instaImgLink['upload_url'],$attachement);
-                }
-                else
-                {
-                    $coverImg =  $this->curl_library->uploadInstaImage($instaImgLink['upload_url'],$eventDetails[0]['filename']);
-                }
-                if(isset($coverImg) && myIsMultiArray($coverImg) && isset($coverImg['url']))
-                {
-                    $postData = array(
-                        'title' => $post['eventName'],
-                        'description' => $post['eventDescription'],
-                        'currency' => 'INR',
-                        'base_price' => $post['eventPrice'],
-                        'start_date' => $post['eventDate'].' '.date("H:i", strtotime($post['startTime'])),
-                        'end_date' => $post['eventDate'].' '.date("H:i", strtotime($post['endTime'])),
-                        'venue' => $locInfo['locData'][0]['locName'].', Doolally Taproom',
-                        'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
-                        'cover_image_json' => json_encode($coverImg),
-                        'timezone' => 'Asia/Kolkata'
-                    );
-                    $donePost = $this->curl_library->createInstaLink($postData);
-                }
-            }
-            if(!myIsMultiArray($donePost)) //Creating event without image
-            {
-                if($post['costType'] == EVENT_FREE)
-                {
-                    $postData = array(
-                        'title' => $post['eventName'],
-                        'description' => $post['eventDescription'],
-                        'currency' => 'INR',
-                        'base_price' => '0',
-                        'start_date' => $post['eventDate'].' '.date("H:i", strtotime($post['startTime'])),
-                        'end_date' => $post['eventDate'].' '.date("H:i", strtotime($post['endTime'])),
-                        'venue' => $locInfo['locData'][0]['locName'].', Doolally Taproom',
-                        'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
-                        'timezone' => 'Asia/Kolkata'
-                    );
-                }
-                else
-                {
-                    $postData = array(
-                        'title' => $post['eventName'],
-                        'description' => $post['eventDescription'],
-                        'currency' => 'INR',
-                        'base_price' => $post['eventPrice'],
-                        'start_date' => $post['eventDate'].' '.date("H:i", strtotime($post['startTime'])),
-                        'end_date' => $post['eventDate'].' '.date("H:i", strtotime($post['endTime'])),
-                        'venue' => $locInfo['locData'][0]['locName'].', Doolally Taproom',
-                        'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
-                        'timezone' => 'Asia/Kolkata'
-                    );
-                }
-                $donePost = $this->curl_library->createInstaLink($postData);
-            }
-
-            if(isset($donePost['link']))
-            {
-                if(isset($donePost['link']['shorturl']))
-                {
-                    $post['eventPaymentLink'] = $donePost['link']['shorturl'];
-                    $post['instaSlug'] = $donePost['link']['slug'];
-                }
-                else
-                {
-                    $post['eventPaymentLink'] = $donePost['link']['url'];
-                    $post['instaSlug'] = $donePost['link']['slug'];
-                }
-            }
-            else
-            {
-                $instaLinkFailed = true;
-            }
-        }
-
-        if($instaLinkFailed === true)
-        {
-            $data['status'] = false;
-            $data['errorMsg'] = 'Failed To Create Link On Instamojo! Try Again Later';
-        }
-        else
+        if($eventDetails[0]['ifApproved'] == EVENT_WAITING || $eventDetails[0]['ifActive'] == NOT_ACTIVE)
         {
             if(myInArray('eventName', $changeCheck))
             {
@@ -1180,44 +1082,6 @@ class Dashboard extends MY_Controller {
                 if($shortDWName !== false)
                 {
                     $post['shortUrl'] = $shortDWName;
-                }
-            }
-
-            //Check if event date is changed or not
-            if(myInArray('eventDate',$changeCheck))
-            {
-                if($isEventNameChanged)
-                {
-                    $dateMailData = array(
-                        'eventName' => $post['eventName'],
-                        'eventSlug' => $post['eventSlug'],
-                        'oldDate' => $eventDetails[0]['eventDate'],
-                        'newDate' => $post['eventDate'],
-                        'costType' => $eventDetails[0]['costType'],
-                        'eventPlace' => $eventDetails[0]['eventPlace']
-                    );
-                }
-                else
-                {
-                    $dateMailData = array(
-                        'eventName' => $eventDetails[0]['eventName'],
-                        'eventSlug' => $eventDetails[0]['eventSlug'],
-                        'oldDate' => $eventDetails[0]['eventDate'],
-                        'newDate' => $post['eventDate'],
-                        'costType' => $eventDetails[0]['costType'],
-                        'eventPlace' => $eventDetails[0]['eventPlace']
-                    );
-                }
-
-                $allAttendees = $this->dashboard_model->getJoinersInfo($eventId);
-                if(isset($allAttendees) && myIsArray($allAttendees))
-                {
-                    foreach($allAttendees as $key => $row)
-                    {
-                        $dateMailData['attendeeName'] = $row['firstName'];
-                        $dateMailData['emailId'] = $row['emailId'];
-                        $this->sendemail_library->attendeeChangeMail($dateMailData);
-                    }
                 }
             }
             $post['startTime'] = date('H:i', strtotime($post['startTime']));
@@ -1245,40 +1109,236 @@ class Dashboard extends MY_Controller {
                     $this->dashboard_model->saveEventAttachment($attArr);
                 }
             }
-
             $changesRecord['eventId'] = $eventId;
             $changesRecord['fromWhere'] = 'Dashboard';
             $changesRecord['insertedDT'] = date('Y-m-d H:i:s');
             $changesRecord['isPending'] = 1;
             $this->dashboard_model->saveEventChangeRecord($changesRecord);
-
-            $externalAPIData = $this->dashboard_model->getFullEventInfoById($eventId);
-            $externalAPIData = $externalAPIData[0];
-            // Editing the event at meetup
-            $meetupRecord = $this->dashboard_model->getMeetupRecord($eventId);
-            if(isset($meetupRecord) && myIsArray($meetupRecord))
+            $data['status'] = true;
+        }
+        else
+        {
+            $instaLinkFailed = false;
+            if(isset($eventDetails) && myIsArray($eventDetails) && $isImpChange)
             {
-                $meetupResponse = $this->meetMeUp($externalAPIData,$eventId,$meetupRecord['meetupId']);
+                if(isset($eventDetails[0]['instaSlug']) && isStringSet($eventDetails[0]['instaSlug']))
+                {
+                    //Deleting old link
+                    $this->curl_library->archiveInstaLink($eventDetails[0]['instaSlug']);
+                }
+                //Get location info
+                $locInfo = $this->locations_model->getLocationDetailsById($post['eventPlace']);
+
+                // Getting image upload url from api;
+                $instaImgLink = $this->curl_library->getInstaImageLink();
+                $donePost = array();
+                if($instaImgLink['success'] === true)
+                {
+                    if(isset($attachement) && isStringSet($attachement))
+                    {
+                        $coverImg =  $this->curl_library->uploadInstaImage($instaImgLink['upload_url'],$attachement);
+                    }
+                    else
+                    {
+                        $coverImg =  $this->curl_library->uploadInstaImage($instaImgLink['upload_url'],$eventDetails[0]['filename']);
+                    }
+                    if(isset($coverImg) && myIsMultiArray($coverImg) && isset($coverImg['url']))
+                    {
+                        $postData = array(
+                            'title' => $post['eventName'],
+                            'description' => $post['eventDescription'],
+                            'currency' => 'INR',
+                            'base_price' => $post['eventPrice'],
+                            'start_date' => $post['eventDate'].' '.date("H:i", strtotime($post['startTime'])),
+                            'end_date' => $post['eventDate'].' '.date("H:i", strtotime($post['endTime'])),
+                            'venue' => $locInfo['locData'][0]['locName'].', Doolally Taproom',
+                            'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
+                            'cover_image_json' => json_encode($coverImg),
+                            'timezone' => 'Asia/Kolkata'
+                        );
+                        $donePost = $this->curl_library->createInstaLink($postData);
+                    }
+                }
+                if(!myIsMultiArray($donePost)) //Creating event without image
+                {
+                    if($post['costType'] == EVENT_FREE)
+                    {
+                        $postData = array(
+                            'title' => $post['eventName'],
+                            'description' => $post['eventDescription'],
+                            'currency' => 'INR',
+                            'base_price' => '0',
+                            'start_date' => $post['eventDate'].' '.date("H:i", strtotime($post['startTime'])),
+                            'end_date' => $post['eventDate'].' '.date("H:i", strtotime($post['endTime'])),
+                            'venue' => $locInfo['locData'][0]['locName'].', Doolally Taproom',
+                            'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
+                            'timezone' => 'Asia/Kolkata'
+                        );
+                    }
+                    else
+                    {
+                        $postData = array(
+                            'title' => $post['eventName'],
+                            'description' => $post['eventDescription'],
+                            'currency' => 'INR',
+                            'base_price' => $post['eventPrice'],
+                            'start_date' => $post['eventDate'].' '.date("H:i", strtotime($post['startTime'])),
+                            'end_date' => $post['eventDate'].' '.date("H:i", strtotime($post['endTime'])),
+                            'venue' => $locInfo['locData'][0]['locName'].', Doolally Taproom',
+                            'redirect_url' => MOBILE_URL.'?event='.$eventId.'&hash='.encrypt_data('EV-'.$eventId),
+                            'timezone' => 'Asia/Kolkata'
+                        );
+                    }
+                    $donePost = $this->curl_library->createInstaLink($postData);
+                }
+
+                if(isset($donePost['link']))
+                {
+                    if(isset($donePost['link']['shorturl']))
+                    {
+                        $post['eventPaymentLink'] = $donePost['link']['shorturl'];
+                        $post['instaSlug'] = $donePost['link']['slug'];
+                    }
+                    else
+                    {
+                        $post['eventPaymentLink'] = $donePost['link']['url'];
+                        $post['instaSlug'] = $donePost['link']['slug'];
+                    }
+                }
+                else
+                {
+                    $instaLinkFailed = true;
+                }
+            }
+
+            if($instaLinkFailed === true)
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'Failed To Create Link On Instamojo! Try Again Later';
             }
             else
             {
-                $meetupResponse = $this->meetMeUp($externalAPIData, $eventId);
-            }
+                if(myInArray('eventName', $changeCheck))
+                {
+                    $isEventNameChanged = true;
+                    $eveSlug = slugify($post['eventName']);
+                    $post['eventSlug'] = $eveSlug;
+                    $post['eventShareLink'] = MOBILE_URL.'?page/events/'.$eveSlug;
+                    $post['shortUrl'] = null;
 
-            if($meetupResponse['status'] === false)
-            {
-                $data['meetupError'] = $meetupResponse['errorMsg'];
-            }
+                    // Adding event slug to new table
+                    $newSlugTab = array(
+                        'eventId' => $eventId,
+                        'eventSlug' => $eveSlug,
+                        'insertedDateTime' => date('Y-m-d H:i:s')
+                    );
+                    $this->dashboard_model->saveEventSlug($newSlugTab);
 
-            //Checking any eventsHigh record in DB for corresponding event
-            $eventHighRecord = $this->dashboard_model->getEventHighRecord($eventId);
-            if(isset($eventHighRecord) && myIsArray($eventHighRecord))
-            {
-                $externalAPIData['highId'] = $eventHighRecord['highId'];
-            }
-            $data['apiData'] = $externalAPIData;
+                    $shortDWName = $this->googleurlapi->shorten(MOBILE_URL.'?page/events/'.$eveSlug);
+                    if($shortDWName !== false)
+                    {
+                        $post['shortUrl'] = $shortDWName;
+                    }
+                }
 
-            $data['status'] = true;
+                //Check if event date is changed or not
+                if(myInArray('eventDate',$changeCheck))
+                {
+                    if($isEventNameChanged)
+                    {
+                        $dateMailData = array(
+                            'eventName' => $post['eventName'],
+                            'eventSlug' => $post['eventSlug'],
+                            'oldDate' => $eventDetails[0]['eventDate'],
+                            'newDate' => $post['eventDate'],
+                            'costType' => $eventDetails[0]['costType'],
+                            'eventPlace' => $eventDetails[0]['eventPlace']
+                        );
+                    }
+                    else
+                    {
+                        $dateMailData = array(
+                            'eventName' => $eventDetails[0]['eventName'],
+                            'eventSlug' => $eventDetails[0]['eventSlug'],
+                            'oldDate' => $eventDetails[0]['eventDate'],
+                            'newDate' => $post['eventDate'],
+                            'costType' => $eventDetails[0]['costType'],
+                            'eventPlace' => $eventDetails[0]['eventPlace']
+                        );
+                    }
+
+                    $allAttendees = $this->dashboard_model->getJoinersInfo($eventId);
+                    if(isset($allAttendees) && myIsArray($allAttendees))
+                    {
+                        foreach($allAttendees as $key => $row)
+                        {
+                            $dateMailData['attendeeName'] = $row['firstName'];
+                            $dateMailData['emailId'] = $row['emailId'];
+                            $this->sendemail_library->attendeeChangeMail($dateMailData);
+                        }
+                    }
+                }
+
+                $post['startTime'] = date('H:i', strtotime($post['startTime']));
+                $post['endTime'] = date('H:i', strtotime($post['endTime']));
+                if(!isset($post['isEventEverywhere']))
+                {
+                    $post['isEventEverywhere'] = '2';
+                }
+                if(isset($post['costType']) && $post['costType'] == EVENT_DOOLALLY_FEE)
+                {
+                    $post['doolallyFee'] = $post['eventPrice'];
+                }
+                $this->dashboard_model->updateEventRecord($post,$eventId);
+
+                if(isset($attachement) && $attachement != '')
+                {
+                    $img_names = explode(',',$attachement);
+                    for($i=0;$i<count($img_names);$i++)
+                    {
+                        $attArr = array(
+                            'eventId' => $eventId,
+                            'filename'=> $img_names[$i],
+                            'attachmentType' => '1'
+                        );
+                        $this->dashboard_model->saveEventAttachment($attArr);
+                    }
+                }
+
+                $changesRecord['eventId'] = $eventId;
+                $changesRecord['fromWhere'] = 'Dashboard';
+                $changesRecord['insertedDT'] = date('Y-m-d H:i:s');
+                $changesRecord['isPending'] = 1;
+                $this->dashboard_model->saveEventChangeRecord($changesRecord);
+
+                $externalAPIData = $this->dashboard_model->getFullEventInfoById($eventId);
+                $externalAPIData = $externalAPIData[0];
+                // Editing the event at meetup
+                $meetupRecord = $this->dashboard_model->getMeetupRecord($eventId);
+                if(isset($meetupRecord) && myIsArray($meetupRecord))
+                {
+                    $meetupResponse = $this->meetMeUp($externalAPIData,$eventId,$meetupRecord['meetupId']);
+                }
+                else
+                {
+                    $meetupResponse = $this->meetMeUp($externalAPIData, $eventId);
+                }
+
+                if($meetupResponse['status'] === false)
+                {
+                    $data['meetupError'] = $meetupResponse['errorMsg'];
+                }
+
+                //Checking any eventsHigh record in DB for corresponding event
+                $eventHighRecord = $this->dashboard_model->getEventHighRecord($eventId);
+                if(isset($eventHighRecord) && myIsArray($eventHighRecord))
+                {
+                    $externalAPIData['highId'] = $eventHighRecord['highId'];
+                }
+                $data['apiData'] = $externalAPIData;
+
+                $data['status'] = true;
+            }
         }
 
         echo json_encode($data);

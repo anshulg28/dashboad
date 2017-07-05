@@ -1177,7 +1177,7 @@ class Dashboard_Model extends CI_Model
     {
         $query = "SELECT id, walletBalance "
             ."FROM staffmaster "
-            ."where mobNum = '".$mob."' AND userOtp = ".$otp;
+            ."where id = '".$mob."' AND userOtp = ".$otp;
 
         $result = $this->db->query($query)->row_array();
 

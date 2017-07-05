@@ -219,7 +219,7 @@
                     }
                     else
                     {
-                        $('.walletBalance-view').empty().html('No Employee Found!').removeClass('hide');
+                        $('.walletBalance-view').empty().html(data.errorMsg).removeClass('hide');
                         $('#checkinBtn').addClass('hide');
                     }
                 },
