@@ -123,7 +123,7 @@
         var mob = $(this).attr('data-mob');
         var staffLink = $(this).attr('data-href');
 
-        if (mob == '' || mob == <?php echo DEFAULT_STAFF_MOB;?>)
+        if (mob == '' || mob == '<?php echo DEFAULT_STAFF_MOB;?>')
         {
             bootbox.prompt({
                 title: "Please provide the staff mobile number",
@@ -131,6 +131,11 @@
                 callback: function (result) {
                     if(result != null && result != '')
                     {
+                        if(result == '<?php echo DEFAULT_STAFF_MOB;?>')
+                        {
+                            bootbox.alert('Invalid Mobile Number!');
+                            return false;
+                        }
                         showCustomLoader();
                         var senderPass = result;
 
@@ -145,6 +150,10 @@
                                 if(data.status === true)
                                 {
                                     window.location.reload();
+                                }
+                                else
+                                {
+                                    bootbox.alert('Mobile Number Already Used!');
                                 }
                             },
                             error: function(xhr,status, error){

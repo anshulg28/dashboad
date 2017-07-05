@@ -704,12 +704,22 @@ class Home extends MY_Controller {
         {
             redirect(base_url());
         }
+        $data = array();
         $post = $this->input->post();
         if(isset($post['mobNum']) && isStringSet($post['mobNum']))
         {
-            $this->dashboard_model->freeStaffRecord($id,$post['mobNum']);
+            $staffCheck = $this->dashboard_model->checkStaffByMob($post['mobNum']);
+            if($staffCheck['status'] == true)
+            {
+                $data['status'] = false;
+            }
+            else
+            {
+                $this->dashboard_model->freeStaffRecord($id,$post['mobNum']);
+                $data['status'] = true;
+            }
         }
-        $data['status'] = true;
+        //$data['status'] = true;
         echo json_encode($data);
     }
 
