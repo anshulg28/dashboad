@@ -1063,17 +1063,19 @@ class Dashboard_Model extends CI_Model
     public function blockStaffRecord($id)
     {
         $details = array(
-            'ifActive'=> '0'
+            'ifActive'=> '0',
+            'mobNum' => '9999999999'
         );
         $this->db->where('id', $id);
         $this->db->update('staffmaster', $details);
         return true;
     }
 
-    public function freeStaffRecord($id)
+    public function freeStaffRecord($id,$mobNum)
     {
         $details = array(
-            'ifActive'=> '1'
+            'ifActive'=> '1',
+            'mobNum' => $mobNum
         );
         $this->db->where('id', $id);
         $this->db->update('staffmaster', $details);

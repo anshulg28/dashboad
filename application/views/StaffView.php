@@ -54,7 +54,7 @@
                                     {
                                         ?>
                                         <div for="bulb<?php echo $row['id'];?>" class="mdl-tooltip">Blocked</div>
-                                        <a class="pageTracker" id="bulb<?php echo $row['id'];?>" href="<?php echo base_url().'freeStaff/'.$row['id'];?>">
+                                        <a class="pageTracker blocked-bulb" data-mob="<?php echo $row['mobNum'];?>" id="bulb<?php echo $row['id'];?>" href="#" data-href="<?php echo base_url().'freeStaff/'.$row['id'];?>">
                                             <i class="fa fa-lightbulb-o fa-15x my-danger-text"></i></a>&nbsp;
                                         <?php
                                     }
@@ -117,5 +117,47 @@
         });
     }
 
+    $(document).on('click','.blocked-bulb' , function(e) {
+        e.preventDefault();
+
+        var mob = $(this).attr('data-mob');
+        var staffLink = $(this).attr('data-href');
+
+        if (mob == '' || mob == <?php echo DEFAULT_STAFF_MOB;?>)
+        {
+            bootbox.prompt({
+                title: "Please provide the staff mobile number",
+                inputType: 'number',
+                callback: function (result) {
+                    if(result != null && result != '')
+                    {
+                        showCustomLoader();
+                        var senderPass = result;
+
+                        $.ajax({
+                            type:'POST',
+                            dataType:'json',
+                            url: staffLink,
+                            data:{mobNum: senderPass},
+                            success: function(data)
+                            {
+                                hideCustomLoader();
+                                if(data.status === true)
+                                {
+                                    window.location.reload();
+                                }
+                            },
+                            error: function(xhr,status, error){
+                                hideCustomLoader();
+                                bootbox.alert('Some Error Occurred!');
+                                var err = '<pre>'+xhr.responseText+'</pre>';
+                                saveErrorLog(err);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    });
 </script>
 </html>

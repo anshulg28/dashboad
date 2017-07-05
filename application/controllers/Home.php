@@ -704,8 +704,13 @@ class Home extends MY_Controller {
         {
             redirect(base_url());
         }
-        $this->dashboard_model->freeStaffRecord($id);
-        redirect(base_url().'empDetails');
+        $post = $this->input->post();
+        if(isset($post['mobNum']) && isStringSet($post['mobNum']))
+        {
+            $this->dashboard_model->freeStaffRecord($id,$post['mobNum']);
+        }
+        $data['status'] = true;
+        echo json_encode($data);
     }
 
     function staffEdit($id)
