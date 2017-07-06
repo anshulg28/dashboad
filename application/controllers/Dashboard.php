@@ -2150,6 +2150,15 @@ class Dashboard extends MY_Controller {
         }
         else
         {
+            $eventHighRecord = $this->dashboard_model->getEventHighRecord($eventId);
+            if(isset($eventHighRecord) && myIsArray($eventHighRecord))
+            {
+                $EHAtendees = $this->curl_library->attendeeEventsHigh($eventHighRecord['highId']);
+                if(isset($EHAtendees['items']))
+                {
+                    $data['EHData'] = $EHAtendees['items'];
+                }
+            }
             $data['status'] = true;
             $data['joinData'] = $this->dashboard_model->getJoinersInfo($eventId);
         }

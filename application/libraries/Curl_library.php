@@ -207,4 +207,11 @@ class curl_library
         $url = 'https://developer.eventshigh.com/disable_event/'.$eventsHighId.'?key='.EVENT_HIGH_KEY;
         return $this->getDataByGet($url,0, array());
     }
+
+    //EventsHigh Getting Attendee List
+    public function attendeeEventsHigh($eventsHighId)
+    {
+        $url = 'https://developer.eventshigh.com/get_event_attendees/'.$eventsHighId.'?key='.EVENT_HIGH_KEY;
+        return $this->getDataByGet($url,0, array());
+    }
 }

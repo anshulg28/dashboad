@@ -3479,12 +3479,14 @@
                 hideCustomLoader();
                 if(data.status === true)
                 {
+                    $('#peopleView-modal .modal-body').html('');
                     $('#peopleView-modal .eventName').html(eventName);
+                    $('#peopleView-modal .modal-body').append('<p class="alert-success">Doolally Signups</p>');
                     if(typeof data.joinData != 'undefined' && data.joinData != null && data.joinData.length != 0)
                     {
                         var downTbl = '<table>';
                         var tblHtml = '<table class="table table-striped">';
-                        downTbl += '<thead><tr><th>Name</th><th>Email</th><th>Mobile Number</th><th>Quantitiy</th><th>Signup Date/time</th>';
+                        downTbl += '<thead><tr><th>Doolally Signups</th></tr><tr><th>Name</th><th>Email</th><th>Mobile Number</th><th>Quantitiy</th><th>Signup Date/time</th>';
                         downTbl += '</tr></thead><tbody>';
                         tblHtml += '<thead><tr><th>Name</th><th>Email</th><th>Mobile Number</th><th>Quantitiy</th><th>Signup Date/time</th>';
                         tblHtml += '</tr></thead><tbody>';
@@ -3506,17 +3508,57 @@
                             tblHtml += '<td>'+formatJsDate(data.joinData[i].createdDT)+'</td>';
                             tblHtml += '</tr>';
                         }
-                        downTbl += '</tbody></table>';
+                        if(typeof data.EHData === 'undefined')
+                        {
+                            downTbl += '</tbody></table>';
+                            $('#peopleView-modal .signup-for-download').html(downTbl);
+                        }
                         tblHtml += '</tbody></table>';
-                        $('#peopleView-modal .modal-body').html(tblHtml);
-                        $('#peopleView-modal .signup-for-download').html(downTbl);
+                        $('#peopleView-modal .modal-body').append(tblHtml);
                         $('#peopleView-modal .exportToExcel').removeClass('hide');
                     }
                     else
                     {
-                        $('#peopleView-modal .modal-body').html('No Sign ups');
+                        $('#peopleView-modal .modal-body').append('No Sign ups');
                         $('#peopleView-modal .exportToExcel').addClass('hide');
                     }
+
+                    $('#peopleView-modal .modal-body').append('<p class="alert-info">EventsHigh Signups</p>');
+                    if(typeof data.EHData !== 'undefined')
+                    {
+                        var tblHtml1 = '<table class="table table-striped">';
+                        downTbl += '<tr><th>EventsHigh Signups</th></tr>';
+                        tblHtml1 += '<thead><tr><th>Name</th><th>Email</th><th>Mobile Number</th><th>Quantitiy</th><th>Signup Date/time</th>';
+                        tblHtml1 += '</tr></thead><tbody>';
+                        for(var j=0;j<data.EHData.length;j++)
+                        {
+                            downTbl += '<tr>';
+                            downTbl += '<td>'+data.EHData[j].name+'</td>';
+                            downTbl += '<td>'+data.EHData[j].email+'</td>';
+                            downTbl += '<td>'+data.EHData[j].mobile+'</td>';
+                            downTbl += '<td>'+data.EHData[j].numTickets+'</td>';
+                            downTbl += '<td>'+formatJsDate(data.EHData[j].bookedOn)+'</td>';
+                            downTbl += '</tr>';
+
+                            tblHtml1 += '<tr>';
+                            tblHtml1 += '<td>'+data.EHData[j].name+'</td>';
+                            tblHtml1 += '<td>'+data.EHData[j].email+'</td>';
+                            tblHtml1 += '<td>'+data.EHData[j].mobile+'</td>';
+                            tblHtml1 += '<td>'+data.EHData[j].numTickets+'</td>';
+                            tblHtml1 += '<td>'+formatJsDate(data.EHData[j].bookedOn)+'</td>';
+                            tblHtml1 += '</tr>';
+                        }
+                        downTbl += '</tbody></table>';
+                        tblHtml1 += '</tbody></table>';
+                        $('#peopleView-modal .signup-for-download').html(downTbl);
+                        $('#peopleView-modal .modal-body').append(tblHtml1);
+
+                    }
+                    else
+                    {
+                        $('#peopleView-modal .modal-body').append('No Sign ups');
+                    }
+
                     $('#peopleView-modal').modal('show');
                 }
             },
