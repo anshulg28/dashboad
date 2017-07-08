@@ -1304,4 +1304,34 @@ class Dashboard_Model extends CI_Model
         $this->db->update('eventchangesmaster', $details);
         return true;
     }
+
+    //Getting all event alternate share images
+    public function getAllShareImgs($eventId)
+    {
+       $query = "SELECT * FROM eventimgsharemaster WHERE eventId = ".$eventId;
+       $result = $this->db->query($query)->result_array();
+       return $result;
+    }
+    public function saveShareImg($details)
+    {
+        $this->db->insert('eventimgsharemaster',$details);
+        return true;
+    }
+    function resetShareImgs($eventId)
+    {
+        $details = array(
+            'ifUsing' => '0'
+        );
+        $this->db->where('eventId',$eventId);
+        $this->db->update('eventimgsharemaster',$details);
+    }
+    function makeShareImgActive($imgId)
+    {
+        $details = array(
+            'ifUsing' => 1
+        );
+        $this->db->where('id',$imgId);
+        $this->db->update('eventimgsharemaster',$details);
+        return true;
+    }
 }

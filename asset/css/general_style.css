@@ -555,6 +555,48 @@ input::-webkit-inner-spin-button {
 {
     padding-top:30px;
 }
+/* Adding Image Radio buttons */
+.dashboard .paymentWrap {
+    padding: 25px;
+}
+
+.dashboard .paymentWrap .paymentBtnGroup {
+    max-width: 800px;
+    margin: auto;
+}
+
+.dashboard .paymentWrap .paymentBtnGroup .paymentMethod {
+    padding: 40px;
+    box-shadow: none;
+    position: relative;
+}
+
+.dashboard .paymentWrap .paymentBtnGroup .paymentMethod.active {
+    outline: none !important;
+}
+
+.dashboard .paymentWrap .paymentBtnGroup .paymentMethod.active .method {
+    border-color: #4cd264;
+    outline: none !important;
+    box-shadow: 0px 3px 22px 0px #7b7b7b;
+}
+
+.dashboard .paymentWrap .paymentBtnGroup .paymentMethod .method {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 2px solid transparent;
+    transition: all 0.5s;
+}
+.dashboard .paymentWrap .paymentBtnGroup .paymentMethod .method:hover {
+    border-color: #4cd264;
+    outline: none !important;
+}
 .eventEdit .img-remove-icon, .fnbEdit .img-remove-icon
 {
     position: absolute;

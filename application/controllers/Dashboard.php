@@ -2616,4 +2616,127 @@ class Dashboard extends MY_Controller {
         $data['status'] = true;
         echo json_encode($data);
     }
+
+    //Geting All Alternate event share images
+    public function getShareImgs($eventId)
+    {
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Logged Out of dashboard!';
+        }
+        else
+        {
+            $data['status'] = true;
+            $shareImgs = $this->dashboard_model->getAllShareImgs($eventId);
+            if(isset($shareImgs) && myIsArray($shareImgs))
+            {
+                $data['shareImgs'] = $shareImgs;
+            }
+        }
+        echo json_encode($data);
+    }
+    public function uploadShareFiles($eventId)
+    {
+        /*if(strpos($_SERVER['HTTP_HOST'],'doolally.io'))
+        {
+
+        }*/
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout, Please Login Again!';
+            echo json_encode($data);
+            return false;
+        }
+
+        $this->load->library('upload');
+        if(isset($_FILES))
+        {
+            if($_FILES['attachment']['error'] != 1)
+            {
+                $filePath = $_FILES['attachment']['name'];
+                $fileName = preg_replace('/\(|\)/','',$filePath);
+                $fileName = preg_replace('/[^a-zA-Z0-9.]\.]/', '', $fileName);
+                $fileName = str_replace(' ','_',$fileName);
+                $config = array();
+                $config['upload_path'] = '../mobile/uploads/events/';
+                $config['allowed_types'] = 'gif|jpg|png|jpeg';
+                $config['max_size']      = '0';
+                $config['overwrite']     = TRUE;
+                $config['file_name']     = $fileName;
+
+                $this->upload->initialize($config);
+                if(!$this->upload->do_upload('attachment'))
+                {
+                    log_message('error','Event: '.$this->upload->display_errors());
+                    $data['status'] = false;
+                    $data['errorMsg'] = $this->upload->display_errors();
+                    echo json_encode($data);
+                    return false;
+                }
+                else
+                {
+                    $upload_data = $this->upload->data();
+                    $attchmentArr= $this->image_thumb($upload_data['file_path'],$upload_data['file_name']);
+                    if($attchmentArr == 'error')
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Error in resizing image!';
+                        echo json_encode($data);
+                        return false;
+                    }
+                    else
+                    {
+                        $details = array(
+                            'eventId' => $eventId,
+                            'filename' => $attchmentArr,
+                            'ifUsing' => 0,
+                            'insertedDT' => date('Y-m-d H:i:s')
+                        );
+                        $this->dashboard_model->saveShareImg($details);
+                    }
+                }
+            }
+            else
+            {
+                echo 'Some Error Occurred!';
+            }
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'No Image Files Received!';
+            echo json_encode($data);
+            return false;
+        }
+    }
+
+    public function saveAltShareImg()
+    {
+        $post = $this->input->post();
+        $data = array();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'Session Timeout, Please Login Again!';
+            echo json_encode($data);
+            return false;
+        }
+
+        if(isset($post['eventId']) && isset($post['hasShareImg']) && isset($post['imgId']))
+        {
+            $details = array(
+                'hasShareImg' => $post['hasShareImg']
+            );
+            $this->dashboard_model->updateEventRecord($details,$post['eventId']);
+            $this->dashboard_model->resetShareImgs($post['eventId']);
+            $this->dashboard_model->makeShareImgActive($post['imgId']);
+        }
+        $data['status'] = true;
+
+        echo  json_encode($data);
+    }
 }

@@ -987,6 +987,8 @@
 
                                                         <a data-toggle="tooltip" class="eventSignups-icon even-tracker" data-eventName="<?php echo $row['eventData']['eventName'];?>" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Signup List" href="#">
                                                             <i class="fa fa-users fa-15x"></i></a>&nbsp;
+                                                        <a data-toggle="tooltip" class="eventShareImg-icon even-tracker" data-hasShareImg="<?php echo $row['eventData']['hasShareImg'];?>" data-eventName="<?php echo $row['eventData']['eventName'];?>" data-eventId="<?php echo $row['eventData']['eventId'];?>" title="Event Share Images" href="#">
+                                                            <i class="fa fa-share-alt fa-15x"></i></a>
                                                     </td>
                                                 </tr>
                                                 <?php
@@ -1847,6 +1849,53 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="shareImg-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Alternate Share Images for <b><span class="eventName"></span></b></h4>
+                </div>
+                <div class="modal-body text-center share-body">
+                    <input type="hidden" id="eventId" value=""/>
+                    <ul class="list-inline text-left">
+                        <li>
+                            <span>Use Alternate Image For Sharing?</span>
+                        </li>
+                        <li>
+                            <div class="radio">
+                                <label><input type="radio" name="hasShareImg" value="1">Yes</label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="radio">
+                                <label><input type="radio" name="hasShareImg" value="0">No</label>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="uploaded-imgs-section">
+                        No Images Uploaded Yet!
+                    </div>
+                    <br>
+                    <div class="text-center">
+                        <input type="file" multiple class="form-control" onchange="shareUploadChange(this)" />
+                        <br>
+                        <div class="share-progress hide">
+                            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="event-alt-share-btn">Save</button>
                 </div>
             </div>
 
@@ -4161,6 +4210,172 @@
     });
     $('#main-feedback-table').DataTable();
 
+</script>
+
+<script>
+    $(document).on('click','.eventShareImg-icon', function(){
+        var eventId = $(this).attr('data-eventId');
+        var eventName = $(this).attr('data-eventName');
+        var hasShareImg = $(this).attr('data-hasShareImg');
+
+        $('#shareImg-modal .share-body #eventId').val(eventId);
+        $('#shareImg-modal .eventName').html(eventName);
+        $("#shareImg-modal .share-body input[name=hasShareImg][value=" + hasShareImg + "]").prop('checked', true);
+       /* if(hasShareImg == '1')
+        {
+
+        }
+        else
+        {
+            $('#shareImg-modal .share-body #hasShareImg').prop('checked',false);
+        }*/
+        fetchAllShareImgs(eventId);
+        $('#shareImg-modal').modal('show');
+    });
+
+    function fetchAllShareImgs(eventId)
+    {
+        //Get All the sharing images
+        showCustomLoader();
+        $.ajax({
+            type:'GET',
+            dataType:'json',
+            url:base_url+'dashboard/getShareImgs/'+eventId,
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === false)
+                {
+                    bootbox.alert(data.errorMsg);
+                }
+                else
+                {
+                    if(typeof data.shareImgs !== 'undefined')
+                    {
+                        var share_body = '<div class="paymentWrap">';
+                        share_body += '<div id="main-img-list" class="btn-group paymentBtnGroup btn-group-justified" data-toggle="buttons">';
+                        for(var i=0;i<data.shareImgs.length;i++)
+                        {
+                            var imgUrl = '<?php echo MOBILE_URL.EVENT_PATH_THUMB;?>'+data.shareImgs[i].filename;
+                            if(data.shareImgs[i].ifUsing == '1')
+                            {
+                                share_body += '<label class="btn paymentMethod active">';
+                                share_body += '<div class="method" style="background-image:url('+imgUrl+');"></div>'; //set background
+                                share_body += '<input type="radio" name="isUsing" value="'+data.shareImgs[i].id+'" checked>';
+                                share_body += '</label>';
+                            }
+                            else
+                            {
+                                share_body += '<label class="btn paymentMethod">';
+                                share_body += '<div class="method" style="background-image:url('+imgUrl+');"></div>'; //set background
+                                share_body += '<input type="radio" name="isUsing" value="'+data.shareImgs[i].id+'">';
+                                share_body += '</label>';
+                            }
+                        }
+                        share_body += '</div></div>';
+                        $('#shareImg-modal .uploaded-imgs-section').html(share_body);
+                    }
+                }
+            },
+            error: function(xhr, status, error){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
+            }
+        });
+    }
+
+    function shareUploadChange(ele)
+    {
+        var eventId = $('#shareImg-modal .share-body #eventId').val();
+        $('#shareImg-modal #event-alt-share-btn').attr('disabled','true');
+        $('#shareImg-modal .share-progress').removeClass('hide');
+        var xhr = [];
+        var totalFiles = ele.files.length;
+        for(var i=0;i<totalFiles;i++)
+        {
+            xhr[i] = new XMLHttpRequest();
+            (xhr[i].upload || xhr[i]).addEventListener('progress', function(e) {
+                var done = e.position || e.loaded;
+                var total = e.totalSize || e.total;
+                $('#shareImg-modal .share-progress .progress-bar').css('width', Math.round(done/total*100)+'%').attr('aria-valuenow', Math.round(done/total*100)).html(parseInt(Math.round(done/total*100))+'%');
+            });
+            xhr[i].addEventListener('load', function(e) {
+                $('#shareImg-modal #event-alt-share-btn').removeAttr('disabled');
+                fetchAllShareImgs(eventId);
+            });
+            xhr[i].open('post', '<?php echo base_url();?>dashboard/uploadShareFiles/'+eventId, true);
+
+            var data = new FormData;
+            data.append('attachment', ele.files[i]);
+            xhr[i].send(data);
+            xhr[i].onreadystatechange = function(e) {
+                if (e.srcElement.readyState == 4 && e.srcElement.status == 200) {
+                    if(e.srcElement.responseText == 'Some Error Occurred!')
+                    {
+                        bootbox.alert('File size Limit 30MB');
+                        return false;
+                    }
+                    try
+                    {
+                        var obj = $.parseJSON(e.srcElement.responseText);
+                        if(obj.status == false)
+                        {
+                            bootbox.alert('<label class="my-danger-text">Error: '+obj.errorMsg+'</label>');
+                            return false;
+                        }
+                    }
+                    catch(excep)
+                    {
+                        //filesEventsArr.push(e.srcElement.responseText);
+                        //fillEventImgs();
+                    }
+                }
+            }
+        }
+        $('#shareImg-modal .share-progress .progress-bar').css('width','0').attr('aria-valuenow','0');
+        $('#shareImg-modal .share-progress').addClass('hide');
+        $('#shareImg-modal .share-body input[type="file"]').val('');
+    }
+
+    $(document).on('click','#shareImg-modal #event-alt-share-btn',function(){
+        var eventId = $('#shareImg-modal .share-body #eventId').val();
+        var hasShareImg = $('#shareImg-modal input[name="hasShareImg"]:checked').val();
+
+        if(typeof $('#shareImg-modal input[name="isUsing"]:checked').val() === 'undefined')
+        {
+            bootbox.alert('Please Select one of the images!');
+            return false;
+        }
+        var imgId = $('#shareImg-modal input[name="isUsing"]:checked').val();
+
+        $.ajax({
+            type:'post',
+            dataType:'json',
+            url: base_url+'dashboard/saveAltShareImg',
+            data: {eventId: eventId,hasShareImg:hasShareImg,imgId: imgId},
+            success: function(data){
+                hideCustomLoader();
+                if(data.status === true)
+                {
+                    bootbox.alert('Event Data Saved!', function(){
+                        window.location.reload();
+                    });
+                }
+                else
+                {
+                    bootbox.alert(data.errorMsg);
+                }
+            },
+            error: function(xhr, status, error){
+                hideCustomLoader();
+                bootbox.alert('Some Error Occurred!');
+                var err = '<pre>'+xhr.responseText+'</pre>';
+                saveErrorLog(err);
+            }
+        });
+
+    });
 </script>
 
 </html>
