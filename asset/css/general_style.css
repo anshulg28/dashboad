@@ -561,14 +561,17 @@ input::-webkit-inner-spin-button {
 }
 
 .dashboard .paymentWrap .paymentBtnGroup {
-    max-width: 800px;
-    margin: auto;
+    /*max-width: 800px;
+    margin: auto;*/
+    display: inline-block;
 }
 
 .dashboard .paymentWrap .paymentBtnGroup .paymentMethod {
-    padding: 40px;
     box-shadow: none;
     position: relative;
+    display: inline-block;
+    float: left;
+    padding: 12%;
 }
 
 .dashboard .paymentWrap .paymentBtnGroup .paymentMethod.active {
