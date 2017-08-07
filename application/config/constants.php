@@ -164,3 +164,4 @@ defined('DEFAULT_SENDER_PASS') OR define('DEFAULT_SENDER_PASS','doolally123');
 defined('OLD_DOOLALLY_FEE') OR define('OLD_DOOLALLY_FEE','250');
 defined('NEW_DOOLALLY_FEE') OR define('NEW_DOOLALLY_FEE','300');
 defined('DEFAULT_STAFF_MOB') OR define('DEFAULT_STAFF_MOB','9999999999');
+defined('MUG_BLOCK_RANGE') OR define('MUG_BLOCK_RANGE',array(4,10,12,14));
