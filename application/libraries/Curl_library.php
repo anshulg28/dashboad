@@ -166,6 +166,17 @@ class curl_library
         );
         return $this->getDataByDelete($url,'',0,$header);
     }
+
+    public function allRefundsInsta()
+    {
+        $url = 'https://www.instamojo.com/api/1.1/refunds/';
+        $header = array(
+            'X-Api-Key:'.INSTA_API_KEY,
+            'X-Auth-Token:'.INSTA_AUTH_TOKEN
+        );
+        return $this->getDataByGet($url,0, $header);
+    }
+
     public function getJukeboxTaprooms()
     {
         $url = 'http://api.bcjukebox.in/api/restaurants/';
@@ -185,6 +196,13 @@ class curl_library
     public function sendCouponSMS($details)
     {
         $url = 'http://api.textlocal.in/send/';
+
+        return $this->getDataByPost($url,$details,0);
+    }
+
+    public function getSMSCredits($details)
+    {
+        $url = 'http://api.textlocal.in/balance/';
 
         return $this->getDataByPost($url,$details,0);
     }

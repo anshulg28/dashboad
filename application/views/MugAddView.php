@@ -328,5 +328,8 @@
     $('#bdate, #invoiceDate, #memberS, #memberE').datetimepicker({
         format: 'YYYY-MM-DD'
     });
+    $(document).on('submit','#mugNumSave-form',function(){
+        $('form button[type="submit"]').attr('disabled','disabled');
+    });
 </script>
 </html>

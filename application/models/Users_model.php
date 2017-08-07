@@ -58,7 +58,7 @@ class Users_Model extends CI_Model
     {
         $query = "SELECT * "
             ."FROM doolally_usersmaster "
-            ."WHERE FIND_IN_SET('".$locId."', assignedLoc)";
+            ."WHERE FIND_IN_SET('".$locId."', assignedLoc) ORDER BY userId ASC";
 
         $result = $this->db->query($query)->row_array();
 

@@ -156,6 +156,15 @@
                                         }
                                     }
                                     ?>
+                                    <!--<li>
+                                        <a href="<?php /*echo base_url().'maintenance';*/?>">
+                                            <div class="menuWrap">
+                                                <i class="fa fa-cogs fa-2x"></i>
+                                                <br>
+                                                <span>Maintenance</span>
+                                            </div>
+                                        </a>
+                                    </li>-->
                                 </ul>
                             </div>
                         </div>

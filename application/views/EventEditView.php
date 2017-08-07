@@ -139,8 +139,8 @@
                                                    value="2" <?php if($row['eventData']['costType'] == "2"){echo 'checked';}?>>
                                             <span class="mdl-radio__label">Event Fee + Doolally Fee</span>
                                         </label>
-                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label custom-price">
-                                            <input class="mdl-textfield__input" type="text" name="doolallyFee" value="<?php echo $row['eventData']['doolallyFee'];?>" pattern="-?[0-9]*(\.[0-9]+)?" id="customPrice">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label custom-price hide">
+                                            <input class="mdl-textfield__input" type="text" name="doolallyFee" value="<?php echo NEW_DOOLALLY_FEE;?>" pattern="-?[0-9]*(\.[0-9]+)?" id="customPrice">
                                             <label class="mdl-textfield__label" for="customPrice">Custom Price</label>
                                             <span class="mdl-textfield__error">Input is not a number!</span>
                                         </div><br>

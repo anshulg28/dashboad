@@ -1,14 +1,15 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * Class Cron
+ * @property Cron_model $cron_model
+ * @property Dashboard_Model $dashboard_model
+ * @property Locations_Model $locations_model
+ */
+
 class Cron extends MY_Controller
 {
-    /**
-     * Class Cron
-     * @property Cron_model $cron_model
-     * @property Dashboard_Model $dashboard_model
-     * @property Locations_Model $locations_model
-     */
     function __construct()
     {
         parent::__construct();
@@ -267,12 +268,135 @@ class Cron extends MY_Controller
         {
             $data[] = (int)(($promo['colaba']/$total['colaba'])*100 - ($de['colaba']/$total['colaba'])*100);
         }
+        if($total['khar'] != 0)
+        {
+            $data[] = (int)(($promo['khar']/$total['khar'])*100 - ($de['khar']/$total['khar'])*100);
+        }
 
         $details = array(
             'locs' => implode(',',$data),
             'insertedDate' => date('Y-m-d')
         );
         $this->cron_model->insertWeeklyFeedback($details);
+    }
+
+    public function monthWiseFeedback()
+    {
+        $feedCols = array('Month','Overall','Andheri','Bandra','Kemps','Colaba','Promoters','Detractors','Total');
+        $months = array('Jan','Feb','March','April','May','June');
+
+        $monthCounter = 0;
+
+        $locArray = $this->locations_model->getAllLocations();
+        $file = fopen("./uploads/Feedback_Monthwise_".date('d_M').".csv","w");
+        fputcsv($file,$feedCols);
+        $feedData = array();
+        for($i=0;$i<count($months); $i++)
+        {
+            $startDate = '2017-0'.($i+1).'-01';
+            if(($i+1) % 2 == 0)
+            {
+                $endDate = '2017-0'.($i+1).'-30';
+            }
+            else
+            {
+                $endDate = '2017-0'.($i+1).'-31';
+            }
+
+            $feedbacks = $this->dashboard_model->getFeedbacksMonthWise($locArray,$startDate,$endDate);
+
+            foreach($feedbacks['feedbacks'][0] as $key => $row)
+            {
+                $keySplit = explode('_',$key);
+                switch($keySplit[0])
+                {
+                    case 'total':
+                        $total[$keySplit[1]] = (int)$row;
+                        break;
+                    case 'promo':
+                        $promo[$keySplit[1]] = (int)$row;
+                        break;
+                    case 'de':
+                        $de[$keySplit[1]] = (int)$row;
+                        break;
+                }
+            }
+            if($total['overall'] != 0)
+            {
+                $data['overall'] = (int)(($promo['overall']/$total['overall'])*100 - ($de['overall']/$total['overall'])*100);
+            }
+            if($total['bandra'] != 0)
+            {
+                $data['bandra'] = (int)(($promo['bandra']/$total['bandra'])*100 - ($de['bandra']/$total['bandra'])*100);
+            }
+            if($total['andheri'] != 0)
+            {
+                $data['andheri'] = (int)(($promo['andheri']/$total['andheri'])*100 - ($de['andheri']/$total['andheri'])*100);
+            }
+            if($total['kemps-corner'] != 0)
+            {
+                $data['kemps'] = (int)(($promo['kemps-corner']/$total['kemps-corner'])*100 - ($de['kemps-corner']/$total['kemps-corner'])*100);
+            }
+            if($total['colaba'] != 0)
+            {
+                $data['colaba'] = (int)(($promo['colaba']/$total['colaba'])*100 - ($de['colaba']/$total['colaba'])*100);
+            }
+
+            $feedData[$months[$i]] = array(
+                'total'=> $total,
+                'promo'=> $promo,
+                'de'=> $de,
+                'data'=> $data
+            ); //array_merge($total,$promo,$de,$data);
+            /*if(isset($data['colaba']))
+            {
+                $feedData[] = array(
+                    $months[$i],
+                    $data['overall'],
+                    $data['andheri'],
+                    $data['bandra'],
+                    $data['kemps'],
+                    $data['colaba'],
+                    $promo['overall'],
+                    $de['overall'],
+                    $total['overall']
+                );
+            }
+            else
+            {
+                $feedData[] = array(
+                    $months[$i],
+                    $data['overall'],
+                    $data['andheri'],
+                    $data['bandra'],
+                    $data['kemps'],
+                    '0',
+                    $promo['overall'],
+                    $de['overall'],
+                    $total['overall']
+                );
+            }*/
+
+            //fputcsv($file,$feedData);
+        }
+        echo '<pre>';
+        var_dump($feedData);
+        die();
+        fclose($file);
+
+        $content = '<html><body><p>Doolally Feedback Monthwise<br>PFA</p></body></html>';
+
+        $this->sendemail_library->sendEmail('saha@brewcraftsindia.com','anshul@brewcraftsindia.com','admin@brewcraftsindia.com','ngks2009','Doolally'
+            ,'admin@brewcraftsindia.com','Doolally Feedback Monthwise | '.date('d_M_Y'),$content,array("./uploads/Feedback_Monthwise_".date('d_M').".csv"));
+        try
+        {
+            unlink("./uploads/Feedback_Monthwise_".date('d_M').".csv");
+        }
+        catch(Exception $ex)
+        {
+
+        }
+
     }
 
     public function fixForColaba()
@@ -948,6 +1072,117 @@ class Cron extends MY_Controller
         if($gotData['status'] === false)
         {
             $this->dashboard_model->saveDashboardRecord($details);
+        }
+    }
+
+    public function sendAllRefunds()
+    {
+        $allRefunds = $this->curl_library->allRefundsInsta();
+
+        $colsArray = array('Event Name','Organizer Name','Quantity','Payment Id','Refund Date/Time');
+
+        $file = fopen("./uploads/refundReport_".date('d_M_Y').'.csv',"w");
+        fputcsv($file,$colsArray);
+        if(isset($allRefunds) && myIsArray($allRefunds))
+        {
+            foreach($allRefunds['refunds'] as $key => $row)
+            {
+                $eveRecord = $this->dashboard_model->getEventByPaymentId($row['payment_id']);
+                $date1 = date_parse($row['created_at']);
+                $date_string1 = date('d M Y H:i:s', mktime($date1['hour'], $date1['minute'], $date1['second'], $date1['month'], $date1['day'], $date1['year']));
+                if(isset($eveRecord) && myIsArray($eveRecord))
+                {
+                    $dataToWrite = array(
+                        $eveRecord['eventName'],
+                        $eveRecord['creatorName'],
+                        $eveRecord['quantity'],
+                        $row['payment_id'],
+                        $date_string1
+                    );
+                }
+                else
+                {
+                    $dataToWrite = array(
+                        '',
+                        '',
+                        '',
+                        $row['payment_id'],
+                        $date_string1
+                    );
+                }
+                fputcsv($file,$dataToWrite);
+            }
+            fclose($file);
+
+            $content = '<html><body><p>Instamojo Refund Data!<br>PFA</p></body></html>';
+
+            $this->sendemail_library->sendEmail('saha@brewcraftsindia.com','anshul@brewcraftsindia.com','admin@brewcraftsindia.com','ngks2009','Doolally'
+                ,'admin@brewcraftsindia.com','Instamojo Refund Data | '.date('d_M_Y'),$content,array("./uploads/refundReport_".date('d_M_Y').".csv"));
+            try
+            {
+                unlink("./uploads/refundReport_".date('d_M_Y').".csv");
+            }
+            catch(Exception $ex)
+            {
+
+            }
+        }
+    }
+
+    public function sendWalletMissSms()
+    {
+        $pending = $this->dashboard_model->fetchPendingSms();
+
+        if(isset($pending) && myIsArray($pending))
+        {
+            $smsLogs = array();
+            foreach($pending as $key => $row)
+            {
+                // Sending SMS to each number
+                $postDetails = array(
+                    'apiKey' => TEXTLOCAL_API,
+                    'numbers' => implode(',', array($row['staffNum'])),
+                    'sender'=> urlencode('DOLALY'),
+                    'message' => rawurlencode('Total available balance is '.$row['walletBal'].' after '.date('M jS').' credit of 1500')
+                );
+                $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+
+
+                //Creating a sms log (failure or success)
+                if($smsStatus['status'] != 'failure')
+                {
+                    $smsLogs[] = array(
+                        'staffNum' => $row['staffNum'],
+                        'smsStatus' => '1',
+                        'smsDescription' => null,
+                        'walletBal' => $row['walletBal'],
+                        'insertedDT' => date('Y-m-d H:i:s')
+                    );
+                }
+            }
+            $this->dashboard_model->smsLogsBatch($smsLogs);
+        }
+    }
+
+    public function lowSmsCredit()
+    {
+        $details = array(
+            'apiKey' => TEXTLOCAL_API
+        );
+        $smsCredit = $this->curl_library->getSMSCredits($details);
+        if($smsCredit['status'] == 'success')
+        {
+            if($smsCredit['balance']['sms'] < 100)
+            {
+                // Sending SMS to each number
+                $postDetails = array(
+                    'apiKey' => TEXTLOCAL_API,
+                    'numbers' => implode(',', array('9975027683')),
+                    'sender'=> urlencode('DOLALY'),
+                    'message' => rawurlencode('Low SMS Credits Alert! Remaining Credits: '.$smsCredit['balance']['sms'])
+                );
+                $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
+            }
         }
     }
 }

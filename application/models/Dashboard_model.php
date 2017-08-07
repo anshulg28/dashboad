@@ -336,6 +336,57 @@ class Dashboard_Model extends CI_Model
 
         return $data;
     }
+    public function getFeedbacksMonthWise($locations,$startDate,$endDate)
+    {
+        $query = "SELECT DISTINCT (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                 WHERE feedbackLoc != 0 AND (DATE(insertedDateTime) >= '".$startDate."' AND DATE(insertedDateTime) <= '".$endDate."')) as 'total_overall',
+                 (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                 WHERE feedbackLoc != 0 AND overallRating >= 9 AND (DATE(insertedDateTime) >= '".$startDate."' AND DATE(insertedDateTime) <= '".$endDate."')) as 'promo_overall',
+                 (SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                 WHERE feedbackLoc != 0 AND overallRating < 7 AND (DATE(insertedDateTime) >= '".$startDate."' AND DATE(insertedDateTime) <= '".$endDate."')) as 'de_overall'";
+        /*,
+        (SELECT COUNT(overallRating) FROM usersfeedbackmaster
+        WHERE feedbackLoc = 2) as 'total_andheri',
+        (SELECT COUNT(overallRating) FROM usersfeedbackmaster
+        WHERE feedbackLoc = 3) as 'total_kemps-corner',
+        (SELECT COUNT(overallRating) FROM usersfeedbackmaster
+        WHERE feedbackLoc = 4) as 'total_colaba'";*/
+        if(isset($locations))
+        {
+            $length = count($locations)-1;
+            $counter = 0;
+            foreach($locations as $key => $row)
+            {
+                if(isset($row['id']))
+                {
+                    $counter++;
+                    if($counter <= $length)
+                    {
+                        $query .= ",";
+                    }
+                    $query .= "(SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                              WHERE feedbackLoc = ".$row['id']." AND (DATE(insertedDateTime) >= '".$startDate."' AND DATE(insertedDateTime) <= '".$endDate."')) as 'total_".$row['locUniqueLink']."',";
+                    $query .= "(SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                              WHERE feedbackLoc = ".$row['id']." AND overallRating >= 9 AND (DATE(insertedDateTime) >= '".$startDate."' AND DATE(insertedDateTime) <= '".$endDate."')) as 'promo_".$row['locUniqueLink']."',";
+                    $query .= "(SELECT COUNT(overallRating) FROM usersfeedbackmaster 
+                              WHERE feedbackLoc = ".$row['id']." AND overallRating < 7 AND (DATE(insertedDateTime) >= '".$startDate."' AND DATE(insertedDateTime) <= '".$endDate."')) as 'de_".$row['locUniqueLink']."'";
+                }
+            }
+        }
+
+        $result = $this->db->query($query)->result_array();
+        $data['feedbacks'] = $result;
+        if(myIsArray($result))
+        {
+            $data['status'] = true;
+        }
+        else
+        {
+            $data['status'] = false;
+        }
+
+        return $data;
+    }
 
     public function getFeedbackData()
     {
@@ -1041,6 +1092,12 @@ class Dashboard_Model extends CI_Model
         $this->db->update('staffmaster', $details);
         return true;
     }
+    public function updateStaffRecordByEmp($empid,$details)
+    {
+        $this->db->where('empId', $empid);
+        $this->db->update('staffmaster', $details);
+        return true;
+    }
     public function walletLogsBatch($details)
     {
         $this->db->insert_batch('walletlogmaster', $details);
@@ -1333,5 +1390,29 @@ class Dashboard_Model extends CI_Model
         $this->db->where('id',$imgId);
         $this->db->update('eventimgsharemaster',$details);
         return true;
+    }
+
+    function getEventByPaymentId($payId)
+    {
+        $query = "SELECT 
+                  CASE WHEN em.eventName IS NULL THEN em1.eventName ELSE em.eventName END AS 'eventName',
+                  CASE WHEN em.creatorName IS NULL THEN em1.creatorName ELSE em.creatorName END AS 'creatorName',
+                  erm.quantity FROM eventregistermaster erm 
+                  LEFT JOIN eventmaster em ON erm.eventId = em.eventId
+                  LEFT JOIN eventcompletedmaster em1 ON erm.eventId = em1.eventId
+                  WHERE erm.paymentId LIKE '".$payId."'";
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+
+    }
+
+    function fetchPendingSms()
+    {
+        $query = "SELECT * FROM smsmaster WHERE smsDescription LIKE 'Insufficient credits'";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
     }
 }

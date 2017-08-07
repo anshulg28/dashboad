@@ -1801,7 +1801,7 @@
                                         <div class="radio">
                                             <label><input type="radio" name="costType" value="2">Event Fee + Doolally Fee</label>
                                         </div>
-                                        <input class="form-control" type="number" name="doolallyFee" id="customPrice" placeholder="Custom Price"/>
+                                        <input class="form-control hide" type="number" name="doolallyFee" value="<?php echo NEW_DOOLALLY_FEE;?>" id="customPrice" placeholder="Custom Price" readonly/>
                                     </li>
                                     <li>
                                         <div class="radio">
@@ -3333,6 +3333,7 @@
                     }
                     catch(excep)
                     {
+                        filesMetaArr = [];
                         filesMetaArr.push(e.srcElement.responseText);
                         fillMetaImgs();
                     }
@@ -3958,7 +3959,7 @@
        var eveApprovType = $(this).attr('data-costType');
         eveApprovUrl = $(this).attr('data-url');
         costPrice = $(this).attr('data-costPrice');
-        doolallyFee = Number($(this).attr('data-doolallyFee'));
+        doolallyFee = <?php echo NEW_DOOLALLY_FEE;?>; // Number($(this).attr('data-doolallyFee'));
         isDirectCostChange = true;
         $('#eventPrice-modal input[name="costType"]').each(function(i,val){
 

@@ -110,6 +110,9 @@ defined('SERVER_USER') OR define('SERVER_USER',3);
 defined('GUEST_USER') OR define('GUEST_USER',4);
 defined('WALLET_USER') OR define('WALLET_USER',5);
 defined('OFFERS_USER') OR define('OFFERS_USER',6);
+defined('MAINTENANCE_ADMIN') OR define('MAINTENANCE_ADMIN',7);
+defined('MAINTENANCE_MANAGER') OR define('MAINTENANCE_MANAGER',8);
+defined('MAINTENANCE_USER') OR define('MAINTENANCE_USER',9);
 
 /*Active or not*/
 defined('ACTIVE')   OR define('ACTIVE', 1);
@@ -133,7 +136,7 @@ defined('INSTA_AUTH_TOKEN') OR define('INSTA_AUTH_TOKEN','2e8a6cb6ddb931a722e05d
 defined('GOOGLE_API_KEY') OR define('GOOGLE_API_KEY','AIzaSyBG3wamyMbQqRlqysulunOuPvv3_51BmpI');
 defined('BCJUKEBOX_CLIENT') OR define('BCJUKEBOX_CLIENT','UUN5m270I7nxuuBDzukIVtAV0QxL5UQEV1FaYmUg');
 defined('TEXTLOCAL_API') OR define('TEXTLOCAL_API','cFIpDcHmYnc-mdteI9XWFa41zNZSq9Z3crlHtQAZCb');
-defined('EVENT_HIGH_KEY') OR define('EVENT_HIGH_KEY','ev3nt5h1ghte5tK3y');
+defined('EVENT_HIGH_KEY') OR define('EVENT_HIGH_KEY','D00la11y@ppKey');
 defined('EVENT_HIGH_ACCOUNT') OR define('EVENT_HIGH_ACCOUNT','doolally');
 defined('MEETUP_KEY') OR define('MEETUP_KEY','165c416c7672a5cc2f1a43292a2817');
 defined('MEETUP_GROUP') OR define('MEETUP_GROUP','meetup-group-XWIyWwft');

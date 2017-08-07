@@ -920,7 +920,14 @@ class Home extends MY_Controller {
                         $details = array(
                             'userOtp'=> $newOtp
                         );
-                        $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
+                        if(isset($walletBal['id']))
+                        {
+                            $this->dashboard_model->updateStaffRecord($walletBal['id'],$details);
+                        }
+                        else
+                        {
+                            $this->dashboard_model->updateStaffRecordByEmp($post['empId'],$details);
+                        }
 
                         $numbers = array('91'.$walletBal['mobNum']);
 

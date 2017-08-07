@@ -478,7 +478,7 @@ $(document).on('click','.homePage .request-otp', function(){
             type:'POST',
             dataType: 'json',
             contentType: "application/json; charset=utf-8",
-            url:'https://developer.eventshigh.com/add_or_edit_event?key=ev3nt5h1ghte5tK3y',
+            url:'https://developer.eventshigh.com/add_or_edit_event?key=D00la11y@ppKey',
             data: JSON.stringify(postData),
             success: function(data){
                 if(data.status == 'error')

@@ -116,6 +116,14 @@ class Dashboard extends MY_Controller {
         {
             $data['feedbacks']['colaba'] = (int)(($promo['colaba']/$total['colaba'])*100 - ($de['colaba']/$total['colaba'])*100);
         }
+        if($total['khar'] == '0')
+        {
+            $data['feedbacks']['khar'] = 0;
+        }
+        else
+        {
+            $data['feedbacks']['khar'] = (int)(($promo['khar']/$total['khar'])*100 - ($de['khar']/$total['khar'])*100);
+        }
 
         $data['allFeedbacks'] = $this->dashboard_model->getFeedbackData();
         $events = $this->dashboard_model->getAllEvents();
@@ -2154,9 +2162,9 @@ class Dashboard extends MY_Controller {
             if(isset($eventHighRecord) && myIsArray($eventHighRecord))
             {
                 $EHAtendees = $this->curl_library->attendeeEventsHigh($eventHighRecord['highId']);
-                if(isset($EHAtendees['items']))
+                if(isset($EHAtendees) && myIsArray($EHAtendees))
                 {
-                    $data['EHData'] = $EHAtendees['items'];
+                    $data['EHData'] = $EHAtendees;
                 }
             }
             $data['status'] = true;
