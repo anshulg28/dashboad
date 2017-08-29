@@ -288,7 +288,7 @@ class Mailers extends MY_Controller {
                 {
                     $mainBody = '<html><body>';
                     $body = $newBody;
-                    $body = wordwrap($body, 70);
+                    //$body = wordwrap($body, 70);
                     $body = nl2br($body);
                     $body = stripslashes($body);
                     $mainBody .= $body .'</body></html>';
@@ -354,6 +354,23 @@ class Mailers extends MY_Controller {
                     {
                         $breakCode = $this->generateBreakfastTwoCode($mugInfo['mugList'][0]['mugId']);
                         $tagStr = str_replace('[brcode]',$breakCode,$tagStr);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        preg_match_all('/\[[docode]\w+\]/', $tagStr, $output_array);
+        if(myIsMultiArray($output_array))
+        {
+            foreach($output_array as $key => $row)
+            {
+                foreach($row as $subKey)
+                {
+                    if($subKey == '[docode]')
+                    {
+                        $breakCode = $this->generateBeerCode($mugInfo['mugList'][0]['mugId']);
+                        $tagStr = str_replace('[docode]',$breakCode,$tagStr);
                         break;
                     }
                 }
@@ -742,6 +759,52 @@ class Mailers extends MY_Controller {
 
         $this->offers_model->setSingleCode($toBeInserted);
         return 'BR-'.$newCode;
+    }
+
+    public function generateBeerCode($mugId)
+    {
+        $allCodes = $this->offers_model->getAllCodes();
+        $usedCodes = array();
+        $toBeInserted = array();
+        if($allCodes['status'] === true)
+        {
+            foreach($allCodes['codes'] as $key => $row)
+            {
+                $usedCodes[] = $row['offerCode'];
+            }
+            $newCode = mt_rand(1000,99999);
+            while(myInArray($newCode,$usedCodes))
+            {
+                $newCode = mt_rand(1000,99999);
+            }
+            $toBeInserted = array(
+                'offerCode' => $newCode,
+                'offerType' => 'Beer',
+                'offerLoc' => null,
+                'offerMug' => $mugId,
+                'isRedeemed' => 0,
+                'ifActive' => 1,
+                'createDateTime' => date('Y-m-d H:i:s'),
+                'useDateTime' => null
+            );
+        }
+        else
+        {
+            $newCode = mt_rand(1000,99999);
+            $toBeInserted = array(
+                'offerCode' => $newCode,
+                'offerType' => 'Beer',
+                'offerLoc' => null,
+                'offerMug' => $mugId,
+                'isRedeemed' => 0,
+                'ifActive' => 1,
+                'createDateTime' => date('Y-m-d H:i:s'),
+                'useDateTime' => null
+            );
+        }
+
+        $this->offers_model->setSingleCode($toBeInserted);
+        return 'DO-'.$newCode;
     }
 
     public function checkGmailLogin()

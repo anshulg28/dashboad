@@ -376,8 +376,27 @@ class Offers extends MY_Controller {
             }
             else
             {
-                $data['status'] = true;
-                $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                if(isset($offerStatus['codeCheck']['validFromDate']))
+                {
+                    $toDay = date('Y-m-d');
+                    $d = date_create($offerStatus['codeCheck']['validFromDate']);
+                    if(strtotime($toDay) >= strtotime($offerStatus['codeCheck']['validFromDate']))
+                    {
+                        $data['status'] = true;
+                        $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                    }
+                    else
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'This code isn\'t active yet. Will be active on '.date_format($d,DATE_MAIL_FORMAT_UI);
+                    }
+                }
+                else
+                {
+                    $data['status'] = true;
+                    $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                }
+
             }
         }
 

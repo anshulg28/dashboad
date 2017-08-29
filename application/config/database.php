@@ -117,9 +117,9 @@ $db['godaddy'] = array(
 );
 $db['amazon'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => 'dev@doolally',
+	'hostname' => '35.154.177.231',
+	'username' => 'cynapse',
+	'password' => 'UuUTIX1rVaQ4LiBE',
 	'database' => 'doolally',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',

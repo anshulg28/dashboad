@@ -7,47 +7,42 @@
  */
 class Cron_Model extends CI_Model
 {
-	function __construct()
-	{
-		parent::__construct();
+    function __construct()
+    {
+        parent::__construct();
 
         $this->load->library('mydatafetch_library');
-	}
+    }
 
     public function checkFeedByType($feedType)
     {
         $query = "SELECT * "
-            ."FROM socialfeedmaster "
-            ."where feedType = '".$feedType."' ";
+            . "FROM socialfeedmaster "
+            . "where feedType = '" . $feedType . "' ";
 
         $result = $this->db->query($query)->row_array();
 
         $data = $result;
-        if(myIsArray($result))
-        {
+        if (myIsArray($result)) {
             $data['status'] = true;
-        }
-        else
-        {
+        } else {
             $data['status'] = false;
         }
 
         return $data;
     }
+
     public function getAllFeeds()
     {
         $query = "SELECT * "
-            ."FROM socialfeedmaster";
+            . "FROM socialfeedmaster WHERE feedType IN(1,2,3)";
 
         $result = $this->db->query($query)->result_array();
 
         $data['feedData'] = $result;
-        if(myIsArray($result))
-        {
+        if (myIsArray($result)) {
             $data['status'] = true;
-        }
-        else
-        {
+        } else {
             $data['status'] = false;
         }
 
@@ -57,14 +52,14 @@ class Cron_Model extends CI_Model
     public function getAllSortedFeeds()
     {
         $query = "SELECT * "
-            ."FROM socialfeedmaster WHERE feedType = 0";
+            . "FROM socialfeedmaster WHERE feedType = 0";
 
         $result = $this->db->query($query)->result_array();
 
         return $result;
     }
 
-    public function updateFeedByType($post,$feedType)
+    public function updateFeedByType($post, $feedType)
     {
         $post['updateDateTime'] = date('Y-m-d H:i:s');
 
@@ -72,7 +67,8 @@ class Cron_Model extends CI_Model
         $this->db->update('socialfeedmaster', $post);
         return true;
     }
-    public function updateFeedById($post,$feedId)
+
+    public function updateFeedById($post, $feedId)
     {
         $post['updateDateTime'] = date('Y-m-d H:i:s');
 
@@ -80,6 +76,7 @@ class Cron_Model extends CI_Model
         $this->db->update('socialfeedmaster', $post);
         return true;
     }
+
     public function insertFeedByType($post)
     {
         $post['updateDateTime'] = date('Y-m-d H:i:s');
@@ -87,33 +84,60 @@ class Cron_Model extends CI_Model
         $this->db->insert('socialfeedmaster', $post);
         return true;
     }
+
     public function insertFeedBatch($details)
     {
         $this->db->insert_batch('socialviewmaster', $details);
         return true;
     }
+    function insertTempFeedBatch($details)
+    {
+        $this->db->insert_batch('socialviewtempmaster', $details);
+        return true;
+    }
+    public function insertNewFeedsBatch($details)
+    {
+        $this->db->insert_batch('socialdemomaster', $details);
+        return true;
+    }
+
+    function getTempFeedView()
+    {
+        $query = "SELECT feedId,feedText,updateDateTime FROM socialviewtempmaster";
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+
     public function getTopViewFeed()
     {
         $query = "SELECT * "
-            ."FROM socialviewmaster LIMIT 1";
+            . "FROM socialviewmaster LIMIT 1";
 
         $result = $this->db->query($query)->row_array();
 
         return $result;
     }
+
     public function getAllViewFeeds()
     {
         $query = "SELECT feedId,feedText,updateDateTime "
-            ."FROM socialviewmaster";
+            . "FROM socialviewmaster";
 
         $result = $this->db->query($query)->result_array();
 
         return $result;
     }
+
     public function clearViewFeeds()
     {
         $this->db->truncate('socialviewmaster');
     }
+    public function clearTempViewFeeds()
+    {
+        $this->db->truncate('socialviewtempmaster');
+    }
+
     public function getLastMainFeed()
     {
         $query = "SELECT * FROM socialfeedmaster WHERE feedType = 0 ORDER BY id DESC LIMIT 1";
@@ -122,6 +146,14 @@ class Cron_Model extends CI_Model
 
         return $result;
     }
+
+    function getAllErrorFeeds()
+    {
+        $query = "SELECT feedText FROM socialfeedmaster WHERE feedType = 0";
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
+
 
     public function getMoreLatestFeeds($count)
     {

@@ -330,6 +330,7 @@
         var picId = $(this).attr('data-picId');
         var parent = $(this).parent();
         bootbox.confirm("Remove Image?", function(result) {
+            var errUrl = base_url+'dashboard/deleteEventAtt';
             if(result === true)
             {
                 $.ajax({
@@ -347,7 +348,7 @@
                     },
                     error: function(xhr, status, error){
                         bootbox.alert('Some Error Occurred!');
-                        var err = '<pre>'+xhr.responseText+'</pre>';
+                        var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                         saveErrorLog(err);
                     }
                 });
@@ -562,6 +563,11 @@
             bootbox.alert('Event Description required!');
             return false;
         }
+        if($(this).find('#eventPrice').val() == 0 && $('input[name="costType"]:checked').val() != '1')
+        {
+            bootbox.alert('Event Price Cannot be Zero');
+            return false;
+        }
         var d = new Date($(this).find('#eventDate').val());
         var startT = $(this).find('#startTime').val();
         var endT = $(this).find('#endTime').val();
@@ -583,6 +589,7 @@
             bootbox.confirm("Sure want to modify timings?", function(result) {
                 if(result === true)
                 {
+                    var errUrl = $(ele).attr('action');
                     showCustomLoader();
                     $.ajax({
                         type:"POST",
@@ -614,7 +621,7 @@
                         error: function(xhr, status, error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
-                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                             saveErrorLog(err);
                         }
                     });
@@ -623,6 +630,7 @@
         }
         else
         {
+            var errUrl = $(this).attr('action');
             showCustomLoader();
             $.ajax({
                 type:"POST",
@@ -654,7 +662,7 @@
                 error: function(xhr, status, error){
                     hideCustomLoader();
                     bootbox.alert('Some Error Occurred!');
-                    var err = '<pre>'+xhr.responseText+'</pre>';
+                    var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                     saveErrorLog(err);
                 }
             });

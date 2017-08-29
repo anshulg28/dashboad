@@ -215,6 +215,7 @@
                                                 <li class="my-pointer-item"><span class="label label-success">[mobno]</span></li>
                                                 <li class="my-pointer-item"><span class="label label-success">[expirydate]</span></li>
                                                 <li class="my-pointer-item"><span class="label label-success">[sendername]</span></li>
+                                                <li class="my-pointer-item"><span class="label label-success">[docode]</span></li>
                                                 <li class="my-pointer-item"><span class="label label-success">[brcode]</span></li>
                                             </ul>
                                         </div>
@@ -354,6 +355,7 @@
                                     <tr>
                                         <th>Mug #</th>
                                         <th>Name</th>
+                                        <th>Location</th>
                                         <th>Email</th>
                                     </tr>
                                     </thead>
@@ -384,6 +386,9 @@
                                                     </td>
                                                     <td>
                                                         <?php echo ucfirst($row['firstName']) .' '.ucfirst($row['lastName']);?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $row['locName'];?>
                                                     </td>
                                                     <td>
                                                         <?php echo $row['emailId'];?>
@@ -443,6 +448,14 @@
     $(window).load(function(){
         $('#main-mugclub-table').DataTable({ordering:  false});
     });
+    $("#searchModal").on('show.bs.modal', function () {
+        $('.my-mail-search-table td').each(function(i,val){
+            if($(val).parent().hasClass('hide'))
+            {
+                $(val).parent().removeClass('hide');
+            }
+        });
+    });
     $(document).on('click','.my-mail-search-table td', function() {
         var selectedRow = $(this).parent()[0];
         var mugNum = $(selectedRow).find('.mugNumber-info')[0].innerText;
@@ -464,8 +477,9 @@
             }
         }
 
+        $(this).parent().addClass('hide');
 
-        $('#searchModal').modal('hide');
+        //$('#searchModal').modal('hide');
     });
 
     function changeToList()
@@ -530,6 +544,7 @@
             callback: function (result) {
                 if(result != null && result != '')
                 {
+                    var errUrl = base_url+'mailers/checkGmailLogin';
                     showCustomLoader();
                     var senderPass = result;
                     $.ajax({
@@ -553,7 +568,7 @@
                         error: function(xhr,status,error){
                             hideCustomLoader();
                             bootbox.alert('Some Error Occurred!');
-                            var err = '<pre>'+xhr.responseText+'</pre>';
+                            var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                             saveErrorLog(err);
                         }
                     });
@@ -565,6 +580,7 @@
 
     function SubmitMailForm(form)
     {
+        var errUrl = $(form).attr('action');
         showCustomLoader();
         $.ajax({
             type:"POST",
@@ -584,7 +600,7 @@
             error: function(xhr, status, error){
                 hideCustomLoader();
                 bootbox.alert('Some Error occurred');
-                var err = '<pre>'+xhr.responseText+'</pre>';
+                var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                 saveErrorLog(err);
             }
         });
@@ -599,7 +615,8 @@
         }
         else if(whichHasFocus == 2)
         {
-            $('textarea[name="mailBody"]').append(mugTag);
+            $('textarea[name="mailBody"]').val($('textarea[name="mailBody"]').val()+mugTag);
+            //$('textarea[name="mailBody"]').append(mugTag);
         }
 
     });

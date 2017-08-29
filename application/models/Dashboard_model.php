@@ -648,10 +648,32 @@ class Dashboard_Model extends CI_Model
     }
     public function getJoinersInfo($eventId)
     {
-        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.quantity, erm.createdDT
+        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.quantity, erm.createdDT, erm.isDirectlyRegistered
                   FROM eventregistermaster erm
                   LEFT JOIN doolally_usersmaster um ON um.userId = erm.bookerUserId
                   WHERE erm.isUserCancel != 1 AND erm.eventId = $eventId ORDER BY erm.createdDT DESC";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function getDoolallyJoinersInfo($eventId)
+    {
+        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.quantity, erm.createdDT
+                  FROM eventregistermaster erm
+                  LEFT JOIN doolally_usersmaster um ON um.userId = erm.bookerUserId
+                  WHERE erm.isUserCancel != 1 AND erm.isDirectlyRegistered = 1 AND erm.eventId = $eventId ORDER BY erm.createdDT DESC";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+    public function getEhJoinersInfo($eventId)
+    {
+        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.quantity, erm.createdDT
+                  FROM eventregistermaster erm
+                  LEFT JOIN doolally_usersmaster um ON um.userId = erm.bookerUserId
+                  WHERE erm.isUserCancel != 1 AND erm.isDirectlyRegistered = 0 AND erm.eventId = $eventId ORDER BY erm.createdDT DESC";
 
         $result = $this->db->query($query)->result_array();
 
@@ -855,6 +877,16 @@ class Dashboard_Model extends CI_Model
         $query = "SELECT highId FROM eventshighmaster WHERE highStatus = 1 AND eventId = ".$eventId;
 
         $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+    public function getEventCouponInfo($eventId, $payId)
+    {
+        $query = "SELECT isRedeemed, offerType
+                  FROM offersmaster  
+                  WHERE offerEvent = ".$eventId." AND bookerPaymentId = '".$payId."'";
+
+        $result = $this->db->query($query)->result_array();
 
         return $result;
     }
@@ -1414,5 +1446,10 @@ class Dashboard_Model extends CI_Model
         $result = $this->db->query($query)->result_array();
 
         return $result;
+    }
+    function saveEhRefundDetails($details)
+    {
+        $this->db->insert('ehrefundmaster',$details);
+        return true;
     }
 }

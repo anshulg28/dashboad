@@ -527,7 +527,7 @@ class Mugclub extends MY_Controller {
                 }
                 else
                 {
-                    if(!in_array($mugid,MUG_BLOCK_RANGE))//range(0,100)
+                    if(!in_array($mugid,unserialize(MUG_BLOCK_RANGE)))//range(0,100)
                     {
                         //Getting mug number data if exists
                         $result = $this->mugclub_model->getMugDataById($mugid);
@@ -683,7 +683,7 @@ class Mugclub extends MY_Controller {
         }
 
         $availMugs = array_values($availMugs);
-        $blockedNums = MUG_BLOCK_RANGE;// range(0,100);
+        $blockedNums = unserialize(MUG_BLOCK_RANGE);// range(0,100);
         $availMugs = array_diff($availMugs,$blockedNums);
         if(myIsMultiArray($holdMugs))
         {
