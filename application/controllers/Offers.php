@@ -15,7 +15,7 @@ class Offers extends MY_Controller {
 	}
 	public function index()
 	{
-
+        $this->load->model('login_model');
         $data = array();
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
@@ -25,6 +25,12 @@ class Offers extends MY_Controller {
         if(isSessionVariableSet($this->isUserSession) === true)
         {
             $data['title'] = 'Offers :: Doolally';
+
+            if(isSessionVariableSet($this->userId))
+            {
+                $rols = $this->login_model->getUserRoles($this->userId);
+                $data['userModules'] = explode(',',$rols['modulesAssigned']);
+            }
         }
         else
         {

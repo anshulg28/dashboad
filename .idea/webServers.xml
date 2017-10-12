@@ -3,15 +3,15 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="f35b5bd9-7825-44e5-a5a5-af1bc351d145" name="demo dashboard" url="http://dtest.doolally.in">
-        <fileTransfer host="dtest.doolally.in" port="22" privateKey="C:\Users\anshul\Downloads\doolProd.ppk" accessType="SFTP" keyPair="true">
+        <fileTransfer host="dtest.doolally.in" port="22" privateKey="F:\Tech softs\doolProd.ppk" accessType="SFTP" keyPair="true">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
-      <webServer id="c6861d16-0e32-4384-bc41-04e3b6f62a21" name="live dashboard" url="http://doolally.io">
-        <fileTransfer host="doolally.io" port="22" privateKey="C:\Users\anshul\Downloads\doolProd.ppk" accessType="SFTP" keyPair="true">
+      <webServer id="112982d2-137e-4ae6-b7cc-99b79851f249" name="Live dashboard" url="http://doolally.io">
+        <fileTransfer host="doolally.io" port="22" privateKey="F:\Tech softs\doolProd.ppk" accessType="SFTP" keyPair="true">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>

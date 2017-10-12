@@ -105,7 +105,7 @@ class Login_Model extends CI_Model
     {
         $query = "SELECT userId,ifActive "
             ."FROM doolally_usersmaster "
-            ."where userType IN(0,1,2,3,5,6) AND mobNum = '".$mobNum."' OR emailId = '".$mobNum."' AND userOtp = ".$otp;
+            ."where userType IN(0,1,2,3,5,6,7,8,9) AND mobNum = '".$mobNum."' OR emailId = '".$mobNum."' AND userOtp = ".$otp;
 
         $result = $this->db->query($query)->row_array();
 
@@ -215,5 +215,30 @@ class Login_Model extends CI_Model
         $this->db->where('userId', $post['userId']);
         $this->db->update('doolally_usersmaster', $post);
         return true;
+    }
+
+    function getUserRoles($userId)
+    {
+        $query = "SELECT modulesAssigned FROM roletomodulemaster WHERE userId = ".$userId;
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+
+    function getAllDashboardUsers()
+    {
+        $query = "SELECT * "
+            ."FROM doolally_usersmaster "
+            ."where userType IN(0,1,2,3,5,6)";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+
+    function saveModuleUser($details)
+    {
+        $this->db->insert('roletomodulemaster',$details);
     }
 }

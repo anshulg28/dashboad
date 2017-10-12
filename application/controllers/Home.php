@@ -30,8 +30,13 @@ class Home extends MY_Controller {
             }
         }*/
 
-
 		$data = array();
+        if(isSessionVariableSet($this->userId))
+        {
+            $rols = $this->login_model->getUserRoles($this->userId);
+            $data['userModules'] = explode(',',$rols['modulesAssigned']);
+
+        }
 		$data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
 		$data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
 		$data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
@@ -53,6 +58,12 @@ class Home extends MY_Controller {
         if(isSessionVariableSet($this->isUserSession) === false)
         {
             redirect(base_url());
+        }
+
+        if(isSessionVariableSet($this->userId))
+        {
+            $rols = $this->login_model->getUserRoles($this->userId);
+            $data['userModules'] = explode(',',$rols['modulesAssigned']);
         }
         $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
         $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
@@ -1141,5 +1152,25 @@ class Home extends MY_Controller {
                 break;
         }
         return $returnVal;
+    }
+
+    public function assignAllModules()
+    {
+        $roles = $this->config->item('defaultRoles');
+
+        $allUsers = $this->login_model->getAllDashboardUsers();
+
+        foreach($allUsers as $key => $row)
+        {
+            $details = array(
+                'userId' => $row['userId'],
+                'userType' => $row['userType'],
+                'modulesAssigned' => implode(',',$roles[$row['userType']])
+            );
+
+            $this->login_model->saveModuleUser($details);
+        }
+        echo 'Done';
+
     }
 }

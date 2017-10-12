@@ -7,9 +7,9 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/bootbox.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/getmdl-select.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/Chart.min.js"></script>
-<script src="http://cdn.ckeditor.com/4.6.2/basic/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/4.6.2/basic/ckeditor.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/progressbar.min.js"></script>
-<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBu7Do2fKtcQYdGyoC5glTzRLxs6FKxy4Y&libraries=places"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBu7Do2fKtcQYdGyoC5glTzRLxs6FKxy4Y&libraries=places"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/mobile/js/jquery.swipebox.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/jquery.geocomplete.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>asset/js/doolally-local-session.js"></script>
@@ -452,7 +452,7 @@ $(document).on('click','.homePage .request-otp', function(){
             'organizer_account_name' : '<?php echo EVENT_HIGH_ACCOUNT;?>',
             'organizer_name' : 'Doolally',
             'organizer_email' : 'events@brewcraftsindia.com',
-            'organizer_phone' : eventData.mobNum
+            'organizer_phone' : eventData.creatorPhone
         };
         if(typeof eventData.highId !== 'undefined')
         {

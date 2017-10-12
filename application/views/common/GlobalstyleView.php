@@ -1,4 +1,5 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!--not tho change css-->
 <link rel="stylesheet" href="<?php echo base_url(); ?>asset/css/material.min.css">
 <link rel="stylesheet" href="<?php echo base_url(); ?>asset/css/bootstrap.min.css">

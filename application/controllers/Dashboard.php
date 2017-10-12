@@ -8,6 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property Mugclub_Model $mugclub_model
  * @property Users_Model $users_model
  * @property  Locations_Model $locations_model
+ * @property Login_Model $login_model
  */
 
 class Dashboard extends MY_Controller {
@@ -20,6 +21,7 @@ class Dashboard extends MY_Controller {
         $this->load->model('mugclub_model');
         $this->load->model('users_model');
         $this->load->model('locations_model');
+        $this->load->model('login_model');
         ini_set('memory_limit', "256M");
         ini_set('upload_max_filesize', "50M");
     }
@@ -34,13 +36,40 @@ class Dashboard extends MY_Controller {
 
 		$data = array();
 
+        if(isSessionVariableSet($this->userId))
+        {
+            $rols = $this->login_model->getUserRoles($this->userId);
+            $data['userModules'] = explode(',',$rols['modulesAssigned']);
+        }
+
         $locArray = $this->locations_model->getAllLocations();
         $data['locations'] = $locArray;
         if($this->userType == EXECUTIVE_USER)
         {
-            //Get assigned location for community manager
+            //Check for Community manager secondary location set
+
             $userInfo = $this->users_model->getUserDetailsById($this->userId);
-            $allLocs = explode(',',$userInfo['userData'][0]['assignedLoc']);
+            if(isset($userInfo['userData'][0]['secondaryLoc']))
+            {
+                $data['secLocs'] = $userInfo['userData'][0]['secondaryLoc'];
+            }
+            if( !isSession($this->commSecLoc) || !isSessionVariableSet($this->commSecLoc))
+            {
+                if($userInfo['status'] === true && isset($userInfo['userData'][0]['secondaryLoc']))
+                {
+                    $this->getCommLocation(base64_encode($userInfo['userData'][0]['secondaryLoc']));
+                    return false;
+                }
+            }
+            if(isSession($this->commSecLoc) && isSessionVariableSet($this->commSecLoc))
+            {
+                $allLocs = explode(',',$this->commSecLoc);
+            }
+            else
+            {
+                //Get assigned location for community manager
+                $allLocs = explode(',',$userInfo['userData'][0]['assignedLoc']);
+            }
 
             foreach($allLocs as $key)
             {
@@ -173,6 +202,35 @@ class Dashboard extends MY_Controller {
 		$this->load->view('DashboardView', $data);
 	}
 
+    public function getCommLocation($allLocs)
+    {
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $data = array();
+
+        $allLocs = base64_decode($allLocs);
+        $data['locData'] = $this->locations_model->getMultiLocs($allLocs);
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+
+        $this->load->view('SecLocSelectView', $data);
+    }
+
+	public function setCommLocation()
+    {
+        $post = $this->input->post();
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+
+        $this->generalfunction_library->setSessionVariable("commSecLoc",$post['currentLoc']);
+
+        redirect(base_url().'dashboard');
+    }
     public function getCustomStats()
     {
         $post = $this->input->post();
@@ -1344,6 +1402,11 @@ class Dashboard extends MY_Controller {
             if(isset($eventHighRecord) && myIsArray($eventHighRecord))
             {
                 $externalAPIData['highId'] = $eventHighRecord['highId'];
+            }
+            $comCheck = $this->dashboard_model->commEventCheck($externalAPIData['creatorEmail']);
+            if(isset($comCheck) && myIsArray($comCheck))
+            {
+                $externalAPIData['creatorPhone'] = DEFAULT_EVENTS_NUMBER;
             }
             $data['apiData'] = $externalAPIData;
 

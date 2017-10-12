@@ -855,6 +855,14 @@ class Dashboard_Model extends CI_Model
         return $result;
     }
 
+    function commEventCheck($email)
+    {
+        $query = "SELECT * FROM doolally_usersmaster WHERE userType = ".EXECUTIVE_USER." AND emailId LIKE '".$email."'";
+
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+
     public function saveEventRegis($details)
     {
         $details['createdDT'] = date('Y-m-d H:i:s');
@@ -1122,6 +1130,18 @@ class Dashboard_Model extends CI_Model
     {
         $this->db->where('id', $id);
         $this->db->update('staffmaster', $details);
+        return true;
+    }
+    function deleteStaffRecord($id)
+    {
+        $query = "INSERT INTO deletedstaffmaster "
+            ."SELECT * FROM staffmaster "
+            ."where id = ".$id;
+
+        $this->db->query($query);
+
+        $this->db->where('id', $id);
+        $this->db->delete('staffmaster');
         return true;
     }
     public function updateStaffRecordByEmp($empid,$details)
@@ -1450,6 +1470,16 @@ class Dashboard_Model extends CI_Model
     function saveEhRefundDetails($details)
     {
         $this->db->insert('ehrefundmaster',$details);
+        return true;
+    }
+    public function saveUpiDump($details)
+    {
+        $this->db->insert('upidumpingtable', $details);
+        return true;
+    }
+    public function saveSmsWall($details)
+    {
+        $this->db->insert('smsreceivemaster', $details);
         return true;
     }
 }

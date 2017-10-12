@@ -134,6 +134,24 @@ class Mugclub_Model extends CI_Model
         return $data;
     }
 
+    function checkMugExists($mugId)
+    {
+        $query = "SELECT * FROM mugmaster WHERE mugId = ".$mugId;
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+
+    function checkDelMug($mugId)
+    {
+        $query = "SELECT * FROM deletedmugmaster WHERE mugId = ".$mugId;
+
+        $result = $this->db->query($query)->row_array();
+
+        return $result;
+    }
+
     public function getMugHoldById($mugId)
     {
         $query = "SELECT * "
@@ -521,7 +539,7 @@ class Mugclub_Model extends CI_Model
 
     public function getBirthdayMugsList($locSort = false, $locArray = '')
     {
-        $query = "SELECT mugId, firstName, emailId, birthDate "
+        $query = "SELECT mugId, firstName, emailId, birthDate, homeBase "
             ." FROM mugmaster "
             ."WHERE birthDate IS NOT NULL AND birthDate != '0000-00-00' AND membershipEnd >= CURRENT_DATE() "
             ."AND DATE_FORMAT(birthDate,'%m-%d') BETWEEN DATE_FORMAT( (CURRENT_DATE() - INTERVAL 1 WEEK ) , '%m-%d')"
@@ -533,6 +551,7 @@ class Mugclub_Model extends CI_Model
             $query .= ' AND homeBase IN('.$locArray.')';
         }
         $query .= " ORDER BY DATE_FORMAT( birthDate, '%m-%d' ) DESC ";
+
         $result = $this->db->query($query)->result_array();
 
         $data['expiryMugList'] = $result;
@@ -551,6 +570,12 @@ class Mugclub_Model extends CI_Model
     public function saveRenewRecord($post)
     {
         $this->db->insert('mugrenewmaster', $post);
+        return true;
+    }
+
+    public function saveDelRecord($post)
+    {
+        $this->db->insert('deletedmugmaster', $post);
         return true;
     }
 

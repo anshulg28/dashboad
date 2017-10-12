@@ -2,14 +2,14 @@
 <project version="4">
   <component name="PublishConfigData" serverName="demo dashboard" persistUploadOnCheckin="false">
     <serverData>
-      <paths name="demo dashboard">
+      <paths name="Live dashboard">
         <serverdata>
           <mappings>
             <mapping deploy="/var/www/html/dashboad" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
-      <paths name="live dashboard">
+      <paths name="demo dashboard">
         <serverdata>
           <mappings>
             <mapping deploy="/var/www/html/dashboad" local="$PROJECT_DIR$" web="/" />

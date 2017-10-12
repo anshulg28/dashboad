@@ -34,6 +34,15 @@ class Locations_Model extends CI_Model
         return $data;
     }
 
+    function getAllActiveLocations()
+    {
+        $query = "SELECT * FROM locationmaster WHERE ifActive = ".ACTIVE;
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+
     public function getLocationDetailsById($locId)
     {
         $query = "SELECT * "
@@ -75,6 +84,12 @@ class Locations_Model extends CI_Model
         return $data;
     }
 
+    public function getMultiLocs($locs)
+    {
+        $query = "SELECT * FROM locationmaster WHERE id IN(".$locs.")";
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
     public function saveLocationRecord($post)
     {
         $post['insertedDate'] = date('Y-m-d H:i:s');
