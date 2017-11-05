@@ -109,15 +109,21 @@ defined('SERVER_USER') OR define('SERVER_USER',3);
 defined('GUEST_USER') OR define('GUEST_USER',4);
 defined('WALLET_USER') OR define('WALLET_USER',5);
 defined('OFFERS_USER') OR define('OFFERS_USER',6);
-defined('MAINTENANCE_ADMIN') OR define('MAINTENANCE_ADMIN',7);
-defined('MAINTENANCE_MANAGER') OR define('MAINTENANCE_MANAGER',8);
-defined('MAINTENANCE_USER') OR define('MAINTENANCE_USER',9);
+defined('MAINTENANCE_MANAGER') OR define('MAINTENANCE_MANAGER',7);
+/*defined('MAINTENANCE_USER') OR define('MAINTENANCE_USER',8);*/
+defined('MAINTENANCE_APPROVER1') OR define('MAINTENANCE_APPROVER1',8);
+defined('MAINTENANCE_APPROVER2') OR define('MAINTENANCE_APPROVER2',9);
+defined('FINANCE_APPROVER') OR define('FINANCE_APPROVER',10);
 
 /* Complaint Log Status */
 defined('LOG_STATUS_OPEN') OR define('LOG_STATUS_OPEN',0);
-defined('LOG_STATUS_IN_PROGRESS') OR define('LOG_STATUS_IN_PROGRESS',1);
-defined('LOG_STATUS_PARTIAL_CLOSE') OR define('LOG_STATUS_PARTIAL_CLOSE',2);
-defined('LOG_STATUS_CLOSED') OR define('LOG_STATUS_CLOSED',3);
+defined('LOG_STATUS_PENDING_APPROVAL') OR define('LOG_STATUS_PENDING_APPROVAL',1);
+defined('LOG_STATUS_PENDING_BUDGET_APPROVAL') OR define('LOG_STATUS_PENDING_BUDGET_APPROVAL',2);
+defined('LOG_STATUS_IN_PROGRESS') OR define('LOG_STATUS_IN_PROGRESS',3);
+defined('LOG_STATUS_PARTIAL_CLOSE') OR define('LOG_STATUS_PARTIAL_CLOSE', 4);
+defined('LOG_STATUS_CLOSED') OR define('LOG_STATUS_CLOSED',5);
+defined('LOG_STATUS_DECLINED') OR define('LOG_STATUS_DECLINED',6);
+defined('LOG_STATUS_POSTPONE') OR define('LOG_STATUS_POSTPONE',7);
 
 /*Active or not*/
 defined('ACTIVE')   OR define('ACTIVE', 1);
@@ -153,6 +159,7 @@ defined('BEVERAGE_PATH_THUMB') OR define('BEVERAGE_PATH_THUMB','uploads/beverage
 defined('BEVERAGE_PATH_NORMAL') OR define('BEVERAGE_PATH_NORMAL','uploads/beverage/');
 defined('EVENT_PATH_THUMB') OR define('EVENT_PATH_THUMB','uploads/events/thumb/');
 defined('TWITTER_BOT_PATH') OR define('TWITTER_BOT_PATH','socialimages/twitter/');
+defined('JOB_MEDIA_PATH') OR define('JOB_MEDIA_PATH','uploads/jobs/');
 defined('ITEM_FOOD') OR define('ITEM_FOOD','1');
 defined('ITEM_BEVERAGE') OR define('ITEM_BEVERAGE','2');
 defined('MOBILE_URL') OR define('MOBILE_URL','https://mtest.doolally.in/');
@@ -163,9 +170,12 @@ defined('EVENT_PAID') OR define('EVENT_PAID','2');
 defined('EVENT_PAID_NO_PINT') OR define('EVENT_PAID_NO_PINT','3');
 defined('EVENT_DOOLALLY_FEE') OR define('EVENT_DOOLALLY_FEE','4');
 
-defined('DEFAULT_SENDER_EMAIL') OR define('DEFAULT_SENDER_EMAIL','communitymanager@brewcraftsindia.com');
-defined('DEFAULT_SENDER_PASS') OR define('DEFAULT_SENDER_PASS','Ngks2009');
+defined('DEFAULT_SENDER_EMAIL') OR define('DEFAULT_SENDER_EMAIL','events@brewcraftsindia.com');
+defined('DEFAULT_SENDER_PASS') OR define('DEFAULT_SENDER_PASS','doolally123');
+defined('ADMIN_SENDER_EMAIL') OR define('ADMIN_SENDER_EMAIL','admin@brewcraftsindia.com');
+defined('ADMIN_SENDER_PASS') OR define('ADMIN_SENDER_PASS','ngks2009');
 defined('DEFAULT_EVENTS_NUMBER') OR define('DEFAULT_EVENTS_NUMBER','7400428099');
+defined('MSG91_KEY') OR define('MSG91_KEY','178025AvcGa0FeRZ2X59d628db');
 
 defined('OLD_DOOLALLY_FEE') OR define('OLD_DOOLALLY_FEE','250');
 defined('NEW_DOOLALLY_FEE') OR define('NEW_DOOLALLY_FEE','300');
@@ -173,3 +183,7 @@ defined('DEFAULT_STAFF_MOB') OR define('DEFAULT_STAFF_MOB','9999999999');
 defined('MUG_BLOCK_RANGE') OR define('MUG_BLOCK_RANGE',serialize(array(4,10,12,14)));
 defined('EH_GATEWAY_CHARGE') OR define('EH_GATEWAY_CHARGE','5');
 defined('DOOLALLY_GATEWAY_CHARGE') OR define('DOOLALLY_GATEWAY_CHARGE','2.24');
+defined('DOOLALLY_SECRET_KEY') OR define('DOOLALLY_SECRET_KEY','8r3w3ry_09');
+defined('JOB_PRIORITY_HIGH') OR define('JOB_PRIORITY_HIGH',1);
+defined('JOB_PRIORITY_MEDIUM') OR define('JOB_PRIORITY_MEDIUM',2);
+defined('JOB_PRIORITY_LOW') OR define('JOB_PRIORITY_LOW',3);

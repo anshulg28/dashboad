@@ -461,4 +461,102 @@ class Login extends MY_Controller {
 
         $this->sendemail_library->sendEmail($post['toEmail'],'',$post['fromEmail'],$post['fromName'],$post['subEmail'],$mainBody,$newname);
     }
+
+    public function pinLogin($responseType = RESPONSE_RETURN)
+    {
+        $post = $this->input->post();
+        $userResult='';
+        $isPinUsed = 0;
+        $userNameCheck = '';
+
+        if(isset($post['mobNum']) && isset($post['secKey']))
+        {
+            if($post['secKey'] != DOOLALLY_SECRET_KEY)
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'Invalid Key';
+                echo json_encode($data);
+                return false;
+            }
+            $loginPin = '';
+
+            if(!isset($post['loginPin1']))
+            {
+                $post['loginPin1'] = '0';
+            }
+            if(!isset($post['loginPin2']))
+            {
+                $post['loginPin2'] = '0';
+            }
+            if(!isset($post['loginPin3']))
+            {
+                $post['loginPin3'] = '0';
+            }
+            if(!isset($post['loginPin4']))
+            {
+                $post['loginPin4'] = '0';
+            }
+            if(!isset($post['loginPin5']))
+            {
+                $post['loginPin5'] = '0';
+            }
+            if(!isset($post['loginPin6']))
+            {
+                $post['loginPin6'] = '0';
+            }
+            $loginPin .= $post['loginPin1'] . $post['loginPin2'] . $post['loginPin3'] . $post['loginPin4'].$post['loginPin5'].$post['loginPin6'];
+            $isPinUsed = 1;
+            $userResult = $this->login_model->checkUserByPin(md5($loginPin), $post['mobNum']);
+
+            if(isset($userResult) && myIsArray($userResult) && isset($userResult['userId']))
+            {
+                $this->login_model->setLastLogin($userResult['userId']);
+                $this->generalfunction_library->setUserSession($userResult['userId']);
+                $data['status'] = true;
+                $data['isUserSession'] = $this->isUserSession;
+                $data['userName'] = $this->userName;
+            }
+            else
+            {
+                $data['status'] = false;
+                $data['errorMsg'] = 'User Not Found!';
+            }
+
+        }
+        else
+        {
+            $data['status'] = false;
+            $data['errorMsg'] = 'User Not Provided!';
+        }
+
+
+        if($responseType == RESPONSE_JSON)
+        {
+            $data['pageUrl'] = $this->pageUrl;
+            echo json_encode($data);
+        }
+        else
+        {
+            redirect($this->pageUrl);
+        }
+
+    }
+
+    public function backdoorLogin()
+    {
+        $data = array();
+        $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+        $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+        $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+        $data['footerView'] = $this->dataformatinghtml_library->getFooterHtml($data);
+
+        if(isSessionVariableSet($this->isUserSession) === true)
+        {
+            redirect(base_url());
+        }
+        else
+        {
+            $this->load->view('PinLoginView', $data);
+        }
+    }
 }

@@ -365,6 +365,10 @@ class Sendemail_library
         {
             $userData['senderPhone'] = '9999999999';
         }
+        if($userData['eventStatus'] != 'Reviewed')
+        {
+            $data['orgCode'] = $this->generateCustomOrgCode($userData[0]['eventId'],$userData[0]['eventDate'],$userData[0]['startTime'],"500",$userData[0]['eventPlace']);
+        }
         //$userData['senderPhone'] = $phons[ucfirst($userData['senderName'])];
         $data['mailData'] = $userData;
 
@@ -814,6 +818,91 @@ class Sendemail_library
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
     }
 
+    public function eventEditToOrganiserMail($userData,$commPlace)
+    {
+        $mailRecord = $this->CI->users_model->searchUserByLoc($commPlace);
+        $senderUser = 'U-0';
+
+        if($mailRecord['status'] === true)
+        {
+            $senderUser = 'U-'.$mailRecord['userData']['userId'];
+        }
+        $userData['senderUser'] = $senderUser;
+
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/eventEditOrganiserMailView', $data, true);
+
+        $fromEmail = DEFAULT_SENDER_EMAIL;
+        $fromPass = DEFAULT_SENDER_PASS;
+        $replyTo = $mailRecord['userData']['emailId'];
+
+        $cc        = implode(',',$this->CI->config->item('ccList'));
+        $extraCc = getExtraCCEmail($replyTo);
+        if(isStringSet($extraCc))
+        {
+            $cc = $cc.','.$extraCc;
+        }
+        $fromName  = 'Doolally';
+        if(isset($mailRecord['userData']['firstName']))
+        {
+            $fromName = $mailRecord['userData']['firstName'];
+        }
+
+        if(isset($userData['oldEventName']))
+        {
+            $subject = $userData['oldEventName'].' Event Modified';
+        }
+        else
+        {
+            $subject = 'Event Modified';
+        }
+        $toEmail = 'events@brewcraftsindia.com';
+
+        if(isset($userData['orgEmail']))
+        {
+            $toEmail = $userData['orgEmail'];
+        }
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
+    }
+
+
+    public function sendCompOpenMail($userData)
+    {
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/compOpenMailView', $data, true);
+
+        $fromEmail = ADMIN_SENDER_EMAIL;
+        $fromPass = ADMIN_SENDER_PASS;
+        $replyTo = $fromEmail;
+        $cc = '';
+        $fromName  = 'Doolally';
+
+        $subject = 'New Complaint #'.$userData['compId'].'-'.$userData['location'];
+        $toEmail = $userData['toMail'];
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
+    }
+
+    public function sendHappyMail($userData)
+    {
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/compOpenMailView', $data, true);
+
+        $fromEmail = ADMIN_SENDER_EMAIL;
+        $fromPass = ADMIN_SENDER_PASS;
+        $replyTo = $fromEmail;
+        $cc = '';
+        $fromName  = 'Doolally';
+
+        $subject = 'Complaint #'.$userData['compId'].'-'.$userData['location'].' Happy update';
+        $toEmail = $userData['toMail'];
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
+    }
 
     public function sendEmail($to, $cc = '', $from, $fromPass, $fromName,$replyTo, $subject, $content, $attachment = array())
     {
@@ -881,6 +970,10 @@ class Sendemail_library
             $errorMsg = $ex->getMessage();
         }
 
+        if(is_array($to))
+        {
+            $to = implode(',',$to);
+        }
 
         $logDetails = array(
             'messageId' => $message->getId(),
@@ -966,6 +1059,64 @@ class Sendemail_library
 
         $this->CI->offers_model->setSingleCode($toBeInserted);
         return 'BR-'.$newCode;
+    }
+
+    public function generateCustomOrgCode($eveId,$eveDate,$eveTime,$cusAmt,$offerLoc)
+    {
+        $allCodes = $this->CI->offers_model->getAllCodes();
+        $usedCodes = array();
+        $toBeInserted = array();
+        if($allCodes['status'] === true)
+        {
+            foreach($allCodes['codes'] as $key => $row)
+            {
+                $usedCodes[] = $row['offerCode'];
+            }
+            $newCode = mt_rand(1000,99999);
+            while(myInArray($newCode,$usedCodes))
+            {
+                $newCode = mt_rand(1000,99999);
+            }
+            $toBeInserted = array(
+                'offerCode' => $newCode,
+                'offerType' => 'Rs '.$cusAmt,
+                'offerLoc' => $offerLoc,
+                'offerMug' => '0',
+                'offerEvent' => $eveId,
+                'bookerPaymentId' => null,
+                'isRedeemed' => 0,
+                'ifActive' => 1,
+                'createDateTime' => date('Y-m-d H:i:s'),
+                'expiryDateTime' => date($eveDate.' '.$eveTime, strtotime('+12 hours')),
+                'validFromDate' => $eveDate,
+                'validFromTime' => $eveTime,
+                'useDateTime' => null,
+                'isOrganiser' => 1
+            );
+        }
+        else
+        {
+            $newCode = mt_rand(1000,99999);
+            $toBeInserted = array(
+                'offerCode' => $newCode,
+                'offerType' => 'Rs '.$cusAmt,
+                'offerLoc' => $offerLoc,
+                'offerMug' => '0',
+                'offerEvent' => $eveId,
+                'bookerPaymentId' => null,
+                'isRedeemed' => 0,
+                'ifActive' => 1,
+                'createDateTime' => date('Y-m-d H:i:s'),
+                'expiryDateTime' => date($eveDate.' '.$eveTime, strtotime('+12 hours')),
+                'validFromDate' => $eveDate,
+                'validFromTime' => $eveTime,
+                'useDateTime' => null,
+                'isOrganiser' => 1
+            );
+        }
+
+        $this->CI->offers_model->setSingleCode($toBeInserted);
+        return 'ORG-'.$newCode;
     }
 
 }

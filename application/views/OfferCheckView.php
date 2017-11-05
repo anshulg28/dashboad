@@ -36,6 +36,12 @@
                             </div>
                             <h4 class="text-center">OR</h4>
                             <div class="input-group">
+                                <span class="input-group-addon">ORG-</span>
+                                <input type="number" name="orgOfferCode" id="orgOfferCode"
+                                       class="form-control offer-input" placeholder="11111">
+                            </div>
+                            <h4 class="text-center">OR</h4>
+                            <div class="input-group">
                                 <span class="input-group-addon">TW-</span>
                                 <input type="number" name="oldOfferCode" id="oldOfferCode"
                                        class="form-control offer-input" placeholder="11111">
@@ -66,6 +72,7 @@
         var oldOffer = $('#oldOfferCode').val();
         var breakOffer = $('#breakOfferCode').val();
         var eventOffer = $('#eventOfferCode').val();
+        var orgOffer = $('#orgOfferCode').val();
         var offerUrl,offerPrifix,finalCode;
         var filledFields = 0;
         $('.offer-input').each(function(i,val){
@@ -102,6 +109,12 @@
             finalCode = eventOffer;
             offerUrl = base_url+'offers/offerCheck/'+eventOffer;
             offerPrifix = 'EV';
+        }
+        else if(orgOffer != '')
+        {
+            finalCode = orgOffer;
+            offerUrl = base_url+'offers/offerCheck/'+orgOffer;
+            offerPrifix = 'ORG';
         }
         else if(oldOffer != '')
         {

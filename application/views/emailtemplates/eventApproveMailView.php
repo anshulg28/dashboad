@@ -18,9 +18,15 @@
         3. You will also be given access to a dashboard. This is a place where information on the number of sign ups, fees collected,
         payout details will be available to you. You can also edit your event from this dashboard.<br><br>
 
-        4. For paid events/workshops, we charge a venue fee of Rs. 118<br><br>
+        4. For paid events/workshops, we charge a venue fee of Rs. 118.<?php
+            if(isset($orgCode))
+            {
+                echo ' As an organizer of an event/workshop, you will be provided Food & Beverage worth Rs. 500. 
+                Please show this code '.$orgCode.' to the waiter who is serving you before placing your order.';
+            }
+        ?><br><br>
 
-        5. Doolally will also list and promote your event on the following platforms - zomato, eventshigh.com, meetup, and Doolally social media profiles.<br><br>
+        5. Doolally will also list and promote your event on the following platforms - Zomato, Eventshigh.com, Meetup, and Doolally social media profiles.<br><br>
 
         6. Cancellation Policy:<br>
         If you need to cancel an event, you will need to get in touch with the venue's community manager.<br><br>
@@ -39,7 +45,7 @@
         For payment for events, we will hand over a cheque in the name of organiser.
         As an organiser, once you have crossed Rs 30,000 in earnings, Doolally will deduct 10% TDS.<br><br>
 
-        In case you have any questions/queries please don't hesitate to write to me at this (<?php echo $mailData['senderEmail'];?>) mail address<!-- or you can reach me at
+        In case you have any questions/queries please don't hesitate to write to me at this (<?php echo $mailData['senderEmail'];?>) mail address.<!-- or you can reach me at
         --><?php /*echo $mailData['senderPhone'] .' ('.$mailData['senderName'].')';*/?><br><br>
 
         Cheers!<br>

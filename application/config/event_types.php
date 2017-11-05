@@ -110,7 +110,11 @@ $config['defaultRoles'] = array(
         'wallet_check',
         'wallet_users',
         'twitter_page',
-        'maintenance'
+        'maintenance',
+        'maintenance_logview',
+        'maintenance_workarea',
+        'maintenance_worktype',
+        'maintenance_useradd'
     ),
     ADMIN_USER => array(
         'mug_portal',
@@ -131,7 +135,11 @@ $config['defaultRoles'] = array(
         'dashboard_beerolympics',
         'wallet_check',
         'wallet_users',
-        'maintenance'
+        'maintenance',
+        'maintenance_logview',
+        'maintenance_workarea',
+        'maintenance_worktype',
+        'maintenance_useradd'
     ),
     EXECUTIVE_USER => array(
         'mug_portal',
@@ -155,7 +163,8 @@ $config['defaultRoles'] = array(
         'offers_check',
         'checkins',
         'wallet_check',
-        'maintenance'
+        'maintenance',
+        'maintenance_complaint'
     ),
     WALLET_USER => array(
         'wallet_check',
@@ -166,10 +175,25 @@ $config['defaultRoles'] = array(
         'offers_gen'
     ),
     MAINTENANCE_MANAGER => array(
-        'maintenance'
+        'maintenance',
+        'maintenance_logview',
+        'maintenance_workarea',
+        'maintenance_worktype',
+        'maintenance_useradd'
     ),
-    MAINTENANCE_USER => array(
-        'maintenance'
+    MAINTENANCE_APPROVER1 => array(
+        'maintenance',
+        'maintenance_logview'
+    ),
+    MAINTENANCE_APPROVER2 => array(
+        'maintenance',
+        'maintenance_logview'
     )
 
+);
+$config['payTypes'] = array(
+    'Happy Cash',
+    'Cash',
+    'NEFT/RTGS',
+    'Maintenance Balance'
 );

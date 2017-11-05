@@ -1094,18 +1094,25 @@ class Dashboard extends MY_Controller {
                         'eventPrice','eventPlace');
         $changeCheck = array();
         $changesRecord = array();
+        $changesMade = array();
         $isEventNameChanged = false;
+
+        $eventId = $post['eventId'];
+        unset($post['eventId']);
+        $eventDetails = $this->dashboard_model->getFullEventInfoById($eventId);
 
         //Separating attachment
         if(isset($post['attachment']))
         {
             $isImpChange = true;
+            if($eventDetails[0]['filename'] != $post['attachment'])
+            {
+                $changesMade['attachment'] = $eventDetails[0]['filename'].';#;'.$post['attachment'];
+            }
             $attachement = $post['attachment'];
             unset($post['attachment']);
         }
-        $eventId = $post['eventId'];
-        unset($post['eventId']);
-        $eventDetails = $this->dashboard_model->getFullEventInfoById($eventId);
+        
         $eventOldInfo = $eventDetails[0];
 
         //Checking for the actual change in the event details
@@ -1120,6 +1127,16 @@ class Dashboard extends MY_Controller {
                         $isImpChange = true; // change is detected in the event details;
                         $changeCheck[] = $key;
                         $changesRecord[$key] = $row;
+                        if($key == 'eventPlace')
+                        {
+                            $oldLoc = $this->locations_model->getLocationDetailsById($row);
+                            $newLoc = $this->locations_model->getLocationDetailsById($post[$key]);
+                            $changesMade[$key] = $oldLoc['locData'][0]['locName'].';#;'.$newLoc['locData'][0]['locName'];
+                        }
+                        else
+                        {
+                            $changesMade[$key] = $row.';#;'.$post[$key];
+                        }
                     }
                 }
             }
@@ -1312,6 +1329,14 @@ class Dashboard extends MY_Controller {
             //Check if event date is changed or not
             if(myInArray('eventDate',$changeCheck))
             {
+                $orgCode = $this->dashboard_model->getOrgCoupon($eventId);
+                if(isset($orgCode) && myIsArray($orgCode))
+                {
+                    $details = array(
+                        'validFromDate'=>$post['eventDate']
+                    );
+                    $this->dashboard_model->updateOfferCode($details,$orgCode['id']);
+                }
                 if($isEventNameChanged)
                 {
                     $dateMailData = array(
@@ -1379,6 +1404,15 @@ class Dashboard extends MY_Controller {
             $changesRecord['isPending'] = 1;
             $this->dashboard_model->saveEventChangeRecord($changesRecord);
 
+            $mailVerify = $changesMade;
+            $mailVerify['eventId'] = $eventId;
+            $commPlace = $eventOldInfo['eventPlace'];
+            $mailVerify['oldEventName'] = $eventOldInfo['eventName'];
+            $mailVerify['orgName'] = $eventOldInfo['creatorName'];
+            $mailVerify['orgEmail'] = $eventOldInfo['creatorEmail'];
+
+            $this->sendemail_library->eventEditToOrganiserMail($mailVerify,$commPlace);
+
             $externalAPIData = $this->dashboard_model->getFullEventInfoById($eventId);
             $externalAPIData = $externalAPIData[0];
             // Editing the event at meetup
@@ -1443,6 +1477,15 @@ class Dashboard extends MY_Controller {
             $events['fromPass'] = $post['fromPass'];
         }
         $this->sendemail_library->eventCancelUserMail($events);
+        //Removing Organiser offer code
+        $orgCode = $this->dashboard_model->getOrgCoupon($eventId);
+        if(isset($orgCode) && myIsArray($orgCode))
+        {
+            $details = array(
+                'ifActive'=>0
+            );
+            $this->dashboard_model->updateOfferCode($details,$orgCode['id']);
+        }
         if($events[0]['costType'] != EVENT_FREE && $events[0]['eventPrice'] != '0' && isset($eventId))
         {
             $this->dashboard_model->cancelEventOffers($eventId);
@@ -1927,10 +1970,10 @@ class Dashboard extends MY_Controller {
 
         //Checking if event is editted and came for review
         $editRecord = $this->dashboard_model->getEditRecord($eventId);
-        $eventStatus = 'Approved';
+        $eventStatus = 'approved';
         if(isset($editRecord) && myIsArray($editRecord))
         {
-            $eventStatus = 'Reviewed';
+            $eventStatus = 'reviewed';
             $upDetail = array(
                 'isPending' => 1
             );
@@ -2100,6 +2143,11 @@ class Dashboard extends MY_Controller {
         if(isset($eventHighRecord) && myIsArray($eventHighRecord))
         {
             $externalAPIData['highId'] = $eventHighRecord['highId'];
+        }
+        $comCheck = $this->dashboard_model->commEventCheck($externalAPIData['creatorEmail']);
+        if(isset($comCheck) && myIsArray($comCheck))
+        {
+            $externalAPIData['creatorPhone'] = DEFAULT_EVENTS_NUMBER;
         }
         $data['apiData'] = $externalAPIData;
         echo json_encode($data);
@@ -2376,6 +2424,7 @@ class Dashboard extends MY_Controller {
             $data['status'] = true;
             $data['joinData'] = $this->dashboard_model->getDoolallyJoinersInfo($eventId);
             $data['EHData'] = $this->dashboard_model->getEhJoinersInfo($eventId);
+            $data['reminderData'] = $this->dashboard_model->getReminderList($eventId);
         }
 
         echo json_encode($data);

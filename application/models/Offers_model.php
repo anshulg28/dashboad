@@ -121,7 +121,7 @@ class Offers_Model extends CI_Model
 
     public function checkOfferCode($offerCode)
     {
-        $query = "SELECT offerType, isRedeemed, validFromDate"
+        $query = "SELECT offerType, offerEvent, isRedeemed, validFromDate, validFromTime, expiryDateTime"
                 ." FROM offersmaster "
                 ."WHERE ifActive = 1 AND offerCode = ".$offerCode;
 
@@ -139,6 +139,25 @@ class Offers_Model extends CI_Model
 
         return $data;
     }
+
+    function getCouponBeerUsed($offerCode)
+    {
+        $query = "SELECT * FROM couponusemaster WHERE itemType LIKE 'Beer' offerCode = ".$offerCode;
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+
+    function getCouponBreakfastUsed($offerCode)
+    {
+        $query = "SELECT * FROM couponusemaster WHERE itemType LIKE 'Breakfast' offerCode = ".$offerCode;
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+
 
     public function checkOldOfferCode($offerCode)
     {

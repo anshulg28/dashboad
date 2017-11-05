@@ -337,7 +337,6 @@ class Offers extends MY_Controller {
         }
         $data = array();
         $offerStatus = $this->offers_model->checkOfferCode($offerCode);
-
         if($offerStatus['status'] === false)
         {
             $data['status'] = false;
@@ -353,6 +352,26 @@ class Offers extends MY_Controller {
             elseif($toRedeem == '1')
             {
                 $offerData = array();
+                if(isset($offerStatus['codeCheck']['offerLoc']))
+                {
+                    if(isset($this->currentLocation) || isSessionVariableSet($this->currentLocation) === true)
+                    {
+                        if($this->currentLocation != $offerStatus['codeCheck']['offerLoc'])
+                        {
+                            $data['status'] = false;
+                            $data['errorMsg'] = 'Coupon Can\'t be redeemed at this location!';
+                            echo json_encode($data);
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Location error!';
+                        echo json_encode($data);
+                        return false;
+                    }
+                }
                 $offerData['offerCode'] = $offerCode;
                 if(isset($this->currentLocation) || isSessionVariableSet($this->currentLocation) === true)
                 {
@@ -361,7 +380,6 @@ class Offers extends MY_Controller {
                 $offerData['isRedeemed'] = 1;
                 $offerData['useDateTime'] = date('Y-m-d H:i:s');
                 $offerTimes = $this->config->item('offerTimes');
-
                 foreach($offerTimes as $key)
                 {
                     $keySplit = explode('-',$key);
@@ -378,18 +396,140 @@ class Offers extends MY_Controller {
                 $offerData['dayOfferUsed'] = date('D');
                 $this->offers_model->setOfferUsed($offerData);
                 $data['status'] = true;
-                $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                if($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'3000') !== false)
+                {
+                    $data['offerType'] = 'Valid for food & beer (3000)';
+                }
+                elseif($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'2000') !== false)
+                {
+                    $data['offerType'] = 'Valid for food (2000)';
+                }
+                else
+                {
+                    $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                }
             }
             else
             {
-                if(isset($offerStatus['codeCheck']['validFromDate']))
+                if(isset($offerStatus['codeCheck']['expiryDateTime']))
+                {
+                    $currDT = date('Y-m-d H:i:s');
+                    //$d = date_create($offerStatus['codeCheck']['expiryDateTime']);
+                    if(strtotime($currDT) > strtotime($offerStatus['codeCheck']['expiryDateTime']))
+                    {
+                        $data['status'] = false;
+                        $data['errorMsg'] = 'Coupon has expired!';
+                    }
+                    else
+                    {
+                        if(isset($offerStatus['codeCheck']['validFromDate']))
+                        {
+                            $toDay = date('Y-m-d');
+                            $d = date_create($offerStatus['codeCheck']['validFromDate']);
+                            if(strtotime($toDay) >= strtotime($offerStatus['codeCheck']['validFromDate']))
+                            {
+                                if(isset($offerStatus['codeCheck']['validFromTime']))
+                                {
+                                    $timeCheck = date('Y-m-d H:i');
+                                    if(strtotime($timeCheck) >= strtotime($offerStatus['codeCheck']['validFromDate'].' '.$offerStatus['codeCheck']['validFromTime']))
+                                    {
+                                        $data['status'] = true;
+                                        if($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'3000') !== false)
+                                        {
+                                            $data['offerType'] = 'food & beer (3000)';
+                                        }
+                                        elseif($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'2000') !== false)
+                                        {
+                                            $data['offerType'] = 'food (2000)';
+                                        }
+                                        else
+                                        {
+                                            $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                                        }
+                                    }
+                                    else
+                                    {
+                                        $data['status'] = false;
+                                        $data['errorMsg'] = 'This code isn\'t active yet.';
+                                    }
+                                }
+                                else
+                                {
+                                    $data['status'] = true;
+                                    if($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'3000') !== false)
+                                    {
+                                        $data['offerType'] = 'food & beer (3000)';
+                                    }
+                                    elseif($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'2000') !== false)
+                                    {
+                                        $data['offerType'] = 'food (2000)';
+                                    }
+                                    else
+                                    {
+                                        $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                $data['status'] = false;
+                                $data['errorMsg'] = 'This code isn\'t active yet. Will be active on '.date_format($d,DATE_MAIL_FORMAT_UI);
+                            }
+                        }
+                        else
+                        {
+                            $data['status'] = true;
+                            $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                        }
+                    }
+                }
+                elseif(isset($offerStatus['codeCheck']['validFromDate']))
                 {
                     $toDay = date('Y-m-d');
                     $d = date_create($offerStatus['codeCheck']['validFromDate']);
                     if(strtotime($toDay) >= strtotime($offerStatus['codeCheck']['validFromDate']))
                     {
-                        $data['status'] = true;
-                        $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                        if(isset($offerStatus['codeCheck']['validFromTime']))
+                        {
+                            $timeCheck = date('Y-m-d H:i');
+                            if(strtotime($timeCheck) >= strtotime($offerStatus['codeCheck']['validFromDate'].' '.$offerStatus['codeCheck']['validFromTime']))
+                            {
+                                $data['status'] = true;
+                                if($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'3000') !== false)
+                                {
+                                    $data['offerType'] = 'food & beer (3000)';
+                                }
+                                elseif($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'2000') !== false)
+                                {
+                                    $data['offerType'] = 'food (2000)';
+                                }
+                                else
+                                {
+                                    $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                                }
+                            }
+                            else
+                            {
+                                $data['status'] = false;
+                                $data['errorMsg'] = 'This code isn\'t active yet.';
+                            }
+                        }
+                        else
+                        {
+                            $data['status'] = true;
+                            if($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'3000') !== false)
+                            {
+                                $data['offerType'] = 'food & beer (3000)';
+                            }
+                            elseif($offerStatus['codeCheck']['offerEvent'] == '536' && stripos($offerStatus['codeCheck']['offerType'],'2000') !== false)
+                            {
+                                $data['offerType'] = 'food (2000)';
+                            }
+                            else
+                            {
+                                $data['offerType'] = $offerStatus['codeCheck']['offerType'];
+                            }
+                        }
                     }
                     else
                     {
@@ -403,9 +543,19 @@ class Offers extends MY_Controller {
                     $data['offerType'] = $offerStatus['codeCheck']['offerType'];
                 }
 
+                //Check for breakfast
+                /*if($data['status'] === true)
+                {
+                    $beerCount = $this->offers_model->getCouponBeerUsed($offerCode);
+                    $breakCount = $this->offers_model->getCouponBreakfastUsed($offerCode);
+
+                    if(myIsArray($beerCount))
+                    {
+
+                    }
+                }*/
             }
         }
-
         echo json_encode($data);
     }
 

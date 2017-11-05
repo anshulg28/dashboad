@@ -268,4 +268,10 @@ class curl_library
         );
         return $this->getJSONDataByPost($url,$details,0,$headers);
     }
+
+    public function sendNewOTPSMS($params)
+    {
+        $url = 'http://api.msg91.com/api/sendhttp.php?'.http_build_query($params);
+        return $this->getDataByGet($url, 0);
+    }
 }

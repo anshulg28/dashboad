@@ -282,4 +282,11 @@ class Cron_Model extends CI_Model
 
         return $data;
     }
+
+    function getPostJobs()
+    {
+        $query = "SELECT * FROM complaintlogmaster WHERE status = ".LOG_STATUS_POSTPONE;
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
 }
