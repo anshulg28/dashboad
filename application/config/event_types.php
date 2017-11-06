@@ -111,6 +111,7 @@ $config['defaultRoles'] = array(
         'wallet_users',
         'twitter_page',
         'maintenance',
+        'maintenance_complaint',
         'maintenance_logview',
         'maintenance_workarea',
         'maintenance_worktype',
@@ -136,6 +137,7 @@ $config['defaultRoles'] = array(
         'wallet_check',
         'wallet_users',
         'maintenance',
+        'maintenance_complaint',
         'maintenance_logview',
         'maintenance_workarea',
         'maintenance_worktype',
@@ -163,8 +165,7 @@ $config['defaultRoles'] = array(
         'offers_check',
         'checkins',
         'wallet_check',
-        'maintenance',
-        'maintenance_complaint'
+        'maintenance'
     ),
     WALLET_USER => array(
         'wallet_check',
@@ -176,23 +177,30 @@ $config['defaultRoles'] = array(
     ),
     MAINTENANCE_MANAGER => array(
         'maintenance',
+        'maintenance_complaint',
+        'maintenance_logview'
+    ),
+    MAINTENANCE_APPROVER1 => array(
+        'maintenance',
+        'maintenance_complaint',
         'maintenance_logview',
         'maintenance_workarea',
         'maintenance_worktype',
         'maintenance_useradd'
     ),
-    MAINTENANCE_APPROVER1 => array(
+    MAINTENANCE_APPROVER2 => array(
         'maintenance',
+        'maintenance_complaint',
         'maintenance_logview'
     ),
-    MAINTENANCE_APPROVER2 => array(
+    FINANCE_APPROVER => array(
         'maintenance',
         'maintenance_logview'
     )
 
 );
 $config['payTypes'] = array(
-    'Happy Cash',
+    'Happay Cash',
     'Cash',
     'NEFT/RTGS',
     'Maintenance Balance'
