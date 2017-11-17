@@ -948,7 +948,7 @@ class Mailers extends MY_Controller {
             foreach($mails as $key => $row)
             {
                 $attachment = explode(',',$row['attachments']);
-                $mailStatus = $this->sendemail_library->sendEmail($row['sendTo'],$row['ccList'],$row['sendFrom'],
+                $mailStatus = $this->sendemail_library->sendEmail($row['sendTo'],$row['ccList'],DEFAULT_SENDER_EMAIL,
                     DEFAULT_SENDER_PASS,$row['sendFromName'],$row['replyTo'],$row['mailSubject'],
                     $row['mailBody'],$attachment);
                 if($mailStatus == 'Success')

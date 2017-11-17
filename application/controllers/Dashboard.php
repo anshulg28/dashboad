@@ -1546,16 +1546,22 @@ class Dashboard extends MY_Controller {
                                 }
                             }
 
-                            $actualRefundAmt = ((int)$events[0]['eventPrice'] * (int)$row['quantity']);
+                            $priceToUse = (int)$events[0]['eventPrice'];
+                            if(isset($row['regPrice']))
+                            {
+                                $priceToUse = $row['regPrice'];
+                            }
+
+                            $actualRefundAmt = ((int)$priceToUse * (int)$row['quantity']);
                             if($row['isDirectlyRegistered'] == '1') //Doolally signup
                             {
-                                $totalPrice = ((int)$events[0]['eventPrice'] * (int)$row['quantity']);
+                                $totalPrice = ((int)$priceToUse * (int)$row['quantity']);
                                 $commision = 0; // ($totalPrice * DOOLALLY_GATEWAY_CHARGE) / 100;
                                 $actualRefundAmt = (($totalPrice - $commision) - $couponAmt);
                             }
                             else // EventsHigh Signup
                             {
-                                $totalPrice = ((int)$events[0]['eventPrice'] * (int)$row['quantity']);
+                                $totalPrice = ((int)$priceToUse * (int)$row['quantity']);
                                 $commision = 0; // ($totalPrice * EH_GATEWAY_CHARGE) / 100;
                                 $actualRefundAmt = (($totalPrice - $commision) - $couponAmt);
                             }
@@ -2259,17 +2265,25 @@ class Dashboard extends MY_Controller {
         }
         else
         {
-            $postData = array(
-                'highId' => $post['id'],
-                'eventId' => $eventId,
-                'highStatus' => 1,
-                'highError' => null,
-                'insertedDT' => date('Y-m-d H:i:s')
-            );
-            $details = array(
-                'eventPaymentLink' => 'https://ticketing.eventshigh.com/ticketModal.jsp?eid='.$post['id'].'&src=fbTicketWidget&theme=jet-black&bg0=1'
-            );
-            $this->dashboard_model->updateEventRecord($details, $eventId);
+            if(isset($post['id']) && $post['id'] != '')
+            {
+                $extraMsg = '';
+                if(isset($post['extraMsg']))
+                {
+                    $extraMsg = $post['extraMsg'];
+                }
+                $postData = array(
+                    'highId' => $post['id'],
+                    'eventId' => $eventId,
+                    'highStatus' => 1,
+                    'highError' => $extraMsg,
+                    'insertedDT' => date('Y-m-d H:i:s')
+                );
+                $details = array(
+                    'eventPaymentLink' => 'https://ticketing.eventshigh.com/ticketModal.jsp?eid='.$post['id'].'&src=fbTicketWidget&theme=jet-black&bg0=1'
+                );
+                $this->dashboard_model->updateEventRecord($details, $eventId);
+            }
         }
         $this->dashboard_model->saveEventHigh($postData);
         $data['status'] = true;
@@ -2424,6 +2438,7 @@ class Dashboard extends MY_Controller {
             $data['status'] = true;
             $data['joinData'] = $this->dashboard_model->getDoolallyJoinersInfo($eventId);
             $data['EHData'] = $this->dashboard_model->getEhJoinersInfo($eventId);
+            $data['canData'] = $this->dashboard_model->getCancelList($eventId);
             $data['reminderData'] = $this->dashboard_model->getReminderList($eventId);
         }
 
@@ -3002,5 +3017,63 @@ class Dashboard extends MY_Controller {
         $data['status'] = true;
 
         echo  json_encode($data);
+    }
+    public function checkmp3($videoId)
+    {
+        $curl = curl_init();
+
+        $post = array(
+            'type'=>'mp3',
+            'end'=>'',
+            'begin'=>'',
+            'bitrate'=>'320',
+            'id'=>$videoId
+        );
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://www.ytbmp3.com/i/download",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => json_encode($post),
+            CURLOPT_HTTPHEADER => array(
+                "accept: application/json, text/plain, */*",
+                "accept-encoding: gzip, deflate, br",
+                "accept-language: en-US,en;q=0.9",
+                "authority: www.ytbmp3.com",
+                "cache-control: no-cache",
+                "content-type: application/json",
+                "cookie: secid=AXFYYWW34VSDKVGXYSYN5SCHEQ; _ga=GA1.2.1583980896.1510408278; _gid=GA1.2.151150225.1510408278",
+                "origin: https://www.ytbmp3.com",
+                "postman-token: a56dc69a-c087-7391-d90d-1ddfeb7ad92b",
+                "referer: https://www.ytbmp3.com/search?q=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DA6TGxnMji_Q",
+                "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36",
+                "x-secid: AXFYYWW34VSDKVGXYSYN5SCHEQ"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            echo "error";
+        } else {
+            echo $response;
+        }
+    }
+
+    public function tryCatchTry()
+    {
+        $details = array(
+            'id' => 564,
+            'errorTxt' => 'abc',
+            'refUrl' => 'https://dtest.doolally.in'
+        );
+        $this->dashboard_model->saveErrorLog($details);
+        echo 'error: '. var_dump($this->db->error());
     }
 }

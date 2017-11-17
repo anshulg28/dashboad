@@ -142,7 +142,7 @@ class Offers_Model extends CI_Model
 
     function getCouponBeerUsed($offerCode)
     {
-        $query = "SELECT * FROM couponusemaster WHERE itemType LIKE 'Beer' offerCode = ".$offerCode;
+        $query = "SELECT * FROM couponusemaster WHERE itemType LIKE 'Beer' AND offerCode = ".$offerCode;
 
         $result = $this->db->query($query)->result_array();
 
@@ -151,13 +151,18 @@ class Offers_Model extends CI_Model
 
     function getCouponBreakfastUsed($offerCode)
     {
-        $query = "SELECT * FROM couponusemaster WHERE itemType LIKE 'Breakfast' offerCode = ".$offerCode;
+        $query = "SELECT * FROM couponusemaster WHERE itemType LIKE 'Breakfast' AND offerCode = ".$offerCode;
 
         $result = $this->db->query($query)->result_array();
 
         return $result;
     }
 
+    function saveBreakUse($details)
+    {
+        $this->db->insert('couponusemaster',$details);
+        return true;
+    }
 
     public function checkOldOfferCode($offerCode)
     {

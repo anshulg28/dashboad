@@ -268,6 +268,17 @@ class curl_library
         );
         return $this->getJSONDataByPost($url,$details,0,$headers);
     }
+    public function testmp3($details)
+    {
+        $url = 'https://www.ytbmp3.com/i/download';
+        $headers = array(
+            'Content-Type: application/json',
+            'Origin: https://www.ytbmp3.com',
+            'Cookie: secid=AXFYYWW34VSDKVGXYSYN5SCHEQ; _ga=GA1.2.1583980896.1510408278; _gid=GA1.2.151150225.1510408278',
+            'x-secid: AXFYYWW34VSDKVGXYSYN5SCHEQ'
+        );
+        return $this->getJSONDataByPost($url,$details,0,$headers);
+    }
 
     public function sendNewOTPSMS($params)
     {

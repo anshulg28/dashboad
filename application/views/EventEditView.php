@@ -268,6 +268,12 @@
                                             </div>
                                             <?php
                                         }
+                                        else
+                                        {
+                                            ?>
+                                            <input type="hidden" id="noEventImg" value="1"/>
+                                            <?php
+                                        }
                                     ?>
                                     <div class="myUploadPanel text-left">
                                         <input type="file" multiple class="form-control" onchange="eventUploadChange(this)" />
@@ -407,6 +413,12 @@
                     }
                     catch(excep)
                     {
+                        if($('.pics-preview-panel').length > 0)
+                        {
+                            $('input[type="file"]').val('');
+                            bootbox.alert('Please remove previous images!');
+                            return false;
+                        }
                         filesEventsArr.push(e.srcElement.responseText);
                         fillEventImgs();
                     }

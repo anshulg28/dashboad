@@ -196,7 +196,9 @@ class Cron extends MY_Controller
         $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolallyandheri',$params);
         $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolallybandra',$params);
         //kemps
-        $fbFeeds[] = $this->curl_library->getFacebookPosts('1741740822733140',$params);
+        $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolallykemps', $params);
+        $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolallyColaba', $params);
+        $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolallykhar', $params);
         $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolally',$params);
 
         if(isset($fbFeeds) && myIsMultiArray($fbFeeds) && isset($fbFeeds[0]['data']))
@@ -745,6 +747,32 @@ class Cron extends MY_Controller
             $tempFeeds = $this->cron_model->getTempFeedView();
             if(isset($tempFeeds) && myIsArray($tempFeeds))
             {
+                //sorting again
+                /*$combinedFeeds = array();
+                foreach($tempFeeds as $tempKey => $tempRow)
+                {
+                    $subKey = json_encode($tempRow['feedText']);
+                    $combinedFeeds[] = json_decode($subKey,TRUE);
+                }*/
+                usort($tempFeeds,
+                    function($a, $b) {
+                        $aNew = $a['feedText'];
+                        $bNew = $b['feedText'];
+                        if(gettype($a['feedText']) == 'string')
+                        {
+                            $aNew = json_decode($a['feedText'],TRUE);
+                        }
+                        if(gettype($b['feedText']) == 'string')
+                        {
+                            $bNew = json_decode($b['feedText'],TRUE);
+                        }
+                        $ts_a = strtotime($aNew['created_at']);
+                        $ts_b = strtotime($bNew['created_at']);
+
+                        return $ts_a > $ts_b;
+                    }
+                );
+
                 if(count($tempFeeds) > 150)
                 {
                     //Dividing the temp view feeds
@@ -1439,6 +1467,32 @@ class Cron extends MY_Controller
             $content .= '</p></body></html>';
             $this->sendemail_library->sendEmail(array('mandar@brewcraftsindia.com','taronish@brewcraftsindia.com'),'saha@brewcraftsindia.com,anshul@brewcraftsindia.com','admin@brewcraftsindia.com','ngks2009','Doolally'
                 ,'admin@brewcraftsindia.com',$subject,$content,array());
+        }
+    }
+    public function sendTestSms()
+    {
+        $otpCount = $this->cron_model->getOtpCount();
+
+        $newOtp = (int)$otpCount['id']+1;
+        $details = array(
+            'id' => $newOtp
+        );
+        $this->cron_model->updateOtpCount($details);
+
+        if($newOtp <= 50)
+        {
+
+            $d = date_create(date('Y-m-d H:i:s'));
+            //gene OTP
+            $details = array(
+                'sender' => 'MSGIND',
+                'route' => '4',
+                'authkey' => MSG91_KEY,
+                'country' => '91',
+                'message' => $newOtp.' is Your OTP @ '.date_format($d,'D, jS F, Y g:i a'),
+                'mobiles' => '919975027683'
+            );
+            $sms = $this->curl_library->sendNewOTPSMS($details);
         }
     }
 }

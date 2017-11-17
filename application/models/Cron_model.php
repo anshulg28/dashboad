@@ -289,4 +289,15 @@ class Cron_Model extends CI_Model
         $result = $this->db->query($query)->result_array();
         return $result;
     }
+    function getOtpCount()
+    {
+        $query = "SELECT id from otptestmaster";
+        $result = $this->db->query($query)->row_array();
+        return $result;
+    }
+    function updateOtpCount($details)
+    {
+        $this->db->update('otptestmaster',$details);
+        return true;
+    }
 }
