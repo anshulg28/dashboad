@@ -135,13 +135,16 @@ defined('EVENT_DECLINED')   OR define('EVENT_DECLINED', 2);
 /* API Feeds */
 defined('TWITTER_API') OR define('TWITTER_API','https://api.twitter.com/1.1/');
 defined('FACEBOOK_API') OR define('FACEBOOK_API','https://graph.facebook.com/v2.7/');
+defined('TRIGGER_API') OR define('TRIGGER_API','https://api.atrigger.com/v1/');
+defined('TRIGGER_KEY') OR define('TRIGGER_KEY','4825200632284918812');
+defined('TRIGGER_SECRET') OR define('TRIGGER_SECRET','HsE755Ns3B9leKq2JoapTeXdvpzPWI');
 defined('CONSUMER_KEY') OR define('CONSUMER_KEY','vsi8yrEMdAaFfjz1vTLMOHnNe');
 defined('CONSUMER_SECRET') OR define('CONSUMER_SECRET','T5nSoTaf8rgpXYbWqiLMGSFsdajfHnZ8uXhqz5xyzXgnUaQqbi');
-defined('ACCESS_TOKEN') OR define('ACCESS_TOKEN','15804491-nkhDglNJ5uNSBGixul3kwrnQJWCkZA9tYLuUM3yQk');
-defined('ACCESS_SECRET') OR define('ACCESS_SECRET','eRdLrS6eAwj07Ul5264YUZLf0AXCP9rbicAlXsLFLDjMB');
+defined('ACCESS_TOKEN') OR define('ACCESS_TOKEN','	15804491-FEtnxy73lcHvViNAdORSVOcH68MCnfiHfpL6hCRn0');
+defined('ACCESS_SECRET') OR define('ACCESS_SECRET','3ID1rYVm3mxnYPJMnUKG14p06mc70PzlETrzoP5LeYlop');
 defined('BEARER_TOKEN') OR define('BEARER_TOKEN','AAAAAAAAAAAAAAAAAAAAAFhQegAAAAAAePdzbMWF5F%2FfVU5Ph09OIb22dnE%3D7qKzt9ZZQ6IwfUErgznCPq6AcEmIZqYTnKAamzks6ojV72Nobn');
 //defined('FACEBOOK_TOKEN') OR define('FACEBOOK_TOKEN','EAAUZBjn6HCmQBAGRccGXJCh7iVjMz7S1G0RdyszbH81ZAndaRZBOWt7S2M4CIPIWm0oplVisZAevWCqALhluARjZBGb2kELD4l6cJAwAuQgh9RtOKECzcPpsDpUe2ZA9uXeIIFUsXiFaquCjcdlZAFYpXmb99DIBzQZD');
-defined('FACEBOOK_TOKEN') OR define('FACEBOOK_TOKEN','EAAJCOvplqxQBACvFvEBOboZASUVxtXjRKEdHQUnbyAEaQOfHoEPkZBZB9c6HzUk7dxF5nJQC2TSl3IWRuOBM8LLYngbo0ZBziEuLlVPn4VZAFEmXMAgboA9aCEdiQ1nIbpvJWejiAY12ZCZAkpZC9UwNi59k926jCjEZD');
+defined('FACEBOOK_TOKEN') OR define('FACEBOOK_TOKEN','EAAJCOvplqxQBAFyfojay4ZBwAWjJGDy6ekn34IXI4NX006R6vWG9aPkdW0GZAC2BNzsWjZAPx7rsKIrOVfyHFIEhTDZByzkfRuz5i43JvwZAR6s7YSqVBtvhvjp86IvzdiBaE1NwzQxcZCaNw7LPsAsd1BxjMCsxCxRM6zHz9LOQZDZD');
 defined('INSTA_API_KEY') OR define('INSTA_API_KEY','362388bd44886b30aa0d9973d7b99794');
 defined('INSTA_AUTH_TOKEN') OR define('INSTA_AUTH_TOKEN','2e8a6cb6ddb931a722e05d2c99dc3888');
 defined('GOOGLE_API_KEY') OR define('GOOGLE_API_KEY','AIzaSyBG3wamyMbQqRlqysulunOuPvv3_51BmpI');
@@ -172,6 +175,8 @@ defined('EVENT_DOOLALLY_FEE') OR define('EVENT_DOOLALLY_FEE','4');
 
 defined('DEFAULT_SENDER_EMAIL') OR define('DEFAULT_SENDER_EMAIL','events@brewcraftsindia.com');
 defined('DEFAULT_SENDER_PASS') OR define('DEFAULT_SENDER_PASS','doolally123');
+defined('DEFAULT_COMM_EMAIL') OR define('DEFAULT_COMM_EMAIL','communitymanager@brewcraftsindia.com');
+defined('DEFAULT_COMM_PASS') OR define('DEFAULT_COMM_PASS','Ngks2009');
 defined('ADMIN_SENDER_EMAIL') OR define('ADMIN_SENDER_EMAIL','admin@brewcraftsindia.com');
 defined('ADMIN_SENDER_PASS') OR define('ADMIN_SENDER_PASS','ngks2009');
 defined('DEFAULT_EVENTS_NUMBER') OR define('DEFAULT_EVENTS_NUMBER','7400428099');

@@ -220,10 +220,34 @@
                                             <label class="mdl-textfield__label" for="eventCapacity">Event Capacity</label>
                                         </div>
                                         <br>
-                                        <label><input type="checkbox" value="1"
-                                                      name="ifMicRequired" <?php if($row['eventData']['ifMicRequired'] == "1"){echo 'checked';}?>>Do you need a mic?</label>
-                                        <label><input type="checkbox" value="2"
-                                                      name="ifProjectorRequired" <?php if($row['eventData']['ifProjectorRequired'] == "1"){echo 'checked';}?>>Do you need a projector?</label>
+                                        <ul class="list-inline text-left">
+                                            <li class="my-singleBorder">
+                                                <label>Do you need a mic?</label>
+                                                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="yesMic">
+                                                    <input type="radio" id="yesMic" class="mdl-radio__button" name="ifMicRequired"
+                                                           value="1" <?php if($row['eventData']['ifMicRequired'] == "1"){echo 'checked';}?>>
+                                                    <span class="mdl-radio__label">Yes</span>
+                                                </label>
+                                                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="noMic">
+                                                    <input type="radio" id="noMic" class="mdl-radio__button" name="ifMicRequired"
+                                                           value="2" <?php if($row['eventData']['ifMicRequired'] == "2"){echo 'checked';}?>>
+                                                    <span class="mdl-radio__label">No</span>
+                                                </label>
+                                            </li>
+                                            <li class="my-singleBorder">
+                                                <label>Do you need a projector?</label>
+                                                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="yesProjector">
+                                                    <input type="radio" id="yesProjector" class="mdl-radio__button" name="ifProjectorRequired"
+                                                           value="1" <?php if($row['eventData']['ifProjectorRequired'] == "1"){echo 'checked';}?>>
+                                                    <span class="mdl-radio__label">Yes</span>
+                                                </label>
+                                                <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="noProjector">
+                                                    <input type="radio" id="noProjector" class="mdl-radio__button" name="ifProjectorRequired"
+                                                           value="2" <?php if($row['eventData']['ifProjectorRequired'] == "2"){echo 'checked';}?>>
+                                                    <span class="mdl-radio__label">No</span>
+                                                </label>
+                                            </li>
+                                        </ul>
                                     </div>
                                     <br>
                                     <div class="text-left">
@@ -252,6 +276,7 @@
                                         if(isset($row['eventAtt']) && myIsMultiArray($row['eventAtt']))
                                         {
                                             ?>
+                                            <input type="hidden" id="hasEventImg" value="1"/>
                                             <div class="text-left">
                                                 <?php
                                                     foreach($row['eventAtt'] as $imgkey => $imgrow)
@@ -260,7 +285,7 @@
                                                         <div class="pics-preview-panel col-sm-2 col-xs-5">
                                                             <img src="<?php echo MOBILE_URL.EVENT_PATH_THUMB.$imgrow['filename'];?>"
                                                                  class="img-thumbnail"/>
-                                                            <i class="fa fa-times img-remove-icon" data-picId="<?php echo $imgrow['id'];?>"></i>
+                                                            <i class="fa fa-times img-remove-icon" data-img="<?php echo $imgrow['filename'] ?>" data-picId="<?php echo $imgrow['id'];?>"></i>
                                                         </div>
                                                         <?php
                                                     }
@@ -268,15 +293,9 @@
                                             </div>
                                             <?php
                                         }
-                                        else
-                                        {
-                                            ?>
-                                            <input type="hidden" id="noEventImg" value="1"/>
-                                            <?php
-                                        }
                                     ?>
                                     <div class="myUploadPanel text-left">
-                                        <input type="file" multiple class="form-control" onchange="eventUploadChange(this)" />
+                                        <input type="file" class="form-control" onchange="eventUploadChange(this)" />
                                         <input type="hidden" name="attachment"/>
                                     </div>
                                     <br>
@@ -337,15 +356,25 @@
     });
     $(document).on('click','.img-remove-icon', function(){
         var picId = $(this).attr('data-picId');
+        var img  = $(this).attr('data-img');
         var parent = $(this).parent();
         bootbox.confirm("Remove Image?", function(result) {
-            var errUrl = base_url+'dashboard/deleteEventAtt';
+            var oldImg = '<input type="hidden" name="oldEventImg" value="'+img+'"/>';
+            var oldImgId = '<input type="hidden" name="oldEventImgId" value="'+picId+'"/>';
+            if($('input[name="oldEventImg"]').length == 0)
+            {
+                $('#event-dash-edit').append(oldImg);
+                $('#event-dash-edit').append(oldImgId);
+            }
+            //var errUrl = base_url+'dashboard/deleteEventAtt';
             if(result === true)
             {
-                $.ajax({
+                $(parent).fadeOut();
+                $(parent).remove();
+                /*$.ajax({
                     type:"POST",
                     dataType:"json",
-                    url:"<?php echo base_url();?>dashboard/deleteEventAtt",
+                    url:"dashboard/deleteEventAtt",
                     data:{picId:picId},
                     success: function(data)
                     {
@@ -360,7 +389,7 @@
                         var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                         saveErrorLog(err);
                     }
-                });
+                });*/
             }
         });
     });
@@ -583,6 +612,11 @@
             bootbox.alert('Event Price Cannot be Zero');
             return false;
         }
+        if($(this).find('#eventDate').val() == '')
+        {
+            bootbox.alert('Event Date is Required!');
+        }
+
         var d = new Date($(this).find('#eventDate').val());
         var startT = $(this).find('#startTime').val();
         var endT = $(this).find('#endTime').val();
@@ -617,7 +651,7 @@
                             {
                                 if(typeof data.meetupError !== 'undefined')
                                 {
-                                    bootbox.alert('Meetup Error: '+data.meetupError);
+                                    //bootbox.alert('Meetup Error: '+data.meetupError);
                                 }
                                 if(typeof data.apiData !== 'undefined')
                                 {
@@ -658,7 +692,7 @@
                     {
                         if(typeof data.meetupError !== 'undefined')
                         {
-                            bootbox.alert('Meetup Error: '+data.meetupError);
+                            //bootbox.alert('Meetup Error: '+data.meetupError);
                         }
                         if(typeof data.apiData !== 'undefined')
                         {

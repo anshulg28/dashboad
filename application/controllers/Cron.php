@@ -6,6 +6,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property Cron_model $cron_model
  * @property Dashboard_Model $dashboard_model
  * @property Locations_Model $locations_model
+ * @property Mugclub_Model $mugclub_model
  * @property Maintenance_Model $maintenance_model
  */
 
@@ -100,6 +101,36 @@ class Cron extends MY_Controller
     {
         $twitterFeeds = '';
         $this->twitter->tmhOAuth->reconfigure();
+        $bearer = $this->twitter->tmhOAuth->bearer_token_credentials();
+        $params = array(
+            'grant_type' => 'client_credentials',
+        );
+
+        $code = $this->twitter->tmhOAuth->request(
+            'POST',
+            $this->twitter->tmhOAuth->url('/oauth2/token', null),
+            $params,
+            false,
+            false,
+            array(
+                'Authorization' => "Basic ${bearer}"
+            )
+        );
+        if ($code == 200)
+        {
+            $data = json_decode($this->twitter->tmhOAuth->response['response']);
+            if (isset($data->token_type) && strcasecmp($data->token_type, 'bearer') === 0)
+            {
+                $new_bearer = $data->access_token;
+            }
+        }
+        else
+        {
+            echo $code;
+        }
+        $this->twitter->tmhOAuth->reconfigure(array(
+            'bearer' => $new_bearer
+        ));
         $oldparmas = array(
             'count' => '20',
             'exclude_replies' => 'true',
@@ -113,14 +144,25 @@ class Cron extends MY_Controller
             'lang' => 'en',
             'result_type' => 'recent'
         );
+        $rsp = $this->twitter->tmhOAuth->apponly_request(array(
+            'method'=> 'GET',
+            'url' => $this->twitter->tmhOAuth->url('1.1/search/tweets'),
+            'params' => $parmas
+        ));
+
         //$responseCode = $this->twitter->tmhOAuth->request('GET','https://api.twitter.com/1.1/statuses/user_timeline.json',$parmas);
-        $responseCode = $this->twitter->tmhOAuth->request('GET','https://api.twitter.com/1.1/search/tweets.json',$parmas);
-        if($responseCode == 200)
+        //$responseCode = $this->twitter->tmhOAuth->request('GET','https://api.twitter.com/1.1/search/tweets.json',$parmas);
+        if($rsp == 200)
         {
             $twitterFeeds = $this->twitter->tmhOAuth->response['response'];
-            $oldresponseCode = $this->twitter->tmhOAuth->request('GET','https://api.twitter.com/1.1/statuses/user_timeline.json',$oldparmas);
+            $oldrsp = $this->twitter->tmhOAuth->apponly_request(array(
+                'method'=> 'GET',
+                'url' => $this->twitter->tmhOAuth->url('1.1/statuses/user_timeline.json'),
+                'params' => $oldparmas
+            ));
+            //$oldresponseCode = $this->twitter->tmhOAuth->request('GET','https://api.twitter.com/1.1/statuses/user_timeline.json',$oldparmas);
 
-            if($oldresponseCode == 200)
+            if($oldrsp == 200)
             {
                 $oldTwitterFeeds = $this->twitter->tmhOAuth->response['response'];
                 $oldTwitterFeeds = json_decode($oldTwitterFeeds,true);
@@ -191,7 +233,7 @@ class Cron extends MY_Controller
         $params = array(
             'access_token' => FACEBOOK_TOKEN,
             'limit' => '15',
-            'fields' => 'message,permalink_url,id,from,name,picture,source,updated_time'
+            'fields' => 'message,permalink_url,id,from,name,full_picture,source,updated_time'
         );
         $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolallyandheri',$params);
         $fbFeeds[] = $this->curl_library->getFacebookPosts('godoolallybandra',$params);
@@ -643,21 +685,24 @@ class Cron extends MY_Controller
         $newMainFeeds = array();
         $foundId = false;
 
+        //echo '<pre>';
+
         foreach($allFeeds as $key => $row)
         {
             switch($row['socialType'])
             {
                 case 'f':
+                    //var_dump('Fb: '.$row['id']);
                     if(!myInArray($row['id'],$viewIds))
                     {
-                        if(isset($row['picture']))
+                        if(isset($row['full_picture']))
                         {
-                            preg_match('/(=http:|=https:|http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['picture']),$matches);
+                            preg_match('/(=http:|=https:|http:|https:)\/\/.+?(\.jpg|\.png|\.gif|\.jpeg)/',urldecode($row['full_picture']),$matches);
                             if(myIsArray($matches))
                             {
                                 $fileArray = explode('/',$matches[0]);
                                 $fileName= $fileArray[count($fileArray)-1];
-                                if(copy($row['picture'],'../mobile/socialimages/facebook/'.$fileName))
+                                if(copy($row['full_picture'],'../mobile/socialimages/facebook/'.$fileName))
                                 {
                                     $row['picture'] = MOBILE_URL.'socialimages/facebook/'.$fileName;
                                 }
@@ -676,6 +721,7 @@ class Cron extends MY_Controller
                     }
                     break;
                 case 'i':
+                    //var_dump('insta: '.$row['id']);
                     if(!myInArray($row['id'],$viewIds))
                     {
                         if(isset($row['image']))
@@ -704,6 +750,7 @@ class Cron extends MY_Controller
                     }
                     break;
                 case 't':
+                    //var_dump('tweet: '.$row['id_str']);
                     if(!myInArray($row['id_str'],$viewIds))
                     {
                         if(isset($row['extended_entities']['media'][0]['media_url_https']))
@@ -738,6 +785,7 @@ class Cron extends MY_Controller
             }
         }
 
+        //die();
         if(myIsArray($newFeeds))
         {
             //Firstly append all new feeds to temp view table
@@ -1437,21 +1485,39 @@ class Cron extends MY_Controller
 
         //If more than 48 hours
         $openJobs = $this->maintenance_model->getOnlyOpenJobs();
-        if(isset($openJobs) && myIsArray($openJobs))
+        if(isset($openJobs) && myIsArray($openJobs) && isset($openJobs[0]['complaintId']) && $openJobs[0]['complaintId'] != '')
         {
+            $subject = "Jobs Pending Action";
+            $content = '<html><body><br><table border="2"><tr><th>Job #</th><th>Problem</th><th>logged By</th><th>logged date/time</th></tr><tbody>';
+            $goneIn = false;
             foreach($openJobs as $key => $row)
             {
-                $oldTime = strtotime($row['lastUpdateDT']) + (2 * 24 * 60 * 60);
-                if($oldTime <= strtotime(date('Y-m-d H:i:s')))
+                if(isset($row['complaintId']) && isStringSet($row['complaintId']))
                 {
-                    $subject = 'Job #'.$row['complaintId'].'-'.$row['locName'].' Pending Action';
-                    $content = '<html><body><p>No Update on Job #'.$row['complaintId'].'-'.$row['locName'].' has 
-                        been performed since 48 hours.</p></body></html>';
-
-                    $this->sendemail_library->sendEmail(array('mandar@brewcraftsindia.com','taronish@brewcraftsindia.com'),'saha@brewcraftsindia.com,anshul@brewcraftsindia.com','admin@brewcraftsindia.com','ngks2009','Doolally'
-                        ,'admin@brewcraftsindia.com',$subject,$content,array());
+                    $oldTime = strtotime($row['lastUpdateDT']) + (2 * 24 * 60 * 60);
+                    if($oldTime <= strtotime(date('Y-m-d H:i:s')))
+                    {
+                        $goneIn = true;
+                        $content .= '<tr>';
+                        $content .= '<td>Job #'.$row['complaintId'].'-'.$row['locName'].'</td>';
+                        $content .= '<td>'.$row['problemDescription'].'</td>';
+                        $content .= '<td>'.$row['loggedUser'].'</td>';
+                        $d = date_create($row['loggedDT']);
+                        $content .= '<td>'.date_format($d,DATE_TIME_FORMAT_UI).'</td>';
+                        $content .= '</tr>';
+                    }
                 }
             }
+            if(!$goneIn)
+            {
+                $content = 'No Jobs Pending';
+            }
+            else
+            {
+                $content .= '</tbody></table>';
+            }
+            $this->sendemail_library->sendEmail(array('mandar@brewcraftsindia.com','taronish@brewcraftsindia.com','anil.jadhav@brewcraftsindia.com'),'saha@brewcraftsindia.com,anshul@brewcraftsindia.com','admin@brewcraftsindia.com','ngks2009','Doolally'
+                ,'admin@brewcraftsindia.com',$subject,$content,array());
         }
 
         //Closed Jobs
@@ -1481,18 +1547,15 @@ class Cron extends MY_Controller
 
         if($newOtp <= 50)
         {
-
+            $numbers = array('919975027683');
             $d = date_create(date('Y-m-d H:i:s'));
-            //gene OTP
-            $details = array(
-                'sender' => 'MSGIND',
-                'route' => '4',
-                'authkey' => MSG91_KEY,
-                'country' => '91',
-                'message' => $newOtp.' is Your OTP @ '.date_format($d,'D, jS F, Y g:i a'),
-                'mobiles' => '919975027683'
+            $postDetails = array(
+                'apiKey' => TEXTLOCAL_API,
+                'numbers' => implode(',', $numbers),
+                'sender'=> urlencode('DOLALY'),
+                'message' => rawurlencode($newOtp.' is Your OTP @ '.date_format($d,'D, jS F g:i a'))
             );
-            $sms = $this->curl_library->sendNewOTPSMS($details);
+            $smsStatus = $this->curl_library->sendCouponSMS($postDetails);
         }
     }
 }

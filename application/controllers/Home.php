@@ -30,12 +30,13 @@ class Home extends MY_Controller {
             }
         }*/
 
+
 		$data = array();
-        if(isSessionVariableSet($this->userId))
+
+		if(isSessionVariableSet($this->userId))
         {
             $rols = $this->login_model->getUserRoles($this->userId);
             $data['userModules'] = explode(',',$rols['modulesAssigned']);
-
         }
 		$data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
 		$data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);

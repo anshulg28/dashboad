@@ -285,4 +285,10 @@ class curl_library
         $url = 'http://api.msg91.com/api/sendhttp.php?'.http_build_query($params);
         return $this->getDataByGet($url, 0);
     }
+
+    public function setTrigger($params)
+    {
+        $url = TRIGGER_API.'tasks/create?'.http_build_query($params);
+        return $this->getDataByGet($url, 0);
+    }
 }

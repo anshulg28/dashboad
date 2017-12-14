@@ -75,9 +75,26 @@
                 echo "You Don't have Permission To Access This Page!";
             }
         ?>
-
+        <button id="triggerJob" class="btn btn-primary">Trigger</button>
     </main>
 </body>
 <?php echo $globalJs; ?>
-
+<script>
+    $(document).on('click','#triggerJob',function(){
+        showCustomLoader();
+        $.ajax({
+            type:'GET',
+            url: base_url+'offers/setTrigger',
+            dataType:'json',
+            success: function(data){
+                hideCustomLoader();
+                bootbox.alert('done');
+            },
+            error: function(){
+                hideCustomLoader();
+                bootbox.alert('error');
+            }
+        });
+    });
+</script>
 </html>

@@ -670,7 +670,7 @@ class Dashboard_Model extends CI_Model
     }
     public function getEhJoinersInfo($eventId)
     {
-        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.quantity, erm.createdDT
+        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.quantity, erm.regPrice, erm.createdDT
                   FROM eventregistermaster erm
                   LEFT JOIN doolally_usersmaster um ON um.userId = erm.bookerUserId
                   WHERE erm.isUserCancel != 1 AND erm.isDirectlyRegistered = 0 AND erm.eventId = $eventId ORDER BY erm.createdDT DESC";
@@ -681,7 +681,7 @@ class Dashboard_Model extends CI_Model
     }
     function getCancelList($eventId)
     {
-        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.quantity, erm.createdDT,erm.isDirectlyRegistered
+        $query = "SELECT um.firstName, um.lastName, um.emailId, um.mobNum, erm.paymentId, erm.regPrice, erm.quantity, erm.createdDT,erm.isDirectlyRegistered
                   FROM eventregistermaster erm
                   LEFT JOIN doolally_usersmaster um ON um.userId = erm.bookerUserId
                   WHERE erm.isUserCancel = 1 AND erm.eventId = $eventId ORDER BY erm.createdDT DESC";
@@ -854,7 +854,7 @@ class Dashboard_Model extends CI_Model
     }
     public function getEventAttById($id)
     {
-        $query = "SELECT id, filename
+        $query = "SELECT id, filename,lowResImage
                   FROM eventattachment WHERE eventId = ".$id;
 
         $result = $this->db->query($query)->result_array();
@@ -1430,7 +1430,7 @@ class Dashboard_Model extends CI_Model
     }
     public function updateEditRecord($details,$id)
     {
-        $this->db->where('id', $id);
+        $this->db->where('eventId', $id);
         $this->db->update('eventchangesmaster', $details);
         return true;
     }
@@ -1507,7 +1507,7 @@ class Dashboard_Model extends CI_Model
     {
         $query = "SELECT * FROM offersmaster WHERE offerType != 'Workshop' AND isOrganiser = 1 AND offerEvent = ".$eventId;
         $result = $this->db->query($query)->row_array();
-        
+
         return $result;
     }
     function updateOfferCode($details,$offerId)

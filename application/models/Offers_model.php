@@ -67,7 +67,7 @@ class Offers_Model extends CI_Model
 
     public function getOfferCodes()
     {
-        $query = "SELECT o.id, offerCode, offerType, isRedeemed, createDateTime, useDateTime ,l.locName"
+        $query = "SELECT o.id, offerCode, offerEvent, offerType, isRedeemed, createDateTime, useDateTime ,l.locName"
                 ." FROM offersmaster o "
                 ."LEFT JOIN locationmaster l ON l.id = offerLoc ORDER BY useDateTime DESC";
 
@@ -121,7 +121,7 @@ class Offers_Model extends CI_Model
 
     public function checkOfferCode($offerCode)
     {
-        $query = "SELECT offerType, offerEvent, isRedeemed, validFromDate, validFromTime, expiryDateTime"
+        $query = "SELECT offerType, offerEvent, isRedeemed, validFromDate,validFromTime, expiryDateTime, useDateTime, offerLoc"
                 ." FROM offersmaster "
                 ."WHERE ifActive = 1 AND offerCode = ".$offerCode;
 

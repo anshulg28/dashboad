@@ -48,28 +48,31 @@ class Dashboard extends MY_Controller {
         {
             //Check for Community manager secondary location set
 
-            $userInfo = $this->users_model->getUserDetailsById($this->userId);
+            /*$userInfo = $this->users_model->getUserDetailsById($this->userId);
             if(isset($userInfo['userData'][0]['secondaryLoc']))
             {
                 $data['secLocs'] = $userInfo['userData'][0]['secondaryLoc'];
-            }
+            }*/
             if( !isSession($this->commSecLoc) || !isSessionVariableSet($this->commSecLoc))
             {
-                if($userInfo['status'] === true && isset($userInfo['userData'][0]['secondaryLoc']))
+                redirect(base_url().'dashboard/setCommLoc');
+                /*if($userInfo['status'] === true && isset($userInfo['userData'][0]['secondaryLoc']))
                 {
                     $this->getCommLocation(base64_encode($userInfo['userData'][0]['secondaryLoc']));
                     return false;
-                }
+                }*/
             }
-            if(isSession($this->commSecLoc) && isSessionVariableSet($this->commSecLoc))
+            //$data['secLocs'] = $this->commSecLoc;
+            $allLocs = explode(',',$this->commSecLoc);
+            /*if(isSession($this->commSecLoc) && isSessionVariableSet($this->commSecLoc))
             {
-                $allLocs = explode(',',$this->commSecLoc);
-            }
-            else
+
+            }*/
+            /*else
             {
                 //Get assigned location for community manager
                 $allLocs = explode(',',$userInfo['userData'][0]['assignedLoc']);
-            }
+            }*/
 
             foreach($allLocs as $key)
             {
@@ -219,6 +222,38 @@ class Dashboard extends MY_Controller {
         $this->load->view('SecLocSelectView', $data);
     }
 
+    public function setCommLoc()
+    {
+        $refUrl = $_SERVER['HTTP_REFERER'];
+        if(isSessionVariableSet($this->isUserSession) === false)
+        {
+            redirect(base_url());
+        }
+        $data = array();
+
+        $userInfo = $this->users_model->getUserDetailsById($this->userId);
+        if($userInfo['status'] === true && isset($userInfo['userData'][0]['secondaryLoc']))
+        {
+            $data['refUrl'] = $refUrl;
+            $data['locData'] = $this->locations_model->getMultiLocs($userInfo['userData'][0]['secondaryLoc']);
+            $data['globalStyle'] = $this->dataformatinghtml_library->getGlobalStyleHtml($data);
+            $data['globalJs'] = $this->dataformatinghtml_library->getGlobalJsHtml($data);
+            $data['headerView'] = $this->dataformatinghtml_library->getHeaderHtml($data);
+
+            $this->load->view('SecLocSelectView', $data);
+        }
+        elseif($userInfo['status'] === true && isset($userInfo['userData'][0]['assignedLoc']))
+        {
+            $this->generalfunction_library->setSessionVariable("commSecLoc",$userInfo['userData'][0]['assignedLoc']);
+            redirect($refUrl);
+        }
+        else
+        {
+            echo 'Location Error Or Invalid User!';
+            die();
+        }
+    }
+
 	public function setCommLocation()
     {
         $post = $this->input->post();
@@ -229,7 +264,7 @@ class Dashboard extends MY_Controller {
 
         $this->generalfunction_library->setSessionVariable("commSecLoc",$post['currentLoc']);
 
-        redirect(base_url().'dashboard');
+        redirect($post['refUrl']);
     }
     public function getCustomStats()
     {
@@ -865,6 +900,7 @@ class Dashboard extends MY_Controller {
                 $fileName = preg_replace('/\(|\)/','',$filePath);
                 $fileName = preg_replace('/[^a-zA-Z0-9.]\.]/', '', $fileName);
                 $fileName = str_replace(' ','_',$fileName);
+                $fileName = time().'_'.$fileName;
                 $config = array();
                 $config['upload_path'] = '../mobile/uploads/events/';
                 $config['allowed_types'] = 'gif|jpg|png|jpeg';
@@ -1088,10 +1124,13 @@ class Dashboard extends MY_Controller {
             redirect(base_url());
         }
         $post = $this->input->post();
+
         $data = array();
         $isImpChange = false;
+        $oldImgId = '';
         $impChanges = array('eventName','eventDescription','eventDate','startTime','endTime','costType',
-                        'eventPrice','eventPlace');
+                        'eventPrice','eventPlace','creatorName','creatorPhone','creatorEmail','eventCapacity',
+                        'ifMicRequired','ifProjectorRequired');
         $changeCheck = array();
         $changesRecord = array();
         $changesMade = array();
@@ -1104,15 +1143,20 @@ class Dashboard extends MY_Controller {
         //Separating attachment
         if(isset($post['attachment']))
         {
-            $isImpChange = true;
-            if($eventDetails[0]['filename'] != $post['attachment'])
+            if($post['attachment'] != '')
             {
-                $changesMade['attachment'] = $eventDetails[0]['filename'].';#;'.$post['attachment'];
+                $isImpChange = true;
+                $changesMade['attachment'] = $post['oldEventImg'].';#;'.$post['attachment'];
+                $attachement = $post['attachment'];
+                $oldImgId = $post['oldEventImgId'];
+                unset($post['attachment'],$post['oldEventImg'],$post['oldEventImgId']);
             }
-            $attachement = $post['attachment'];
-            unset($post['attachment']);
+            else
+            {
+                unset($post['attachment']);
+            }
         }
-        
+
         $eventOldInfo = $eventDetails[0];
 
         //Checking for the actual change in the event details
@@ -1132,6 +1176,14 @@ class Dashboard extends MY_Controller {
                             $oldLoc = $this->locations_model->getLocationDetailsById($row);
                             $newLoc = $this->locations_model->getLocationDetailsById($post[$key]);
                             $changesMade[$key] = $oldLoc['locData'][0]['locName'].';#;'.$newLoc['locData'][0]['locName'];
+                        }
+                        elseif($key == 'ifMicRequired' || $key == 'ifProjectorRequired')
+                        {
+                            $ynPoll = array(
+                                '1' => 'Yes',
+                                '2' => 'No'
+                            );
+                            $changesMade[$key] = $ynPoll[$row].';#;'.$ynPoll[$post[$key]];
                         }
                         else
                         {
@@ -1190,6 +1242,10 @@ class Dashboard extends MY_Controller {
                         'attachmentType' => '1'
                     );
                     $this->dashboard_model->saveEventAttachment($attArr);
+                }
+                if($oldImgId != '')
+                {
+                    $this->dashboard_model->eventAttDelete($oldImgId);
                 }
             }
             $changesRecord['eventId'] = $eventId;
@@ -1395,6 +1451,10 @@ class Dashboard extends MY_Controller {
                         'attachmentType' => '1'
                     );
                     $this->dashboard_model->saveEventAttachment($attArr);
+                }
+                if($oldImgId != '')
+                {
+                    $this->dashboard_model->eventAttDelete($oldImgId);
                 }
             }
 
@@ -1983,7 +2043,7 @@ class Dashboard extends MY_Controller {
             $upDetail = array(
                 'isPending' => 1
             );
-            $this->dashboard_model->updateEditRecord($upDetail,$editRecord['id']);
+            $this->dashboard_model->updateEditRecord($upDetail,$eventId);
         }
 
         $eventDetail = $this->dashboard_model->getFullEventInfoById($eventId);
@@ -2128,6 +2188,31 @@ class Dashboard extends MY_Controller {
             }
         }
 
+        //Creating whatsapp image
+        $imgPath = '/var/www/html/mobile/'.EVENT_PATH_THUMB;
+        $lowResImg = $this->image_thumb_low_res($imgPath,$eventDetail[0]['filename']);
+
+        $low_size = (int)$this->human_filesize(filesize($imgPath.$lowResImg),0);
+        if($low_size>300)
+        {
+            $this->saveLocalErrorLog('Low res Image size is more than 300KB');
+            log_message('error','Low res Image size is more than 300KB');
+        }
+        else
+        {
+            $eveAtt = $this->dashboard_model->getEventAttById($eventId);
+            if(isset($eveAtt) && myIsArray($eveAtt))
+            {
+                if(!isset($eveAtt[0]['lowResImage']))
+                {
+                    $attDetails = array(
+                        'lowResImage' => $lowResImg
+                    );
+                    $this->dashboard_model->updateEventAttachment($attDetails,$eventId);
+                }
+            }
+        }
+
 
         // Editing the event at meetup
         $meetupRecord = $this->dashboard_model->getMeetupRecord($eventId);
@@ -2157,6 +2242,42 @@ class Dashboard extends MY_Controller {
         }
         $data['apiData'] = $externalAPIData;
         echo json_encode($data);
+    }
+
+    function image_thumb_low_res( $image_path, $img_name)
+    {
+        $image_thumb = $image_path.'low_res_'.$img_name;
+
+        // LOAD LIBRARY
+        $this->load->library( 'image_lib' );
+
+        // CONFIGURE IMAGE LIBRARY
+        $config['image_library']    = 'gd2';
+        $config['source_image']     = $image_path.$img_name;
+        $config['new_image']        = $image_thumb;
+        $config['quality']          = 40;
+        $config['maintain_ratio']   = TRUE;
+        $config['height']           = 300;
+        $config['width']            = 200;
+
+        $this->image_lib->initialize( $config );
+        if(!$this->image_lib->resize())
+        {
+            log_message('error',$image_path.': '.$this->image_lib->display_errors());
+            $this->image_lib->clear();
+            return $this->image_lib->display_errors();
+        }
+        else
+        {
+            $this->image_lib->clear();
+            return 'low_res_'.$img_name;
+        }
+    }
+    function human_filesize($bytes, $decimals = 2)
+    {
+        $factor = floor((strlen($bytes) - 1) / 3);
+        if ($factor > 0) $sz = 'KMGT';
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor));
     }
 
     public function meetMeUp($eventInfo, $eventId, $meetupId = '')
@@ -2248,7 +2369,7 @@ class Dashboard extends MY_Controller {
         return $meetData;
     }
 
-    function saveEventHighData($eventId)
+    public function saveEventHighData($eventId)
     {
         $post = $this->input->post();
         $data = array();
@@ -2794,6 +2915,23 @@ class Dashboard extends MY_Controller {
                 $post['refUrl'] = $_SERVER['HTTP_REFERER'];
             }
             $this->dashboard_model->saveErrorLog($post);
+        }
+        return true;
+    }
+
+    public function saveLocalErrorLog($txt)
+    {
+
+        if($txt != '')
+        {
+            $details = array(
+                'errorTxt' => $txt
+            );
+            if(isset($_SERVER['HTTP_REFERER']))
+            {
+                $details['refUrl'] = $_SERVER['HTTP_REFERER'];
+            }
+            $this->dashboard_model->saveErrorLog($details);
         }
         return true;
     }

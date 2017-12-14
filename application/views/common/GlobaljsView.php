@@ -69,7 +69,14 @@
                 $('#mainLoginForm button[type="submit"]').removeAttr("disabled");
                 if(data.status == true)
                 {
-                    window.location.reload();
+                    if(typeof data.locError !== 'undefined' && data.locError === true)
+                    {
+                        window.location.href=base_url+'dashboard/setCommLoc';
+                    }
+                    else
+                    {
+                        window.location.reload();
+                    }
                 }
                 else
                 {
@@ -522,7 +529,7 @@ $(document).on('click','.homePage .request-otp', function(){
                         },
                         error: function(xhr, status, error){
                             hideCustomLoader();
-                            bootbox.alert('Some Error Occurred!');
+                            bootbox.alert('Enable/Disable Failed On Eventshigh, Please try again!');
                             var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                             saveErrorLog(err);
                         }
@@ -554,7 +561,7 @@ $(document).on('click','.homePage .request-otp', function(){
                         },
                         error: function(xhr, status, error){
                             hideCustomLoader();
-                            bootbox.alert('Some Error Occurred!');
+                            bootbox.alert('Failed to save Eventshigh data, Please Try again');
                             var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                             saveErrorLog(err);
                         }
@@ -563,28 +570,19 @@ $(document).on('click','.homePage .request-otp', function(){
             },
             error: function(xhr, status, error){
                 hideCustomLoader();
-                bootbox.alert('Some Error Occurred!');
+                bootbox.alert('Failed to push event data on Eventshigh, Please try again!');
                 var err = 'Url: '+errUrl+' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
                 saveErrorLog(err);
             }
         });
     }
 
-    function mp3Temp()
+    if(typeof $('#userActive').val() != 'undefined')
     {
-        $.ajax({
-            type:'GET',
-            dataType:'json',
-            url:base_url+'dashboard/checkmp3',
-            success: function(data)
-            {
-                console.log(data);
-            },
-            error: function(xhr, status, error){
-                var err = ' StatusText: '+xhr.statusText+' Status: '+xhr.status+' resp: '+xhr.responseText;
-                bootbox.alert(err);
-                console.log(err);
-            }
-        });
+        var ifActive = $('#userActive').val();
+        if( ifActive == '0')
+        {
+            window.location.href = base_url+'login/logout';
+        }
     }
 </script>

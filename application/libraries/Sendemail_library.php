@@ -22,6 +22,18 @@ class Sendemail_library
     {
         $data['mailData'] = $userData;
         $data['breakfastCode'] = $this->generateBreakfastCode($userData['mugId']);
+        if(isset($userData['homeBase']))
+        {
+            $commDetail = $this->CI->users_model->searchUserByLoc($userData['homeBase']);
+            if($commDetail['status'] === true)
+            {
+                $data['fromName'] = ucfirst(trim($commDetail['userData']['firstName']));
+            }
+            else
+            {
+                $data['fromName'] = ucfirst($this->CI->userFirstName);
+            }
+        }
 
         $content = $this->CI->load->view('emailtemplates/signUpWelcomeMailView', $data, true);
 
@@ -37,16 +49,31 @@ class Sendemail_library
         }
 
         $cc        = implode(',',$this->CI->config->item('ccList'));
-        $extraCc = getExtraCCEmail($fromEmail);
+        /*$extraCc = getExtraCCEmail($fromEmail);
         if(isStringSet($extraCc))
         {
             $cc = $cc.','.$extraCc;
-        }
+        }*/
         $fromName  = 'Doolally';
-        if(isset($this->CI->userFirstName))
+        if( isset($commDetail) && myIsArray($commDetail) && $commDetail['status'] === true)
+        {
+            if($fromEmail != $commDetail['userData']['emailId'])
+            {
+                $cc .= ','.$commDetail['userData']['emailId'];
+                if($fromEmail == DEFAULT_COMM_EMAIL)
+                {
+                    $fromName = ucfirst(trim($commDetail['userData']['firstName']));
+                }
+            }
+            else
+            {
+                $fromName = ucfirst(trim($commDetail['userData']['firstName']));
+            }
+        }
+        /*if(isset($this->CI->userFirstName))
         {
             $fromName = ucfirst($this->CI->userFirstName);
-        }
+        }*/
         $subject = 'Breakfast for Mug #'.$userData['mugId'];
         $toEmail = $userData['emailId'];
 
@@ -174,6 +201,7 @@ class Sendemail_library
         $fromPass = DEFAULT_SENDER_PASS;
         $replyTo = $fromEmail;
         $senderPhone = '9999999999';
+        $cc = implode(',',$this->CI->config->item('ccList'));
         if(isset($userData['fromEmail']) && isset($userData['fromPass']))
         {
             $fromEmail = $userData['fromEmail'];
@@ -186,6 +214,17 @@ class Sendemail_library
                 $senderName = $senderUser['firstName'];
                 $senderPhone = $senderUser['mobNum'];
             }
+            if($senderEmail == DEFAULT_COMM_EMAIL)
+            {
+                $commDetail = $this->CI->users_model->searchUserByLoc($userData[0]['eventPlace']);
+                if($commDetail['status'] === true)
+                {
+                    $cc .= ','.$commDetail['userData']['emailId'];
+                    $senderName = ucfirst(trim($commDetail['userData']['firstName']));
+                    $senderEmail = $commDetail['userData']['emailId'];
+                    $senderPhone = $commDetail['userData']['mobNum'];
+                }
+            }
         }
         else
         {
@@ -194,6 +233,7 @@ class Sendemail_library
             {
                 $senderName = $mailRecord['userData']['firstName'];
                 $senderEmail = $mailRecord['userData']['emailId'];
+                $cc .= ','.$mailRecord['userData']['emailId'];
             }
             else
             {
@@ -220,12 +260,12 @@ class Sendemail_library
         {
             $fromPass = $mailRecord['userData']['gmailPass'];
         }*/
-        $cc = implode(',',$this->CI->config->item('ccList'));
-        $extraCc = getExtraCCEmail($fromEmail);
+
+        /*$extraCc = getExtraCCEmail($fromEmail);
         if(isStringSet($extraCc))
         {
             $cc = $cc.','.$extraCc;
-        }
+        }*/
         $fromName  = 'Doolally';
         if(isset($senderName) && isStringSet($senderName))
         {
@@ -302,6 +342,7 @@ class Sendemail_library
         $fromPass = DEFAULT_SENDER_PASS;
         $replyTo = $fromEmail;
         $senderPhone = '9999999999';
+        $cc        = implode(',',$this->CI->config->item('ccList'));
         if(isset($userData['fromEmail']) && isset($userData['fromPass']))
         {
             $fromEmail = $userData['fromEmail'];
@@ -314,6 +355,17 @@ class Sendemail_library
                 $senderName = $senderUser['firstName'];
                 $senderPhone = $senderUser['mobNum'];
             }
+            if($senderEmail == DEFAULT_COMM_EMAIL)
+            {
+                $commDetail = $this->CI->users_model->searchUserByLoc($userData['eventPlace']);
+                if($commDetail['status'] === true)
+                {
+                    $cc .= ','.$commDetail['userData']['emailId'];
+                    $senderName = ucfirst(trim($commDetail['userData']['firstName']));
+                    $senderEmail = $commDetail['userData']['emailId'];
+                    $senderPhone = $commDetail['userData']['mobNum'];
+                }
+            }
         }
         else
         {
@@ -322,6 +374,7 @@ class Sendemail_library
             {
                 $senderName = $mailRecord['userData']['firstName'];
                 $senderEmail = $mailRecord['userData']['emailId'];
+                $cc .= ','.$mailRecord['userData']['emailId'];
             }
             else
             {
@@ -339,12 +392,12 @@ class Sendemail_library
 
         $content = $this->CI->load->view('emailtemplates/attendeeCancelMailView', $data, true);
 
-        $cc        = implode(',',$this->CI->config->item('ccList'));
-        $extraCc = getExtraCCEmail($fromEmail);
+
+        /*$extraCc = getExtraCCEmail($fromEmail);
         if(isStringSet($extraCc))
         {
             $cc = $cc.','.$extraCc;
-        }
+        }*/
         $fromName  = $senderName;
 
         $subject = $userData['eventName'].' has been cancelled by the organiser';
@@ -357,6 +410,7 @@ class Sendemail_library
     public function eventApproveMail($userData)
     {
         $senderUser = $this->CI->users_model->getSenderUsername($userData['senderEmail']);
+        $commDetail = $this->CI->users_model->searchUserByLoc($userData[0]['eventPlace']);
         if(isset($senderUser) && myIsArray($senderUser))
         {
             $userData['senderPhone'] = $senderUser['mobNum'];
@@ -369,10 +423,6 @@ class Sendemail_library
         {
             $data['orgCode'] = $this->generateCustomOrgCode($userData[0]['eventId'],$userData[0]['eventDate'],$userData[0]['startTime'],"500",$userData[0]['eventPlace']);
         }
-        //$userData['senderPhone'] = $phons[ucfirst($userData['senderName'])];
-        $data['mailData'] = $userData;
-
-        $content = $this->CI->load->view('emailtemplates/eventApproveMailView', $data, true);
 
         $fromEmail = DEFAULT_SENDER_EMAIL;
         $fromPass = DEFAULT_SENDER_PASS;
@@ -385,6 +435,16 @@ class Sendemail_library
             $replyTo = $userData['fromEmail'];
         }
 
+        if($fromEmail == DEFAULT_COMM_EMAIL && $commDetail['status'] === true)
+        {
+            $userData['senderName'] = ucfirst(trim($commDetail['userData']['firstName']));
+            $userData['senderEmail'] = $commDetail['userData']['emailId'];
+        }
+        //$userData['senderPhone'] = $phons[ucfirst($userData['senderName'])];
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/eventApproveMailView', $data, true);
+
         /*if(isset($userData['senderEmail']) && isStringSet($userData['senderEmail']))
         {
             $replyTo = $userData['senderEmail'];
@@ -396,13 +456,26 @@ class Sendemail_library
             }
         }*/
         $cc        = implode(',',$this->CI->config->item('ccList'));
-        $extraCc = getExtraCCEmail($fromEmail);
+        /*$extraCc = getExtraCCEmail($fromEmail);
         if(isStringSet($extraCc))
         {
             $cc = $cc.','.$extraCc;
+        }*/
+
+        if($commDetail['status'] === true)
+        {
+            if($fromEmail != $commDetail['userData']['emailId'])
+            {
+                $cc .= ','.$commDetail['userData']['emailId'];
+            }
         }
+
         $fromName  = 'Doolally';
-        if(isset($userData['senderName']) && isStringSet($userData['senderName']))
+        if( $fromEmail == DEFAULT_COMM_EMAIL && $commDetail['status'] === true)
+        {
+            $fromName = ucfirst(trim($commDetail['userData']['firstName']));
+        }
+        elseif(isset($userData['senderName']) && isStringSet($userData['senderName']))
         {
             $fromName = ucfirst($userData['senderName']);
         }
@@ -431,6 +504,14 @@ class Sendemail_library
         }
         //$userData['senderPhone'] = $phons[$userData['senderName']];
         $data['mailData'] = $userData;
+        if(isset($userData[0]['eventPlace']))
+        {
+            $commDetail = $this->CI->users_model->searchUserByLoc($userData[0]['eventPlace']);
+            if($commDetail['status'] === true)
+            {
+                $data['senderName'] = ucfirst(trim($commDetail['userData']['firstName']));
+            }
+        }
 
         $content = $this->CI->load->view('emailtemplates/eventDeclineMailView', $data, true);
 
@@ -457,13 +538,24 @@ class Sendemail_library
         }*/
 
         $cc        = implode(',',$this->CI->config->item('ccList'));
-        $extraCc = getExtraCCEmail($fromEmail);
+        /*$extraCc = getExtraCCEmail($fromEmail);
         if(isStringSet($extraCc))
         {
             $cc = $cc.','.$extraCc;
+        }*/
+        if(isset($commDetail) && $commDetail['status'] === true)
+        {
+            if($fromEmail != $commDetail['userData']['emailId'])
+            {
+                $cc .= ','.$commDetail['userData']['emailId'];
+            }
         }
         $fromName  = 'Doolally';
-        if(isset($userData['senderName']) && isStringSet($userData['senderName']))
+        if( $fromEmail == DEFAULT_COMM_EMAIL && isset($commDetail) && $commDetail['status'] === true)
+        {
+            $fromName = ucfirst(trim($commDetail['userData']['firstName']));
+        }
+        elseif(isset($userData['senderName']) && isStringSet($userData['senderName']))
         {
             $fromName = $userData['senderName'];
         }
@@ -538,6 +630,19 @@ class Sendemail_library
         $userData['breakCode'] = $this->generateBreakfastTwoCode($userData['mugId']);
         $data['mailData'] = $userData;
 
+        if(isset($userData['homeBase']))
+        {
+            $commDetail = $this->CI->users_model->searchUserByLoc($userData['homeBase']);
+            if($commDetail['status'] === true)
+            {
+                $data['fromName'] = ucfirst(trim($commDetail['userData']['firstName']));
+            }
+            else
+            {
+                $data['fromName'] = ucfirst($this->CI->userFirstName);
+            }
+        }
+
         $content = $this->CI->load->view('emailtemplates/membershipRenewMailView', $data, true);
 
         $fromEmail = DEFAULT_SENDER_EMAIL;
@@ -562,16 +667,32 @@ class Sendemail_library
             }
         }*/
         $cc        = implode(',',$this->CI->config->item('ccList'));
-        $extraCc = getExtraCCEmail($fromEmail);
+        /*$extraCc = getExtraCCEmail($fromEmail);
         if(isStringSet($extraCc))
         {
             $cc = $cc.','.$extraCc;
-        }
+        }*/
+
         $fromName  = 'Doolally';
-        if(isset($this->CI->userFirstName))
+        if(isset($commDetail) && myIsArray($commDetail) && $commDetail['status'] === true)
+        {
+            if($fromEmail != $commDetail['userData']['emailId'])
+            {
+                $cc .= ','.$commDetail['userData']['emailId'];
+                if($fromEmail == DEFAULT_COMM_EMAIL)
+                {
+                    $fromName = ucfirst(trim($commDetail['userData']['firstName']));
+                }
+            }
+            else
+            {
+                $fromName = ucfirst(trim($commDetail['userData']['firstName']));
+            }
+        }
+        /*if(isset($this->CI->userFirstName))
         {
             $fromName = ucfirst($this->CI->userFirstName);
-        }
+        }*/
         $subject = 'Mug #'.$userData['mugId'].' has been Renewed';
         $toEmail = $userData['emailId'];
 
@@ -671,6 +792,24 @@ class Sendemail_library
 
         $subject = 'Mug Member Edited';
         $toEmail = 'tresha@brewcraftsindia.com';
+
+        $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
+    }
+
+    public function sendCompOpenMail($userData)
+    {
+        $data['mailData'] = $userData;
+
+        $content = $this->CI->load->view('emailtemplates/compOpenMailView', $data, true);
+
+        $fromEmail = ADMIN_SENDER_EMAIL;
+        $fromPass = ADMIN_SENDER_PASS;
+        $replyTo = $fromEmail;
+        $cc = '';
+        $fromName  = 'Doolally';
+
+        $subject = 'New Complaint #'.$userData['compId'].'-'.$userData['location'];
+        $toEmail = $userData['toMail'];
 
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
     }
@@ -805,10 +944,15 @@ class Sendemail_library
         }
 
         $cc        = implode(',',$this->CI->config->item('ccList'));
-        $extraCc = getExtraCCEmail($fromEmail);
+        /*$extraCc = getExtraCCEmail($fromEmail);
         if(isStringSet($extraCc))
         {
             $cc = $cc.','.$extraCc;
+        }*/
+        //$commDetail = $this->CI->users_model->searchUserByLoc($userData['eventPlace']);
+        if($mailRecord['status'] === true)
+        {
+            $cc .= ','.$mailRecord['userData']['emailId'];
         }
         $fromName  = $senderName;
 
@@ -829,6 +973,7 @@ class Sendemail_library
         }
         $userData['senderUser'] = $senderUser;
 
+        $userData['senderName'] = ucfirst(trim($mailRecord['userData']['firstName']));
         $data['mailData'] = $userData;
 
         $content = $this->CI->load->view('emailtemplates/eventEditOrganiserMailView', $data, true);
@@ -838,11 +983,12 @@ class Sendemail_library
         $replyTo = $mailRecord['userData']['emailId'];
 
         $cc        = implode(',',$this->CI->config->item('ccList'));
-        $extraCc = getExtraCCEmail($replyTo);
+        $cc .= ','.$mailRecord['userData']['emailId'];
+        /*$extraCc = getExtraCCEmail($replyTo);
         if(isStringSet($extraCc))
         {
             $cc = $cc.','.$extraCc;
-        }
+        }*/
         $fromName  = 'Doolally';
         if(isset($mailRecord['userData']['firstName']))
         {
@@ -867,24 +1013,6 @@ class Sendemail_library
         $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
     }
 
-
-    public function sendCompOpenMail($userData)
-    {
-        $data['mailData'] = $userData;
-
-        $content = $this->CI->load->view('emailtemplates/compOpenMailView', $data, true);
-
-        $fromEmail = ADMIN_SENDER_EMAIL;
-        $fromPass = ADMIN_SENDER_PASS;
-        $replyTo = $fromEmail;
-        $cc = '';
-        $fromName  = 'Doolally';
-
-        $subject = 'New Complaint #'.$userData['compId'].'-'.$userData['location'];
-        $toEmail = $userData['toMail'];
-
-        $this->sendEmail($toEmail, $cc, $fromEmail, $fromPass, $fromName,$replyTo, $subject, $content);
-    }
 
     public function sendHappyMail($userData)
     {

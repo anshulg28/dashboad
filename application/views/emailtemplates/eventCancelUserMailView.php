@@ -14,7 +14,8 @@
         {
             ?>
             Fees collected will be refunded to participants within 7 days.
-            However, the payment gateway fee of 2.24 % per attendee will be borne by you.<br><br>
+            However, the payment gateway fee of 2.24 % per attendee will be borne by you.
+            We will deduct this from the next workshop/activity you do with us.<br><br>
             <?php
         }
         else
@@ -24,9 +25,7 @@
             <?php
         }
     ?>
-
-    We will deduct this from the next workshop/activity you do with us.<br><br>
-    In case you have any questions/queries please don't hesitate to write to me at this (<?php echo $mailData['senderEmail'];?>) mail address.
+    In case you have any questions/queries please don't hesitate to write to me at this (<?php echo $mailData['senderEmail'];?>) mail address.<br><br>
     <!--For queries, contact <?php /*echo $mailData['senderPhone'] .' ('.$mailData['senderName'].')';*/?><br><br>-->
 
     Thanks,<br>

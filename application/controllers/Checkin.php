@@ -239,12 +239,24 @@ class Checkin extends MY_Controller {
         $post = $this->input->post();
         if(isSessionVariableSet($this->isUserSession) === false)
         {
-            redirect(base_url());
+            $data['status'] = false;
+            $data['pageUrl'] = base_url();
+            echo json_encode($data);
+            return false;
         }
 
         if(isset($post['mugNum']))
         {
             $verifyMugData = $this->mugclub_model->getMugDataById($post['mugNum']);
+            $offerDetail = $this->mugclub_model->getBreakfastOfMug($post['mugNum']);
+            if(isset($offerDetail) && myIsArray($offerDetail))
+            {
+                $verifyMugData['mugList']['offerDetails']= $offerDetail;
+            }
+            else
+            {
+                $verifyMugData['mugList']['offerNotFound'] = true;
+            }
 
             echo json_encode($verifyMugData);
         }
