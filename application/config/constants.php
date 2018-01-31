@@ -136,15 +136,15 @@ defined('EVENT_DECLINED')   OR define('EVENT_DECLINED', 2);
 defined('TWITTER_API') OR define('TWITTER_API','https://api.twitter.com/1.1/');
 defined('FACEBOOK_API') OR define('FACEBOOK_API','https://graph.facebook.com/v2.7/');
 defined('TRIGGER_API') OR define('TRIGGER_API','https://api.atrigger.com/v1/');
-defined('TRIGGER_KEY') OR define('TRIGGER_KEY','4825200632284918812');
-defined('TRIGGER_SECRET') OR define('TRIGGER_SECRET','HsE755Ns3B9leKq2JoapTeXdvpzPWI');
+defined('TRIGGER_KEY') OR define('TRIGGER_KEY','5442989893688992721');
+defined('TRIGGER_SECRET') OR define('TRIGGER_SECRET','1mhXJzK4geoU27VOpRSzkHfEVvWrIt');
 defined('CONSUMER_KEY') OR define('CONSUMER_KEY','vsi8yrEMdAaFfjz1vTLMOHnNe');
 defined('CONSUMER_SECRET') OR define('CONSUMER_SECRET','T5nSoTaf8rgpXYbWqiLMGSFsdajfHnZ8uXhqz5xyzXgnUaQqbi');
 defined('ACCESS_TOKEN') OR define('ACCESS_TOKEN','	15804491-FEtnxy73lcHvViNAdORSVOcH68MCnfiHfpL6hCRn0');
 defined('ACCESS_SECRET') OR define('ACCESS_SECRET','3ID1rYVm3mxnYPJMnUKG14p06mc70PzlETrzoP5LeYlop');
 defined('BEARER_TOKEN') OR define('BEARER_TOKEN','AAAAAAAAAAAAAAAAAAAAAFhQegAAAAAAePdzbMWF5F%2FfVU5Ph09OIb22dnE%3D7qKzt9ZZQ6IwfUErgznCPq6AcEmIZqYTnKAamzks6ojV72Nobn');
 //defined('FACEBOOK_TOKEN') OR define('FACEBOOK_TOKEN','EAAUZBjn6HCmQBAGRccGXJCh7iVjMz7S1G0RdyszbH81ZAndaRZBOWt7S2M4CIPIWm0oplVisZAevWCqALhluARjZBGb2kELD4l6cJAwAuQgh9RtOKECzcPpsDpUe2ZA9uXeIIFUsXiFaquCjcdlZAFYpXmb99DIBzQZD');
-defined('FACEBOOK_TOKEN') OR define('FACEBOOK_TOKEN','EAAJCOvplqxQBAFyfojay4ZBwAWjJGDy6ekn34IXI4NX006R6vWG9aPkdW0GZAC2BNzsWjZAPx7rsKIrOVfyHFIEhTDZByzkfRuz5i43JvwZAR6s7YSqVBtvhvjp86IvzdiBaE1NwzQxcZCaNw7LPsAsd1BxjMCsxCxRM6zHz9LOQZDZD');
+defined('FACEBOOK_TOKEN') OR define('FACEBOOK_TOKEN','EAAJCOvplqxQBANyvZAdLMFV7UZCfdRdXnCKwSmMgjEqdmZALZBLjOTIBmecl7PPCwxdek1anJ3Pi6DgcXC8jJGy5xVrFtBGNP15KYoRI1har2XrYQTSyVBTADfBZC0ZCHRbZB0v02lnyNCCmOXO3vllccS1oIfstHgZD');
 defined('INSTA_API_KEY') OR define('INSTA_API_KEY','362388bd44886b30aa0d9973d7b99794');
 defined('INSTA_AUTH_TOKEN') OR define('INSTA_AUTH_TOKEN','2e8a6cb6ddb931a722e05d2c99dc3888');
 defined('GOOGLE_API_KEY') OR define('GOOGLE_API_KEY','AIzaSyBG3wamyMbQqRlqysulunOuPvv3_51BmpI');
@@ -154,6 +154,10 @@ defined('EVENT_HIGH_KEY') OR define('EVENT_HIGH_KEY','D00la11y@ppKey');
 defined('EVENT_HIGH_ACCOUNT') OR define('EVENT_HIGH_ACCOUNT','doolally');
 defined('MEETUP_KEY') OR define('MEETUP_KEY','165c416c7672a5cc2f1a43292a2817');
 defined('MEETUP_GROUP') OR define('MEETUP_GROUP','Mumbai-Craft-Beer-Meetup');
+defined('QUIKCHEX_API') OR define('QUIKCHEX_API','https://secure.quikchex.in/data/v1/');
+defined('QUIKCHEX_ACCESS_TOKEN') OR define('QUIKCHEX_ACCESS_TOKEN','80bc6de6ba5a51dd55f3f873a2285ff5');
+
+
 
 /* Image Paths for Fnb*/
 defined('FOOD_PATH_THUMB') OR define('FOOD_PATH_THUMB','uploads/food/thumb/');

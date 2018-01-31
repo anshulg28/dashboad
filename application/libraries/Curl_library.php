@@ -291,4 +291,18 @@ class curl_library
         $url = TRIGGER_API.'tasks/create?'.http_build_query($params);
         return $this->getDataByGet($url, 0);
     }
+
+    public function getQuikchexAttendance($params)
+    {
+        $url = QUIKCHEX_API.'detailed_attendance_data?'.http_build_query($params);
+        return $this->getDataByGet($url, 0);
+    }
+    public function checkBill($params)
+    {
+        $headers = array(
+            'Content-Type: application/x-www-form-urlencoded',
+        );
+        $url = "https://live.nirvanaxp.com/report_view/extract?__report=order_details_report.rptdesign&__format=html&fromDate=2018-01-01&location_name=Doolally+Tap+Room+%28Banra%29&toDate=2018-01-02&businessId=1508&currentDate=2018-01-02+03%3A20%3A10&schemaName=doolally_613&order_id=43432&logoUrl=https%3A%2F%2Flive.nirvanaxp.com%2Fimages%2Flocation_images%2F120_120%2F1428568524_IMG20150409135203.jpg&locationCurrency=%24&__overwrite=true&__locale=en_US&__designer=false";
+        return $this->getDataByPost($url,$params, 0,$headers);
+    }
 }
